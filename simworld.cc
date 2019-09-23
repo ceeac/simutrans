@@ -1251,8 +1251,8 @@ void karte_t::init(settings_t* const sets, sint8 const* const h_field)
 	recalc_average_speed();	// resets timeline
 	koord::locality_factor = settings.get_locality_factor( last_year );
 
-	map.world_maximum_height = sets->get_maximumheight();
-	map.world_minimum_height = sets->get_minimumheight();
+	map.max_allowed_height = sets->get_maximumheight();
+	map.min_allowed_height = sets->get_minimumheight();
 	map.groundwater = (sint8)sets->get_groundwater();      //29-Nov-01     Markus Weber    Changed
 
 	init_height_to_climate();
@@ -5238,8 +5238,8 @@ void karte_t::load(loadsave_t *file)
 		goods_manager_t::set_multiplier( 1000 );
 	}
 
-	map.world_maximum_height = settings.get_maximumheight();
-	map.world_minimum_height = settings.get_minimumheight();
+	map.max_allowed_height = settings.get_maximumheight();
+	map.min_allowed_height = settings.get_minimumheight();
 
 	map.groundwater = (sint8)(settings.get_groundwater());
 	map.min_height = map.max_height = map.groundwater;

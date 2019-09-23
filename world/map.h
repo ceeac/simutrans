@@ -78,15 +78,9 @@ public:
 	 */
 	sint16 snowline;
 
-	/**
-	 * the maximum allowed world height.
-	 */
-	sint8 world_maximum_height;
-
-	/**
-	 * the minimum allowed world height.
-	 */
-	sint8 world_minimum_height;
+	/// the minimum/maximum allowed world height.
+	sint8 max_allowed_height;
+	sint8 min_allowed_height;
 
 	/// cache the current maximum and minimum height on the map
 	/// @sa karte_t::update_cached_minmax_height

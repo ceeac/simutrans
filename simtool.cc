@@ -832,7 +832,7 @@ const char* tool_raise_lower_base_t::drag(player_t *player, koord k, sint16 heig
 	const char* err = NULL;
 
 	// dragging may be going up or down!
-	while(  welt->lookup_hgt(k) < height  &&  height <= welt->get_maximumheight()  ) {
+	while(  welt->lookup_hgt(k) < height  &&  height <= welt->get_max_allowed_height()  ) {
 		int diff = welt->grid_raise( player, k, err );
 		if(  diff == 0  ) {
 			break;
@@ -842,7 +842,7 @@ const char* tool_raise_lower_base_t::drag(player_t *player, koord k, sint16 heig
 
 	// when going down need to check here we will not be going below sea level
 	// cannot rely on check within lower as water height can be recalculated
-	while(  height >= welt->get_water_hgt(k)  &&  welt->lookup_hgt(k) > height  &&  height >= welt->get_minimumheight()  ) {
+	while(  height >= welt->get_water_hgt(k)  &&  welt->lookup_hgt(k) > height  &&  height >= welt->get_min_allowed_height()  ) {
 		int diff = welt->grid_lower( player, k, err );
 		if(  diff == 0  ) {
 			break;
@@ -906,7 +906,7 @@ const char *tool_raise_t::work(player_t* player, koord3d pos )
 
 		const sint8 hgt = (sint8) get_drag_height(k);
 
-		if(  hgt <= welt->get_maximumheight()  ) {
+		if(  hgt <= welt->get_max_allowed_height()  ) {
 
 			int n = 0;	// tiles changed
 			if(  !strempty(default_param)  ) {
@@ -923,7 +923,7 @@ const char *tool_raise_t::work(player_t* player, koord3d pos )
 			                   : (*err == 0 ? NOTICE_TILE_FULL : err);
 		}
 		else {
-			// no mountains higher than welt->get_maximumheight() ...
+			// no mountains higher than welt->get_max_allowed_height() ...
 			return "Maximum tile height difference reached.";
 		}
 	}

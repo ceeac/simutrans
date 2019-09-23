@@ -1031,13 +1031,13 @@ public:
 	/**
 	 * Returns the minimum allowed height on the map.
 	 */
-	sint8 get_minimumheight() const { return map.world_minimum_height; }
+	sint8 get_min_allowed_height() const { return map.max_allowed_height; }
 
 	/**
 	 * Returns the maximum allowed world height.
 	 * @author Hj. Malthaner
 	 */
-	sint8 get_maximumheight() const { return map.world_maximum_height; }
+	sint8 get_max_allowed_height() const { return map.max_allowed_height; }
 
 	/**
 	 * Returns the current snowline height.
