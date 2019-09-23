@@ -329,6 +329,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)vehicle\simroadtraffic.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)vehicle\simvehicle.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)world\map.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)world\sync_list.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)freight_list_sorter.h" />
@@ -688,6 +689,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)vehicle\simroadtraffic.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)vehicle\simvehicle.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)world\map.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)world\sync_list.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(MSBuildThisFileDirectory)simres.rc" />

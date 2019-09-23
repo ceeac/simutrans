@@ -511,6 +511,7 @@ SOURCES += vehicle/simpeople.cc
 SOURCES += vehicle/simroadtraffic.cc
 SOURCES += vehicle/simvehicle.cc
 SOURCES += world/map.cc
+SOURCES += world/sync_list.cc
 
 
 ifeq ($(BACKEND),allegro)

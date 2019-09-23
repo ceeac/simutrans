@@ -30,6 +30,7 @@
 #include "dataobj/rect.h"
 
 #include "world/map.h"
+#include "world/sync_list.h"
 
 #include "simplan.h"
 
@@ -1484,22 +1485,6 @@ public:
 
 	/// rotate map view by 90 degrees
 	void rotate90();
-
-	class sync_list_t {
-			friend class karte_t;
-		public:
-			sync_list_t() : currently_deleting(NULL), sync_step_running(false) {}
-			void add(sync_steppable *obj);
-			void remove(sync_steppable *obj);
-		private:
-			void sync_step(uint32 delta_t);
-			/// clears list, does not delete the objects
-			void clear();
-
-			vector_tpl<sync_steppable *> list;  ///< list of sync-steppable objects
-			sync_steppable* currently_deleting; ///< deleted durign sync_step, safeguard calls to remove
-			bool sync_step_running;
-	};
 
 	sync_list_t sync;              ///< vehicles, transformers, traffic lights
 	sync_list_t sync_eyecandy;     ///< animated buildings
