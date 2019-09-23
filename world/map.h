@@ -6,6 +6,9 @@
 #include "../dataobj/koord.h"
 
 
+class planquadrat_t;
+
+
 /**
  * Stores all physical map properties like terrain, vehicles etc.
  */
@@ -36,6 +39,31 @@ public:
 	 * Maximum size for waiting bars etc.
 	 */
 	int cached_size_max;
+
+	/**
+	 * @name Map data structures
+	 *       This variables represent the simulated map.
+	 * @{
+	 */
+
+	/**
+	 * Array containing all the map tiles.
+	 * @see cached_size
+	 */
+	planquadrat_t *plan;
+
+	/**
+	 * Array representing the height of each point of the grid.
+	 * @see map.cached_grid_size
+	 */
+	sint8 *grid_hgts;
+
+	/**
+	 * Array representing the height of water on each point of the grid.
+	 * @see map.cached_grid_size
+	 */
+	sint8 *water_hgts;
+	/** @} */
 };
 
 #endif

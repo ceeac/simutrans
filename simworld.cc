@@ -408,7 +408,7 @@ void karte_t::cleanup_karte( int xoff, int yoff )
 	// we need a copy to smooth the map to a realistic level
 	const sint32 grid_size = (get_size().x+1)*(sint32)(get_size().y+1);
 	sint8 *grid_hgts_cpy = new sint8[grid_size];
-	memcpy( grid_hgts_cpy, grid_hgts, grid_size );
+	memcpy( grid_hgts_cpy, map.grid_hgts, grid_size );
 
 	// the trick for smoothing is to raise each tile by one
 	sint32 i,j;
@@ -422,7 +422,7 @@ void karte_t::cleanup_karte( int xoff, int yoff )
 	// but to leave the map unchanged, we lower the height again
 	for(j=0; j<=get_size().y; j++) {
 		for(i=j>=yoff?0:xoff; i<=get_size().x; i++) {
-			grid_hgts[i+j*(get_size().x+1)] --;
+			map.grid_hgts[i+j*(get_size().x+1)] --;
 		}
 	}
 
@@ -525,19 +525,19 @@ void karte_t::destroy()
 	// dinge aufraeumen
 	map.cached_grid_size.x = map.cached_grid_size.y = 1;
 	map.cached_size.x = map.cached_size.y = 0;
-	delete [] plan;
-	plan = NULL;
+	delete [] map.plan;
+	map.plan = NULL;
 	DBG_MESSAGE("karte_t::destroy()", "planquadrat destroyed");
 
 	old_progress += (map.cached_size.x*map.cached_size.y)/2;
 	ls.set_progress( old_progress );
 
 	// gitter aufraeumen
-	delete [] grid_hgts;
-	grid_hgts = NULL;
+	delete [] map.grid_hgts;
+	map.grid_hgts = NULL;
 
-	delete [] water_hgts;
-	water_hgts = NULL;
+	delete [] map.water_hgts;
+	map.water_hgts = NULL;
 
 	// player cleanup
 	for(int i=0; i<MAX_PLAYER_COUNT; i++) {
@@ -634,16 +634,16 @@ bool karte_t::remove_city(stadt_t *s)
 // just allocates space;
 void karte_t::init_tiles()
 {
-	assert(plan==0);
+	assert(map.plan==0);
 
 	uint32 const x = get_size().x;
 	uint32 const y = get_size().y;
-	plan      = new planquadrat_t[x * y];
-	grid_hgts = new sint8[(x + 1) * (y + 1)];
+	map.plan      = new planquadrat_t[x * y];
+	map.grid_hgts = new sint8[(x + 1) * (y + 1)];
 	max_height = min_height = 0;
-	MEMZERON(grid_hgts, (x + 1) * (y + 1));
-	water_hgts = new sint8[x * y];
-	MEMZERON(water_hgts, x * y);
+	MEMZERON(map.grid_hgts, (x + 1) * (y + 1));
+	map.water_hgts = new sint8[x * y];
+	MEMZERON(map.water_hgts, x * y);
 
 	win_set_world( this );
 	minimap_t::get_instance()->init();
@@ -1215,7 +1215,7 @@ void karte_t::init(settings_t* const sets, sint8 const* const h_field)
 	step_mode  = PAUSE_FLAG;
 	intr_disable();
 
-	if(plan) {
+	if(map.plan) {
 		destroy();
 	}
 
@@ -1391,7 +1391,7 @@ void karte_t::create_lakes(  int xoff, int yoff  )
 				if(  max_water_hgt[offset]==1  &&  stage[offset]==-1  ) {
 
 					sint8 hgt = lookup_hgt_nocheck( x, y );
-					const sint8 water_hgt = water_hgts[offset]; // optimised <- get_water_hgt_nocheck(x, y);
+					const sint8 water_hgt = map.water_hgts[offset]; // optimised <- get_water_hgt_nocheck(x, y);
 					const sint8 new_water_hgt = max(hgt, water_hgt);
 					if(  new_water_hgt>max_lake_height  ) {
 						max_water_hgt[offset] = 0;
@@ -1432,7 +1432,7 @@ void karte_t::create_lakes(  int xoff, int yoff  )
 	delete [] new_stage;
 	delete [] local_stage;
 
-	for (planquadrat_t *pl = plan; pl < (plan + size_x * size_y); pl++) {
+	for (planquadrat_t *pl = map.plan; pl < (map.plan + size_x * size_y); pl++) {
 		pl->correct_water();
 	}
 }
@@ -1474,7 +1474,7 @@ bool karte_t::can_flood_to_depth(  koord k, sint8 new_water_height, sint8 *stage
 				if(our_stage[neighbour_offset] != -1) goto next_neighbour;
 
 				// water height above
-				if(water_hgts[neighbour_offset] >= new_water_height) goto next_neighbour;
+				if(map.water_hgts[neighbour_offset] >= new_water_height) goto next_neighbour;
 
 				grund_t *gr2 = lookup_kartenboden_nocheck(k_neighbour);
 				if(  !gr2  ) goto next_neighbour;
@@ -1526,7 +1526,7 @@ void karte_t::flood_to_depth( sint8 new_water_height, sint8 *stage )
 		if(  stage[offset] == -1  ) {
 			continue;
 		}
-		water_hgts[offset] = new_water_height;
+		map.water_hgts[offset] = new_water_height;
 	}
 }
 
@@ -1706,15 +1706,15 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 			for (sint16 ix = 0; ix<old_x; ix++) {
 				uint32 nr = ix+(iy*old_x);
 				uint32 nnr = ix+(iy*new_size_x);
-				swap(new_plan[nnr], plan[nr]);
-				new_water_hgts[nnr] = water_hgts[nr];
+				swap(new_plan[nnr], map.plan[nr]);
+				new_water_hgts[nnr] = map.water_hgts[nr];
 			}
 		}
 		for (sint16 iy = 0; iy<=old_y; iy++) {
 			for (sint16 ix = 0; ix<=old_x; ix++) {
 				uint32 nr = ix+(iy*(old_x+1));
 				uint32 nnr = ix+(iy*(new_size_x+1));
-				new_grid_hgts[nnr] = grid_hgts[nr];
+				new_grid_hgts[nnr] = map.grid_hgts[nr];
 			}
 		}
 		max_display_progress = 16 + sets->get_city_count()*2 + stadt.get_count()*4;
@@ -1724,12 +1724,12 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 	}
 	loadingscreen_t ls( translator::translate( old_x ? "enlarge map" : "Init map ..."), max_display_progress, true, true );
 
-	delete [] plan;
-	plan = new_plan;
-	delete [] grid_hgts;
-	grid_hgts = new_grid_hgts;
-	delete [] water_hgts;
-	water_hgts = new_water_hgts;
+	delete [] map.plan;
+	map.plan = new_plan;
+	delete [] map.grid_hgts;
+	map.grid_hgts = new_grid_hgts;
+	delete [] map.water_hgts;
+	map.water_hgts = new_water_hgts;
 
 	if(  old_x==0  ) {
 		// init max and min with defaults
@@ -1745,12 +1745,12 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 		// init from file
 		for(int y=0; y<map.cached_grid_size.y; y++) {
 			for(int x=0; x<map.cached_grid_size.x; x++) {
-				grid_hgts[x + y*(map.cached_grid_size.x+1)] = h_field[x+(y*(sint32)map.cached_grid_size.x)]+1;
+				map.grid_hgts[x + y*(map.cached_grid_size.x+1)] = h_field[x+(y*(sint32)map.cached_grid_size.x)]+1;
 			}
-			grid_hgts[map.cached_grid_size.x + y*(map.cached_grid_size.x+1)] = grid_hgts[map.cached_grid_size.x-1 + y*(map.cached_grid_size.x+1)];
+			map.grid_hgts[map.cached_grid_size.x + y*(map.cached_grid_size.x+1)] = map.grid_hgts[map.cached_grid_size.x-1 + y*(map.cached_grid_size.x+1)];
 		}
 		// lower border
-		memcpy( grid_hgts+(map.cached_grid_size.x+1)*(sint32)map.cached_grid_size.y, grid_hgts+(map.cached_grid_size.x+1)*(sint32)(map.cached_grid_size.y-1), map.cached_grid_size.x+1 );
+		memcpy( map.grid_hgts+(map.cached_grid_size.x+1)*(sint32)map.cached_grid_size.y, map.grid_hgts+(map.cached_grid_size.x+1)*(sint32)(map.cached_grid_size.y-1), map.cached_grid_size.x+1 );
 		ls.set_progress(2);
 	}
 	else {
@@ -2024,10 +2024,10 @@ karte_t::karte_t() :
 	goods_manager_t::set_multiplier( 1000 );
 
 	zeiger = 0;
-	plan = 0;
+	map.plan = 0;
 
-	grid_hgts = 0;
-	water_hgts = 0;
+	map.grid_hgts = 0;
+	map.water_hgts = 0;
 	schedule_counter = 0;
 	nosave_warning = nosave = false;
 	loaded_rotation = 0;
@@ -2462,8 +2462,8 @@ void karte_t::raise_grid_to(sint16 x, sint16 y, sint8 h)
 	if(is_within_grid_limits(x,y)) {
 		const sint32 offset = x + y*(map.cached_grid_size.x+1);
 
-		if(  grid_hgts[offset] < h  ) {
-			grid_hgts[offset] = h;
+		if(  map.grid_hgts[offset] < h  ) {
+			map.grid_hgts[offset] = h;
 
 			const sint8 hh = h - (ground_desc_t::double_grounds ? 2 : 1);
 
@@ -2792,8 +2792,8 @@ void karte_t::lower_grid_to(sint16 x, sint16 y, sint8 h)
 	if(is_within_grid_limits(x,y)) {
 		const sint32 offset = x + y*(map.cached_grid_size.x+1);
 
-		if(  grid_hgts[offset] > h  ) {
-			grid_hgts[offset] = h;
+		if(  map.grid_hgts[offset] > h  ) {
+			map.grid_hgts[offset] = h;
 			sint8 hh = h + 2;
 			// set new height of neighbor grid points
 			lower_grid_to(x-1, y-1, hh);
@@ -3077,7 +3077,7 @@ void karte_t::local_set_tool( tool_t *tool_in, player_t * player )
 sint8 karte_t::min_hgt_nocheck(const koord k) const
 {
 	// more optimised version of min_hgt code
-	const sint8 * p = &grid_hgts[k.x + k.y*(sint32)(map.cached_grid_size.x+1)];
+	const sint8 * p = &map.grid_hgts[k.x + k.y*(sint32)(map.cached_grid_size.x+1)];
 
 	const int h1 = *p;
 	const int h2 = *(p+1);
@@ -3091,7 +3091,7 @@ sint8 karte_t::min_hgt_nocheck(const koord k) const
 sint8 karte_t::max_hgt_nocheck(const koord k) const
 {
 	// more optimised version of max_hgt code
-	const sint8 * p = &grid_hgts[k.x + k.y*(sint32)(map.cached_grid_size.x+1)];
+	const sint8 * p = &map.grid_hgts[k.x + k.y*(sint32)(map.cached_grid_size.x+1)];
 
 	const int h1 = *p;
 	const int h2 = *(p+1);
@@ -3138,13 +3138,13 @@ void karte_t::rotate90_plans(sint16 x_min, sint16 x_max, sint16 y_min, sint16 y_
 						const int nr = x + (y * map.cached_grid_size.x);
 						const int new_nr = (map.cached_size.y - y) + (x * map.cached_grid_size.y);
 						// first rotate everything on the ground(s)
-						for(  uint i = 0;  i < plan[nr].get_boden_count();  i++  ) {
-							plan[nr].get_boden_bei(i)->rotate90();
+						for(  uint i = 0;  i < map.plan[nr].get_boden_count();  i++  ) {
+							map.plan[nr].get_boden_bei(i)->rotate90();
 						}
 						// rotate climate transitions
 						rotate_transitions( koord( x, y ) );
 						// now: rotate all things on the map
-						swap(rotate90_new_plan[new_nr], plan[nr]);
+						swap(rotate90_new_plan[new_nr], map.plan[nr]);
 					}
 				}
 			}
@@ -3160,7 +3160,7 @@ void karte_t::rotate90_plans(sint16 x_min, sint16 x_max, sint16 y_min, sint16 y_
 						rotate_transitions( koord( x, y ) );
 						const int nr = x + (y * map.cached_grid_size.x);
 						const int new_nr = (map.cached_size.y - y) + (x * map.cached_grid_size.y);
-						swap(rotate90_new_plan[new_nr], plan[nr]);
+						swap(rotate90_new_plan[new_nr], map.plan[nr]);
 					}
 				}
 			}
@@ -3187,7 +3187,7 @@ void karte_t::rotate90_plans(sint16 x_min, sint16 x_max, sint16 y_min, sint16 y_
 				int nr = x + (yy * map.cached_grid_size.x);
 				int new_nr = (map.cached_size.y - yy) + (x * map.cached_grid_size.y);
 				for(  int y = yy;  y < min( yy + LOOP_BLOCK, y_max );  y++  ) {
-					rotate90_new_water[new_nr] = water_hgts[nr];
+					rotate90_new_water[new_nr] = map.water_hgts[nr];
 					nr += map.cached_grid_size.x;
 					new_nr--;
 				}
@@ -3222,10 +3222,10 @@ DBG_MESSAGE( "karte_t::rotate90()", "called" );
 
 	grund_t::finish_rotate90();
 
-	delete [] plan;
-	plan = rotate90_new_plan;
-	delete [] water_hgts;
-	water_hgts = rotate90_new_water;
+	delete [] map.plan;
+	map.plan = rotate90_new_plan;
+	delete [] map.water_hgts;
+	map.water_hgts = rotate90_new_water;
 
 	// rotate heightmap
 	sint8 *new_hgts = new sint8[(map.cached_grid_size.x+1)*(map.cached_grid_size.y+1)];
@@ -3236,13 +3236,13 @@ DBG_MESSAGE( "karte_t::rotate90()", "called" );
 				for(  int y=yy;  y<=min(yy+LOOP_BLOCK,map.cached_grid_size.y);  y++  ) {
 					const int nr = x+(y*(map.cached_grid_size.x+1));
 					const int new_nr = (map.cached_grid_size.y-y)+(x*(map.cached_grid_size.y+1));
-					new_hgts[new_nr] = grid_hgts[nr];
+					new_hgts[new_nr] = map.grid_hgts[nr];
 				}
 			}
 		}
 	}
-	delete [] grid_hgts;
-	grid_hgts = new_hgts;
+	delete [] map.grid_hgts;
+	map.grid_hgts = new_hgts;
 
 	// rotate borders
 	sint16 xw = map.cached_size.x;
@@ -4056,7 +4056,7 @@ void karte_t::step()
 		// process
 		const uint32 end_count = min( map.cached_grid_size.x * map.cached_grid_size.y,  tile_counter + max( 16384, map.cached_grid_size.x * map.cached_grid_size.y / 16 ) );
 		while(  tile_counter < end_count  ) {
-			plan[tile_counter].check_season_snowline( season_change, snowline_change );
+			map.plan[tile_counter].check_season_snowline( season_change, snowline_change );
 			tile_counter++;
 			if(  (tile_counter & 0x3FF) == 0  ) {
 				INT_CHECK("karte_t::step");
@@ -4451,7 +4451,7 @@ uint8 karte_t::calc_natural_slope( const koord k ) const
 {
 	if(is_within_grid_limits(k.x, k.y)) {
 
-		const sint8 * p = &grid_hgts[k.x + k.y*(sint32)(get_size().x+1)];
+		const sint8 * p = &map.grid_hgts[k.x + k.y*(sint32)(get_size().x+1)];
 
 		const int h1 = *p;
 		const int h2 = *(p+1);
@@ -4698,7 +4698,7 @@ DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved cities ok");
 
 	for(int j=0; j<get_size().y; j++) {
 		for(int i=0; i<get_size().x; i++) {
-			plan[i+j*map.cached_grid_size.x].rdwr(file, koord(i,j) );
+			map.plan[i+j*map.cached_grid_size.x].rdwr(file, koord(i,j) );
 		}
 		if(silent) {
 			INT_CHECK("saving");
@@ -4712,7 +4712,7 @@ DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved tiles");
 	if(  file->is_version_less(102, 2)  ) {
 		// not needed any more
 		for(int j=0; j<(get_size().y+1)*(sint32)(get_size().x+1); j++) {
-			file->rdwr_byte(grid_hgts[j]);
+			file->rdwr_byte(map.grid_hgts[j]);
 		}
 	DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved hgt");
 	}
@@ -5374,7 +5374,7 @@ DBG_MESSAGE("karte_t::load()", "init player");
 	DBG_MESSAGE("karte_t::load()","loading tiles");
 	for (int y = 0; y < get_size().y; y++) {
 		for (int x = 0; x < get_size().x; x++) {
-			plan[x+y*map.cached_grid_size.x].rdwr(file, koord(x,y) );
+			map.plan[x+y*map.cached_grid_size.x].rdwr(file, koord(x,y) );
 		}
 		if(file->is_eof()) {
 			dbg->fatal("karte_t::load()","Savegame file mangled (too short)!");
@@ -5397,7 +5397,7 @@ DBG_MESSAGE("karte_t::load()", "init player");
 		// hgt now bytes
 		DBG_MESSAGE("karte_t::load()","loading grid for older versions");
 		for( sint32 i=0;  i<(get_size().y+1)*(sint32)(get_size().x+1);  i++  ) {
-			file->rdwr_byte(grid_hgts[i]);
+			file->rdwr_byte(map.grid_hgts[i]);
 		}
 	}
 
@@ -5770,8 +5770,8 @@ void karte_t::update_map_intern(sint16 x_min, sint16 x_max, sint16 y_min, sint16
 				for(  int y = yy;  y < min(yy + LOOP_BLOCK, y_max);  y++  ) {
 					for(  int x = xx;  x < min(xx + LOOP_BLOCK, x_max);  x++  ) {
 						const int nr = y * map.cached_grid_size.x + x;
-						for(  uint i = 0;  i < plan[nr].get_boden_count();  i++  ) {
-							plan[nr].get_boden_bei(i)->calc_image();
+						for(  uint i = 0;  i < map.plan[nr].get_boden_count();  i++  ) {
+							map.plan[nr].get_boden_bei(i)->calc_image();
 						}
 					}
 				}
@@ -5782,8 +5782,8 @@ void karte_t::update_map_intern(sint16 x_min, sint16 x_max, sint16 y_min, sint16
 		for(  int y = y_min;  y < y_max;  y++  ) {
 			for(  int x = x_min;  x < x_max;  x++  ) {
 				const int nr = y * map.cached_grid_size.x + x;
-				for(  uint i = 0;  i < plan[nr].get_boden_count();  i++  ) {
-					plan[nr].get_boden_bei(i)->calc_image();
+				for(  uint i = 0;  i < map.plan[nr].get_boden_count();  i++  ) {
+					map.plan[nr].get_boden_bei(i)->calc_image();
 				}
 			}
 		}
@@ -5839,7 +5839,7 @@ void karte_t::prepare_tiles(rect_t const &new_area, rect_t const &old_area) {
 
 		for (sint16 y = y_start ; y < y_end ; y++) {
 			for (sint16 x = x_start ; x < x_end ; x++) {
-				const planquadrat_t &tile = plan[y * map.cached_grid_size.x + x];
+				const planquadrat_t &tile = map.plan[y * map.cached_grid_size.x + x];
 				tile.update_underground();
 			}
 		}
