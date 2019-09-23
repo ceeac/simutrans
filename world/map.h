@@ -6,9 +6,12 @@
 #include "../dataobj/koord.h"
 
 #include "../tpl/vector_tpl.h"
+#include "../tpl/slist_tpl.h"
 
 #include "../convoihandle_t.h"
 
+
+class fabrik_t;
 class planquadrat_t;
 
 
@@ -95,6 +98,9 @@ public:
 
 	/// Array containing the convois.
 	vector_tpl<convoihandle_t> convoi_array;
+
+	/// Array containing all factories on the map.
+	slist_tpl<fabrik_t *> fab_list;
 
 	/// @}
 };

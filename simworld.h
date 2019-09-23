@@ -240,10 +240,6 @@ private:
 	 */
 	uint8 height_to_climate[128];
 
-	/**
-	 * Array containing the factories.
-	 */
-	slist_tpl<fabrik_t *> fab_list;
 
 	/**
 	 * Stores a list of goods produced by factories currently in the game;
@@ -1471,9 +1467,9 @@ public:
 
 	bool add_fab(fabrik_t *fab);
 	bool rem_fab(fabrik_t *fab);
-	int get_fab_index(fabrik_t* fab)  const { return fab_list.index_of(fab); }
-	fabrik_t* get_fab(unsigned index) const { return index < fab_list.get_count() ? fab_list.at(index) : NULL; }
-	const slist_tpl<fabrik_t*>& get_fab_list() const { return fab_list; }
+	int get_fab_index(fabrik_t* fab)  const { return map.fab_list.index_of(fab); }
+	fabrik_t* get_fab(unsigned index) const { return index < map.fab_list.get_count() ? map.fab_list.at(index) : NULL; }
+	const slist_tpl<fabrik_t*>& get_fab_list() const { return map.fab_list; }
 
 	/**
 	 * Returns a list of goods produced by factories that exist in current game.
