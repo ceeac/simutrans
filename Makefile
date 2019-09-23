@@ -510,6 +510,8 @@ SOURCES += vehicle/movingobj.cc
 SOURCES += vehicle/simpeople.cc
 SOURCES += vehicle/simroadtraffic.cc
 SOURCES += vehicle/simvehicle.cc
+SOURCES += world/map.cc
+
 
 ifeq ($(BACKEND),allegro)
   SOURCES += simsys_d.cc

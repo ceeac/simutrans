@@ -29,6 +29,8 @@
 #include "dataobj/loadsave.h"
 #include "dataobj/rect.h"
 
+#include "world/map.h"
+
 #include "simplan.h"
 
 #include "simdebug.h"
