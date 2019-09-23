@@ -108,7 +108,7 @@ public:
 	weighted_vector_tpl<gebaeude_t *> attractions;
 
 	/// Stores the cities.
-	weighted_vector_tpl<stadt_t*> stadt;
+	weighted_vector_tpl<stadt_t*> cities;
 
 	/// @}
 };

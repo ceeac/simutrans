@@ -1439,7 +1439,7 @@ public:
 	 * To access the cities array.
 	 * @author Hj. Malthaner
 	 */
-	const weighted_vector_tpl<stadt_t*>& get_cities() const { return map.stadt; }
+	const weighted_vector_tpl<stadt_t*>& get_cities() const { return map.cities; }
 	void add_city(stadt_t *s);
 
 	/**
