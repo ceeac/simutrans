@@ -240,18 +240,12 @@ private:
 	 */
 	uint8 height_to_climate[128];
 
-
 	/**
 	 * Stores a list of goods produced by factories currently in the game;
 	 */
 	vector_tpl<const goods_desc_t*> goods_in_game;
 
 	slist_tpl<koord> labels;
-
-	/**
-	 * Stores the cities.
-	 */
-	weighted_vector_tpl<stadt_t*> stadt;
 
 	sint64 last_month_bev;
 
@@ -1445,7 +1439,7 @@ public:
 	 * To access the cities array.
 	 * @author Hj. Malthaner
 	 */
-	const weighted_vector_tpl<stadt_t*>& get_cities() const { return stadt; }
+	const weighted_vector_tpl<stadt_t*>& get_cities() const { return map.stadt; }
 	void add_city(stadt_t *s);
 
 	/**

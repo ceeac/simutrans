@@ -442,7 +442,7 @@ void karte_t::destroy()
 	destroying = true;
 	DBG_MESSAGE("karte_t::destroy()", "destroying world");
 
-	uint32 max_display_progress = 256+stadt.get_count()*10 + haltestelle_t::get_alle_haltestellen().get_count() + map.convoi_array.get_count() + (map.cached_size.x*map.cached_size.y)*2;
+	uint32 max_display_progress = 256+map.stadt.get_count()*10 + haltestelle_t::get_alle_haltestellen().get_count() + map.convoi_array.get_count() + (map.cached_size.x*map.cached_size.y)*2;
 	uint32 old_progress = 0;
 
 	loadingscreen_t ls( translator::translate("Destroying map ..."), max_display_progress, true );
@@ -511,8 +511,8 @@ void karte_t::destroy()
 	// delete towns first (will also delete all their houses)
 	// for the next game we need to remember the desired number ...
 	sint32 const no_of_cities = settings.get_city_count();
-	for(  uint32 i=0;  !stadt.empty();  i++  ) {
-		remove_city(stadt.front());
+	for(  uint32 i=0;  !map.stadt.empty();  i++  ) {
+		remove_city(map.stadt.front());
 		old_progress += 10;
 		if(  (i&0x00F) == 0  ) {
 			ls.set_progress( old_progress );
@@ -586,10 +586,10 @@ void karte_t::rem_convoi(convoihandle_t const cnv)
 void karte_t::add_city(stadt_t *s)
 {
 	settings.set_city_count(settings.get_city_count() + 1);
-	stadt.append(s, s->get_einwohner());
+	map.stadt.append(s, s->get_einwohner());
 
 	// Knightly : add links between this city and other cities as well as attractions
-	FOR(weighted_vector_tpl<stadt_t*>, const c, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const c, map.stadt) {
 		c->add_target_city(s);
 	}
 	s->recalc_target_cities();
@@ -599,7 +599,7 @@ void karte_t::add_city(stadt_t *s)
 
 bool karte_t::remove_city(stadt_t *s)
 {
-	if(s == NULL  ||  stadt.empty()) {
+	if(s == NULL  ||  map.stadt.empty()) {
 		// no town there to delete ...
 		return false;
 	}
@@ -608,12 +608,12 @@ bool karte_t::remove_city(stadt_t *s)
 	if(s->get_name()) {
 		DBG_MESSAGE("karte_t::remove_city()", "%s", s->get_name());
 	}
-	stadt.remove(s);
+	map.stadt.remove(s);
 	DBG_DEBUG4("karte_t::remove_city()", "reduce city to %i", settings.get_city_count() - 1);
 	settings.set_city_count(settings.get_city_count() - 1);
 
 	// Knightly : remove links between this city and other cities
-	FOR(weighted_vector_tpl<stadt_t*>, const c, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const c, map.stadt) {
 		c->remove_target_city(s);
 	}
 
@@ -814,7 +814,7 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 	vector_tpl<koord> *pos = stadt_t::random_place(new_city_count, old_x, old_y);
 
 	if(  !pos->empty()  ) {
-		const sint32 old_city_count = stadt.get_count();
+		const sint32 old_city_count = map.stadt.get_count();
 		new_city_count = pos->get_count();
 		DBG_DEBUG("karte_t::distribute_groundobjs_cities()", "Creating cities: %d", new_city_count);
 
@@ -840,8 +840,8 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 				}
 			}
 			// center on first city
-			if(  old_x+old_y == 0  &&  stadt.get_count()>0) {
-				viewport->change_world_position( stadt[0]->get_pos() );
+			if(  old_x+old_y == 0  &&  map.stadt.get_count()>0) {
+				viewport->change_world_position( map.stadt[0]->get_pos() );
 			}
 
 			delete pos;
@@ -864,9 +864,9 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 			uint32 original_industry_growth = settings.get_industry_increase_every();
 			settings.set_industry_increase_every( 0 );
 
-			for(  uint32 i=old_city_count;  i<stadt.get_count();  i++  ) {
+			for(  uint32 i=old_city_count;  i<map.stadt.get_count();  i++  ) {
 				// Hajo: do final init after world was loaded/created
-				stadt[i]->finish_rd();
+				map.stadt[i]->finish_rd();
 
 	//			int citizens=(int)(new_mean_citizen_count*0.9);
 	//			citizens = citizens/10+simrand(2*citizens+1);
@@ -886,7 +886,7 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 				while(  current_bev < citizens  ) {
 					growth = min( citizens-current_bev, growth*2 );
 					current_bev += growth;
-					stadt[i]->change_size( growth, new_town );
+					map.stadt[i]->change_size( growth, new_town );
 					// Only "new" for the first change_size call
 					new_town = false;
 					if(  current_bev > citizens/2  &&  not_updated  ) {
@@ -905,7 +905,7 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 			settings.set_industry_increase_every( original_industry_growth );
 			msg->clear();
 		}
-		finance_history_year[0][WORLD_TOWNS] = finance_history_month[0][WORLD_TOWNS] = stadt.get_count();
+		finance_history_year[0][WORLD_TOWNS] = finance_history_month[0][WORLD_TOWNS] = map.stadt.get_count();
 		finance_history_year[0][WORLD_CITICENS] = finance_history_month[0][WORLD_CITICENS] = last_month_bev;
 
 		// Hajo: connect some cities with roads
@@ -931,16 +931,16 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 			// find townhall of city i and road in front of it
 			vector_tpl<koord3d> k;
 			for (int i = 0;  i < settings.get_city_count(); ++i) {
-				koord k1(stadt[i]->get_townhall_road());
+				koord k1(map.stadt[i]->get_townhall_road());
 				if (lookup_kartenboden(k1)  &&  lookup_kartenboden(k1)->hat_weg(road_wt)) {
 					k.append(lookup_kartenboden(k1)->get_pos());
 				}
 				else {
 					// look for a road near the townhall
-					gebaeude_t const* const gb = obj_cast<gebaeude_t>(lookup_kartenboden(stadt[i]->get_pos())->first_obj());
+					gebaeude_t const* const gb = obj_cast<gebaeude_t>(lookup_kartenboden(map.stadt[i]->get_pos())->first_obj());
 					bool ok = false;
 					if(  gb  &&  gb->is_townhall()  ) {
-						koord k_check = stadt[i]->get_pos() + koord(-1,-1);
+						koord k_check = map.stadt[i]->get_pos() + koord(-1,-1);
 						const koord size = gb->get_tile()->get_desc()->get_size(gb->get_tile()->get_layout());
 						koord inc(1,0);
 						// scan all adjacent tiles, take the first that has a road
@@ -1137,7 +1137,7 @@ DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing rivers");
 	else {
 		// could not generate any town
 		delete pos;
-		settings.set_city_count( stadt.get_count() ); // new number of towns (if we did not find enough positions)
+		settings.set_city_count( map.stadt.get_count() ); // new number of towns (if we did not find enough positions)
 	}
 
 DBG_DEBUG("karte_t::distribute_groundobjs_cities()","distributing groundobjs");
@@ -1268,7 +1268,7 @@ void karte_t::init(settings_t* const sets, sint8 const* const h_field)
 
 	recalc_season_snowline(false);
 
-	stadt.clear();
+	map.stadt.clear();
 
 DBG_DEBUG("karte_t::init()","hausbauer_t::new_world()");
 	// Call this before building cities
@@ -1717,7 +1717,7 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 				new_grid_hgts[nnr] = map.grid_hgts[nr];
 			}
 		}
-		max_display_progress = 16 + sets->get_city_count()*2 + stadt.get_count()*4;
+		max_display_progress = 16 + sets->get_city_count()*2 + map.stadt.get_count()*4;
 	}
 	else {
 		max_display_progress = 16 + sets->get_city_count() * 4 + settings.get_factory_count();
@@ -1982,8 +1982,7 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 
 
 karte_t::karte_t() :
-	settings(env_t::default_settings),
-	stadt(0)
+	settings(env_t::default_settings)
 {
 	destroying = false;
 
@@ -3244,7 +3243,7 @@ DBG_MESSAGE( "karte_t::rotate90()", "called" );
 	map.cached_grid_size.y = wx;
 
 	// now step all towns (to generate passengers)
-	FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 		i->rotate90(map.cached_size.x);
 	}
 
@@ -3372,7 +3371,7 @@ void karte_t::add_attraction(gebaeude_t *gb)
 	map.attractions.append( gb, gb->get_tile()->get_desc()->get_level() );
 
 	// Knightly : add links between this attraction and all cities
-	FOR(weighted_vector_tpl<stadt_t*>, const c, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const c, map.stadt) {
 		c->add_target_attraction(gb);
 	}
 }
@@ -3384,7 +3383,7 @@ void karte_t::remove_attraction(gebaeude_t *gb)
 	map.attractions.remove( gb );
 
 	// Knightly : remove links between this attraction and all cities
-	FOR(weighted_vector_tpl<stadt_t*>, const c, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const c, map.stadt) {
 		c->remove_target_attraction(gb);
 	}
 }
@@ -3399,7 +3398,7 @@ stadt_t *karte_t::find_nearest_city(const koord k) const
 	stadt_t *best = NULL;	// within city limits
 
 	if(  is_within_limits(k)  ) {
-		FOR(  weighted_vector_tpl<stadt_t*>,  const s,  stadt  ) {
+		FOR(  weighted_vector_tpl<stadt_t*>,  const s,  map.stadt  ) {
 			if(  k.x >= s->get_linksoben().x  &&  k.y >= s->get_linksoben().y  &&  k.x < s->get_rechtsunten().x  &&  k.y < s->get_rechtsunten().y  ) {
 				const uint32 dist = koord_distance( k, s->get_center() );
 				if(  !contains  ) {
@@ -3753,8 +3752,8 @@ void karte_t::new_month()
 
 
 //	DBG_MESSAGE("karte_t::new_month()","cities");
-	stadt.update_weights(get_population);
-	FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+	map.stadt.update_weights(get_population);
+	FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 		i->new_month(need_locality_update);
 	}
 
@@ -4080,7 +4079,7 @@ void karte_t::step()
 	// now step all towns (to generate passengers)
 	DBG_DEBUG4("karte_t::step", "step cities");
 	sint64 bev=0;
-	FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 		i->step(delta_t);
 		bev += i->get_finance_history_month(0, HIST_CITICENS);
 	}
@@ -4189,7 +4188,7 @@ void karte_t::restore_history(bool restore_transported_only)
 		sint64 total_pas = 1, trans_pas = 0;
 		sint64 total_mail = 1, trans_mail = 0;
 		sint64 total_goods = 1, supplied_goods = 0;
-		FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+		FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 			bev            += i->get_finance_history_month(m, HIST_CITICENS);
 			trans_pas      += i->get_finance_history_month(m, HIST_PAS_TRANSPORTED);
 			total_pas      += i->get_finance_history_month(m, HIST_PAS_GENERATED);
@@ -4222,7 +4221,7 @@ void karte_t::restore_history(bool restore_transported_only)
 		sint64 total_pas_year = 1, trans_pas_year = 0;
 		sint64 total_mail_year = 1, trans_mail_year = 0;
 		sint64 total_goods_year = 1, supplied_goods_year = 0;
-		FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+		FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 			bev                 += i->get_finance_history_year(y, HIST_CITICENS);
 			trans_pas_year      += i->get_finance_history_year(y, HIST_PAS_TRANSPORTED);
 			total_pas_year      += i->get_finance_history_year(y, HIST_PAS_GENERATED);
@@ -4266,7 +4265,7 @@ void karte_t::update_history()
 	sint64 total_pas_year = 1, trans_pas_year = 0;
 	sint64 total_mail_year = 1, trans_mail_year = 0;
 	sint64 total_goods_year = 1, supplied_goods_year = 0;
-	FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 		bev                 += i->get_finance_history_month(0, HIST_CITICENS);
 		trans_pas           += i->get_finance_history_month(0, HIST_PAS_TRANSPORTED);
 		total_pas           += i->get_finance_history_month(0, HIST_PAS_GENERATED);
@@ -4286,7 +4285,7 @@ void karte_t::update_history()
 	finance_history_year[0][WORLD_GROWTH] = bev - (finance_history_year[1][WORLD_CITICENS]==0 ? finance_history_month[0][WORLD_CITICENS] : finance_history_year[1][WORLD_CITICENS]);
 
 	// the inhabitants stuff
-	finance_history_year[0][WORLD_TOWNS] = finance_history_month[0][WORLD_TOWNS] = stadt.get_count();
+	finance_history_year[0][WORLD_TOWNS] = finance_history_month[0][WORLD_TOWNS] = map.stadt.get_count();
 	finance_history_year[0][WORLD_CITICENS] = finance_history_month[0][WORLD_CITICENS] = bev;
 	finance_history_month[0][WORLD_GROWTH] = bev-last_month_bev;
 	finance_history_year[0][WORLD_GROWTH] = bev - (finance_history_year[1][WORLD_CITICENS]==0 ? finance_history_month[0][WORLD_CITICENS] : finance_history_year[1][WORLD_CITICENS]);
@@ -4678,7 +4677,7 @@ DBG_MESSAGE("karte_t::save(loadsave_t *file)", "start");
 		}
 	}
 
-	FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 		i->rdwr(file);
 		if(silent) {
 			INT_CHECK("saving");
@@ -5346,11 +5345,11 @@ DBG_MESSAGE("karte_t::load()", "init player");
 		}
 	}
 	DBG_DEBUG("karte_t::load", "init %i cities", settings.get_city_count());
-	stadt.clear();
-	stadt.resize(settings.get_city_count());
+	map.stadt.clear();
+	map.stadt.resize(settings.get_city_count());
 	for (int i = 0; i < settings.get_city_count(); ++i) {
 		stadt_t *s = new stadt_t(file);
-		stadt.append( s, s->get_einwohner());
+		map.stadt.append( s, s->get_einwohner());
 	}
 
 	DBG_MESSAGE("karte_t::load()","loading blocks");
@@ -5572,14 +5571,14 @@ DBG_MESSAGE("karte_t::load()", "%d ways loaded",weg_t::get_alle_wege().get_count
 DBG_MESSAGE("karte_t::load()", "laden_abschliesen for tiles finished" );
 
 	// must finish loading cities first before cleaning up factories
-	weighted_vector_tpl<stadt_t*> new_weighted_stadt(stadt.get_count() + 1);
-	FOR(weighted_vector_tpl<stadt_t*>, const s, stadt) {
+	weighted_vector_tpl<stadt_t*> new_weighted_stadt(map.stadt.get_count() + 1);
+	FOR(weighted_vector_tpl<stadt_t*>, const s, map.stadt) {
 		s->finish_rd();
 		s->recalc_target_cities();
 		new_weighted_stadt.append(s, s->get_einwohner());
 		INT_CHECK("simworld 1278");
 	}
-	swap(stadt, new_weighted_stadt);
+	swap(map.stadt, new_weighted_stadt);
 	DBG_MESSAGE("karte_t::load()", "cities initialized");
 
 	ls.set_progress( (get_size().y*3)/2+256+get_size().y/4 );
@@ -5597,8 +5596,8 @@ DBG_MESSAGE("karte_t::load()", "%d factories loaded", map.fab_list.get_count());
 		sint32 const temp_max = settings.get_factory_worker_maximum_towns();
 		// this needs to avoid the first city to be connected to all town
 		settings.set_factory_worker_minimum_towns(0);
-		settings.set_factory_worker_maximum_towns(stadt.get_count() + 1);
-		FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+		settings.set_factory_worker_maximum_towns(map.stadt.get_count() + 1);
+		FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 			i->verbinde_fabriken();
 		}
 		settings.set_factory_worker_minimum_towns(temp_min);
@@ -6177,7 +6176,7 @@ void karte_t::step_year()
 	reset_timer();
 	recalc_average_speed();
 	koord::locality_factor = settings.get_locality_factor( last_year );
-	FOR(weighted_vector_tpl<stadt_t*>, const i, stadt) {
+	FOR(weighted_vector_tpl<stadt_t*>, const i, map.stadt) {
 		i->recalc_target_cities();
 		i->recalc_target_attractions();
 	}
@@ -6946,8 +6945,8 @@ void karte_t::announce_server(int status)
 		buf.printf( "&active=%u",    active );
 		buf.printf( "&locked=%u",    locked );
 		buf.printf( "&clients=%u",   socket_list_t::get_playing_clients() );
-		buf.printf( "&towns=%u",     stadt.get_count() );
-		buf.printf( "&citizens=%u",  stadt.get_sum_weight() );
+		buf.printf( "&towns=%u",     map.stadt.get_count() );
+		buf.printf( "&citizens=%u",  map.stadt.get_sum_weight() );
 		buf.printf( "&factories=%u", map.fab_list.get_count() );
 		buf.printf( "&convoys=%u",   convoys().get_count());
 		buf.printf( "&stops=%u",     haltestelle_t::get_alle_haltestellen().get_count() );

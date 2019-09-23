@@ -15,6 +15,7 @@
 class fabrik_t;
 class gebaeude_t;
 class planquadrat_t;
+class stadt_t;
 
 
 /**
@@ -105,6 +106,9 @@ public:
 	slist_tpl<fabrik_t *> fab_list;
 
 	weighted_vector_tpl<gebaeude_t *> attractions;
+
+	/// Stores the cities.
+	weighted_vector_tpl<stadt_t*> stadt;
 
 	/// @}
 };
