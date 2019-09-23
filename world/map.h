@@ -5,6 +5,9 @@
 
 #include "../dataobj/koord.h"
 
+#include "../tpl/vector_tpl.h"
+
+#include "../convoihandle_t.h"
 
 class planquadrat_t;
 
@@ -85,6 +88,15 @@ public:
 	/// cache the current maximum and minimum height on the map
 	/// @sa karte_t::update_cached_minmax_height
 	sint8 max_height, min_height;
+
+
+	/// @name Map objects (vehicles etc.)
+	/// @{
+
+	/// Array containing the convois.
+	vector_tpl<convoihandle_t> convoi_array;
+
+	/// @}
 };
 
 #endif
