@@ -50,7 +50,7 @@ wolke_t::~wolke_t()
 {
 	mark_image_dirty( get_image(), 0 );
 	if(  insta_zeit != 2499  ) {
-		welt->sync_way_eyecandy.remove( this );
+		welt->unregister_sync_way_eyecandy(this);
 	}
 }
 

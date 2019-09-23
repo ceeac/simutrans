@@ -11,6 +11,8 @@
 
 #include "../convoihandle_t.h"
 
+#include "sync_list.h"
+
 
 class fabrik_t;
 class gebaeude_t;
@@ -109,6 +111,10 @@ public:
 
 	/// Stores the cities.
 	weighted_vector_tpl<stadt_t*> cities;
+
+	sync_list_t sync;              ///< vehicles, transformers, traffic lights
+	sync_list_t sync_eyecandy;     ///< animated buildings
+	sync_list_t sync_way_eyecandy; ///< smoke
 
 	/// @}
 };

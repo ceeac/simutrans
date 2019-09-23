@@ -318,7 +318,7 @@ private_car_t::~private_car_t()
 
 	// just to be sure we are removed from this list!
 	if(time_to_life>0) {
-		welt->sync.remove(this);
+		welt->unregister_sync_obj(this);
 	}
 	welt->buche( -1, karte_t::WORLD_CITYCARS );
 }
@@ -331,7 +331,7 @@ private_car_t::private_car_t(loadsave_t *file) :
 	ms_traffic_jam = 0;
 	calc_disp_lane();
 	if(desc) {
-		welt->sync.add(this);
+		welt->register_sync_obj(this);
 	}
 	welt->buche( +1, karte_t::WORLD_CITYCARS );
 }

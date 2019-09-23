@@ -1549,7 +1549,7 @@ void fabrik_t::smoke() const
 		const sint8 offsety =  ((rada->get_xy_off(rot).y+sim_async_rand(7)-3)*OBJECT_OFFSET_STEPS)/16;
 		wolke_t *smoke =  new wolke_t(gr->get_pos(), offsetx, offsety, rada->get_images() );
 		gr->obj_add(smoke);
-		welt->sync_way_eyecandy.add( smoke );
+		welt->register_sync_way_eyecandy(smoke);
 	}
 	// maybe sound?
 	if(  desc->get_sound()!=NO_SOUND  &&  welt->get_ticks()>last_sound_ms+desc->get_sound_interval_ms()  ) {

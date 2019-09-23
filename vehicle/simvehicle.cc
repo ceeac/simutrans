@@ -1239,7 +1239,7 @@ void vehicle_t::make_smoke() const
 					delete abgas;
 				}
 				else {
-					welt->sync_way_eyecandy.add( abgas );
+					welt->register_sync_way_eyecandy( abgas );
 				}
 			}
 		}

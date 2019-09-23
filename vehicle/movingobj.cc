@@ -154,7 +154,7 @@ movingobj_t::movingobj_t(loadsave_t *file) : vehicle_base_t()
 {
 	rdwr(file);
 	if(get_desc()) {
-		welt->sync.add( this );
+		welt->register_sync_obj( this );
 	}
 }
 
@@ -166,13 +166,13 @@ movingobj_t::movingobj_t(koord3d pos, const groundobj_desc_t *b ) : vehicle_base
 	timetochange = 0;	// will do random direct change anyway during next step
 	direction = calc_set_direction( koord3d(0,0,0), koord3d(koord::west,0) );
 	calc_image();
-	welt->sync.add( this );
+	welt->register_sync_obj( this );
 }
 
 
 movingobj_t::~movingobj_t()
 {
-	welt->sync.remove( this );
+	welt->unregister_sync_obj( this );
 }
 
 

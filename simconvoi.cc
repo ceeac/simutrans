@@ -202,7 +202,7 @@ DBG_MESSAGE("convoi_t::~convoi_t()", "destroying %d, %p", self.get_id(), this);
 		welt->get_viewport()->set_follow_convoi( convoihandle_t() );
 	}
 
-	welt->sync.remove( this );
+	welt->unregister_sync_obj( this );
 	welt->rem_convoi( self );
 
 	// Knightly : if lineless convoy -> unregister from stops
@@ -1348,7 +1348,7 @@ void convoi_t::step()
 
 		// just waiting for action here
 		case INITIAL:
-			welt->sync.remove(this);
+			welt->unregister_sync_obj(this);
 			/* FALLTHROUGH */
 		case EDIT_SCHEDULE:
 		case NO_ROUTE:
@@ -1505,7 +1505,7 @@ void convoi_t::start()
 		gr->obj_add( fahr[0] );
 
 		// put into sync list
-		welt->sync.add(this);
+		welt->register_sync_obj(this);
 
 		alte_richtung = ribi_t::none;
 		no_load = false;

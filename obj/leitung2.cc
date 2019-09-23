@@ -655,7 +655,7 @@ senke_t::senke_t(loadsave_t *file) : leitung_t( koord3d::invalid, NULL )
 
 	rdwr( file );
 
-	welt->sync.add(this);
+	welt->register_sync_obj(this);
 }
 
 
@@ -669,7 +669,7 @@ senke_t::senke_t(koord3d pos, player_t *player) : leitung_t(pos, player)
 
 	player_t::book_construction_costs(player, welt->get_settings().cst_transformer, get_pos().get_2d(), powerline_wt);
 
-	welt->sync.add(this);
+	welt->register_sync_obj(this);
 }
 
 
@@ -678,7 +678,7 @@ senke_t::~senke_t()
 	// one last final income
 	pay_revenue();
 
-	welt->sync.remove( this );
+	welt->unregister_sync_obj(this);
 	if(fab!=NULL) {
 		fab->set_transformer_connected(NULL);
 		fab = NULL;

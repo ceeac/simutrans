@@ -478,9 +478,10 @@ void karte_t::destroy()
 	ls.set_progress( old_progress );
 
 	// removes all moving stuff from the sync_step
-	sync.clear();
-	sync_eyecandy.clear();
-	sync_way_eyecandy.clear();
+	map.sync.clear();
+	map.sync_eyecandy.clear();
+	map.sync_way_eyecandy.clear();
+
 	old_progress += map.cached_size.x*map.cached_size.y;
 	ls.set_progress( old_progress );
 	DBG_MESSAGE("karte_t::destroy()", "sync list cleared");
@@ -3451,16 +3452,16 @@ void karte_t::sync_step(uint32 delta_t, bool do_sync_step, bool display )
 		 * foundations etc are added removed frequently during city growth
 		 * => they are now in a hastable!
 		 */
-		sync_eyecandy.sync_step( delta_t );
+		map.sync_eyecandy.sync_step( delta_t );
 
 		/* pedestrians do not require exact sync and are added/removed frequently
 		 * => they are now in a hastable!
 		 */
-		sync_way_eyecandy.sync_step( delta_t );
+		map.sync_way_eyecandy.sync_step( delta_t );
 
 		clear_random_mode( INTERACTIVE_RANDOM );
 
-		sync.sync_step( delta_t );
+		map.sync.sync_step( delta_t );
 
 		ticker::update();
 	}
@@ -5457,7 +5458,7 @@ DBG_MESSAGE("karte_t::load()", "init player");
 			}
 		}
 		else {
-			sync.add( cnv );
+			register_sync_obj( cnv );
 		}
 		if(  (map.convoi_array.get_count()&7) == 0  ) {
 			ls.set_progress( get_size().y+(get_size().y*map.convoi_array.get_count())/(2*max_convoi)+128 );

@@ -1729,7 +1729,7 @@ void stadt_t::new_month( bool recalc_destinations )
 				if(  gr != NULL  &&  gr->get_weg(road_wt)  &&  ribi_t::is_twoway(gr->get_weg_ribi_unmasked(road_wt))  &&  gr->find<private_car_t>() == NULL) {
 					private_car_t* vt = new private_car_t(gr, koord::invalid);
 					gr->obj_add(vt);
-					welt->sync.add(vt);
+					welt->register_sync_obj(vt);
 					number_of_cars--;
 				}
 			}

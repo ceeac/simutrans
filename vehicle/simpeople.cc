@@ -72,7 +72,7 @@ pedestrian_t::pedestrian_t(loadsave_t *file)
 	steps_offset = 0;
 	rdwr(file);
 	if(desc) {
-		welt->sync.add(this);
+		welt->register_sync_obj(this);
 		ped_offset = desc->get_offset();
 	}
 	calc_disp_lane();
@@ -130,7 +130,7 @@ pedestrian_t::pedestrian_t(grund_t *gr) :
 pedestrian_t::~pedestrian_t()
 {
 	if(  time_to_life>0  ) {
-		welt->sync.remove( this );
+		welt->unregister_sync_obj( this );
 	}
 }
 
@@ -144,7 +144,7 @@ void pedestrian_t::calc_image()
 image_id pedestrian_t::get_image() const
 {
 	if (desc->get_steps_per_frame() > 0) {
-		uint16 frame = ((animation_steps + steps) / desc->get_steps_per_frame()) % desc->get_animation_count(ribi_t::get_dir(direction));
+		const uint16 frame = ((animation_steps + steps) / desc->get_steps_per_frame()) % desc->get_animation_count(ribi_t::get_dir(direction));
 		return desc->get_image_id(ribi_t::get_dir(get_direction()), frame);
 	}
 	else {
@@ -224,7 +224,7 @@ void pedestrian_t::generate_pedestrians_at(const koord3d k, int &count)
 						// walk a little
 						fg->sync_step( (i & 3) * 64 * 24);
 					}
-					welt->sync.add(fg);
+					welt->register_sync_obj(fg);
 					count--;
 				}
 				else {

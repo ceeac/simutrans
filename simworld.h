@@ -1486,9 +1486,16 @@ public:
 	/// rotate map view by 90 degrees
 	void rotate90();
 
-	sync_list_t sync;              ///< vehicles, transformers, traffic lights
-	sync_list_t sync_eyecandy;     ///< animated buildings
-	sync_list_t sync_way_eyecandy; ///< smoke
+public:
+	void register_sync_obj(sync_steppable* obj) { map.sync.add(obj); }
+	void unregister_sync_obj(sync_steppable* obj) { map.sync.remove(obj); }
+
+	void register_sync_eyecandy(sync_steppable* obj) { map.sync_eyecandy.add(obj); }
+	void unregister_sync_eyecandy(sync_steppable* obj) { map.sync_eyecandy.remove(obj); }
+
+	void register_sync_way_eyecandy(sync_steppable* obj) { map.sync_way_eyecandy.add(obj); }
+	void unregister_sync_way_eyecandy(sync_steppable* obj) { map.sync_way_eyecandy.remove(obj); }
+
 
 	/**
 	 * Synchronous stepping of objects like vehicles.
