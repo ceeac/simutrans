@@ -169,7 +169,7 @@ private:
 	bool background_dirty;
 
 	/**
-	 * True during destroying of the map.
+	 * True during destroying of the map (within karte_t::destroy).
 	 */
 	bool destroying;
 
