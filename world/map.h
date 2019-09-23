@@ -77,6 +77,16 @@ public:
 	 * @author prissi
 	 */
 	sint16 snowline;
+
+	/**
+	 * the maximum allowed world height.
+	 */
+	sint8 world_maximum_height;
+
+	/**
+	 * the minimum allowed world height.
+	 */
+	sint8 world_minimum_height;
 };
 
 #endif
