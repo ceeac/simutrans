@@ -640,7 +640,7 @@ void karte_t::init_tiles()
 	uint32 const y = get_size().y;
 	map.plan      = new planquadrat_t[x * y];
 	map.grid_hgts = new sint8[(x + 1) * (y + 1)];
-	max_height = min_height = 0;
+	map.max_height = map.min_height = 0;
 	MEMZERON(map.grid_hgts, (x + 1) * (y + 1));
 	map.water_hgts = new sint8[x * y];
 	MEMZERON(map.water_hgts, x * y);
@@ -1733,8 +1733,8 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 
 	if(  old_x==0  ) {
 		// init max and min with defaults
-		max_height = map.groundwater;
-		min_height = map.groundwater;
+		map.max_height = map.groundwater;
+		map.min_height = map.groundwater;
 	}
 
 	setsimrand(0xFFFFFFFF, settings.get_map_number());
@@ -1833,13 +1833,8 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 	// update height bounds
 	for(  sint16 iy = 0;  iy < new_size_y;  iy++  ) {
 		for(  sint16 ix = (iy >= old_y) ? 0 : max( old_x, 0 );  ix < new_size_x;  ix++  ) {
-			sint8 hgt = lookup_kartenboden_nocheck(ix, iy)->get_hoehe();
-			if (hgt < min_height) {
-				min_height = hgt;
-			}
-			if (hgt > max_height) {
-				max_height = hgt;
-			}
+			const sint8 hgt = lookup_kartenboden_nocheck(ix, iy)->get_hoehe();
+			update_cached_minmax_height(hgt);
 		}
 	}
 
@@ -2521,10 +2516,9 @@ int karte_t::grid_raise(const player_t *player, koord k, const char*&err)
 		// force world full redraw, or background could be dirty.
 		set_dirty();
 
-		if(  max_height < lookup_kartenboden_gridcoords(k)->get_hoehe()  ) {
-			max_height = lookup_kartenboden_gridcoords(k)->get_hoehe();
-		}
+		update_cached_minmax_height(lookup_kartenboden_gridcoords(k)->get_hoehe());
 	}
+
 	return (n+3)>>2;
 }
 
@@ -2844,9 +2838,7 @@ int karte_t::grid_lower(const player_t *player, koord k, const char*&err)
 		// force world full redraw, or background could be dirty.
 		set_dirty();
 
-		if(  min_height > min_hgt_nocheck( koord(x,y) )  ) {
-			min_height = min_hgt_nocheck( koord(x,y) );
-		}
+		update_cached_minmax_height(min_hgt_nocheck(koord(x, y)));
 	}
 	return (n+3)>>2;
 }
@@ -5147,7 +5139,7 @@ static recursive_mutex_maker_t height_mutex_maker(height_mutex);
 
 void karte_t::plans_finish_rd( sint16 x_min, sint16 x_max, sint16 y_min, sint16 y_max )
 {
-	sint8 min_h = min_height, max_h = max_height;
+	sint8 min_h = map.min_height, max_h = map.max_height;
 	for(  int y = y_min;  y < y_max;  y++  ) {
 		for(  int x = x_min; x < x_max;  x++  ) {
 			planquadrat_t *plan = access_nocheck(x,y);
@@ -5155,12 +5147,10 @@ void karte_t::plans_finish_rd( sint16 x_min, sint16 x_max, sint16 y_min, sint16 
 			const int boden_count = plan->get_boden_count();
 			for(  int schicht = 0;  schicht < boden_count;  schicht++  ) {
 				grund_t *gr = plan->get_boden_bei(schicht);
-				if(  min_h > gr->get_hoehe()  ) {
-					min_h = gr->get_hoehe();
-				}
-				else if(  max_h < gr->get_hoehe()  ) {
-					max_h = gr->get_hoehe();
-				}
+
+				min_h = std::min(min_h, gr->get_hoehe());
+				max_h = std::max(max_h, gr->get_hoehe());
+
 				for(  int n = 0;  n < gr->get_top();  n++  ) {
 					obj_t *obj = gr->obj_bei(n);
 					if(obj) {
@@ -5174,19 +5164,16 @@ void karte_t::plans_finish_rd( sint16 x_min, sint16 x_max, sint16 y_min, sint16 
 			}
 		}
 	}
+
 	// update heights
 #ifdef MULTI_THREAD
 	pthread_mutex_lock( &height_mutex );
-	if(  min_height > min_h  ) {
-		min_height = min_h;
-	}
-	if(  max_height < max_h  ) {
-		max_height = max_h;
-	}
+	update_cached_minmax_height(min_h);
+	update_cached_minmax_height(max_h);
 	pthread_mutex_unlock( &height_mutex );
 #else
-	min_height = min_h;
-	max_height = max_h;
+	map.min_height = min_h;
+	map.max_height = max_h;
 #endif
 }
 
@@ -5255,7 +5242,7 @@ void karte_t::load(loadsave_t *file)
 	map.world_minimum_height = settings.get_minimumheight();
 
 	map.groundwater = (sint8)(settings.get_groundwater());
-	min_height = max_height = map.groundwater;
+	map.min_height = map.max_height = map.groundwater;
 	DBG_DEBUG("karte_t::load()","groundwater %i",map.groundwater);
 
 	if(  file->is_version_less(112, 7)  ) {

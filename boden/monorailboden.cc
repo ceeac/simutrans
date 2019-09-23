@@ -12,12 +12,7 @@ monorailboden_t::monorailboden_t(koord3d pos,slope_t::type slope) : grund_t(pos)
 	this->slope = slope;
 
 	// update limits
-	if(  welt->min_height > pos.z  ) {
-		welt->min_height = pos.z;
-	}
-	else if(  welt->max_height < pos.z  ) {
-		welt->max_height = pos.z;
-	}
+	welt->update_cached_minmax_height(pos.z);
 }
 
 

@@ -321,7 +321,7 @@ void main_view_t::display(bool force_dirty)
 					}
 				}
 				break;
-			
+
 			case 1:
 				// show message of active player
 				int x = welt->get_active_player_nr();
@@ -424,7 +424,7 @@ void main_view_t::display_region( koord lt, koord wh, sint16 y_min, sint16 y_max
 					// check if outside visible
 					outside_visible = true;
 					if(  env_t::draw_outside_tile  ) {
-						const sint16 yypos = ypos - tile_raster_scale_y( welt->min_height * TILE_HEIGHT_STEP, IMG_SIZE );
+						const sint16 yypos = ypos - tile_raster_scale_y( welt->get_min_height() * TILE_HEIGHT_STEP, IMG_SIZE );
 						display_normal( ground_desc_t::outside->get_image(0), xpos, yypos, 0, true, false  CLIP_NUM_PAR);
 					}
 				}

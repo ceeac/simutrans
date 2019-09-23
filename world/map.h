@@ -87,6 +87,10 @@ public:
 	 * the minimum allowed world height.
 	 */
 	sint8 world_minimum_height;
+
+	/// cache the current maximum and minimum height on the map
+	/// @sa karte_t::update_cached_minmax_height
+	sint8 max_height, min_height;
 };
 
 #endif

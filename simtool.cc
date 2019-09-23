@@ -1381,12 +1381,7 @@ const char *tool_setslope_t::tool_set_slope_work( player_t *player, koord3d pos,
 			player_t::book_construction_costs(player, cost, k, ignore_wt);
 		}
 		// update limits
-		if(  welt->min_height > gr1->get_hoehe()  ) {
-			welt->min_height = gr1->get_hoehe();
-		}
-		else if(  welt->max_height < gr1->get_hoehe()  ) {
-			welt->max_height = gr1->get_hoehe();
-		}
+		welt->update_cached_minmax_height(gr1->get_hoehe());
 	}
 	return ok ? NULL : "";
 }
@@ -6462,7 +6457,7 @@ bool tool_show_underground_t::init( player_t * )
 		// decrease slice level
 		case 'D':
 			if(grund_t::underground_mode==grund_t::ugm_level) {
-				if(  grund_t::underground_level > welt->min_height  ) {
+				if(  grund_t::underground_level > welt->get_min_height()  ) {
 					grund_t::underground_level --;
 				}
 			}
@@ -6473,7 +6468,7 @@ bool tool_show_underground_t::init( player_t * )
 		// increase slice level
 		case 'I':
 			if(grund_t::underground_mode==grund_t::ugm_level) {
-				if(  grund_t::underground_level < welt->max_height  ) {
+				if(  grund_t::underground_level < welt->get_max_height()  ) {
 					grund_t::underground_level ++;
 				}
 			}

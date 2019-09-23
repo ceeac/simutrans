@@ -648,9 +648,17 @@ public:
 	 */
 	void announce_server(int status);
 
-	/// cache the current maximum and minimum height on the map
-	sint8 max_height, min_height;
+public:
+	sint8 get_min_height() const { return map.min_height; }
+	sint8 get_max_height() const { return map.max_height; }
 
+	inline void update_cached_minmax_height(sint8 height)
+	{
+		map.max_height = std::max(map.max_height, height);
+		map.min_height = std::min(map.min_height, height);
+	}
+
+public:
 	/**
 	 * Returns the messagebox message container.
 	 */
