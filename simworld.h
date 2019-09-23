@@ -148,26 +148,7 @@ private:
 	 */
 	settings_t settings;
 
-	/**
-	 * For performance reasons we have the map grid size cached locally, comes from the environment (Einstellungen)
-	 * @brief Cached map grid size.
-	 * @note Valid coords are (0..x-1,0..y-1)
-	 */
-	koord cached_grid_size;
-
-	/**
-	 * For performance reasons we have the map size cached locally, comes from the environment (Einstellungen).
-	 * @brief Cached map size.
-	 * @note Valid coords are (0..x-1,0..y-1)
-	 * @note These values are one less than the size values of the grid.
-	 */
-	koord cached_size;
-
-	/**
-	 * @brief The maximum of the two dimensions.
-	 * Maximum size for waiting bars etc.
-	 */
-	int cached_size_max;
+	map_t map;
 	/** @} */
 
 	/**
@@ -406,13 +387,13 @@ private:
 
 	/**
 	 * Array representing the height of each point of the grid.
-	 * @see cached_grid_size
+	 * @see map.cached_grid_size
 	 */
 	sint8 *grid_hgts;
 
 	/**
 	 * Array representing the height of water on each point of the grid.
-	 * @see cached_grid_size
+	 * @see map.cached_grid_size
 	 */
 	sint8 *water_hgts;
 	/** @} */
@@ -1196,12 +1177,12 @@ public:
 	 * @note These values are exactly one less then get_grid_size ones.
 	 * @see get_grid_size()
 	 */
-	inline koord const &get_size() const { return cached_grid_size; }
+	inline koord const &get_size() const { return map.cached_grid_size; }
 
 	/**
 	 * Maximum size for waiting bars etc.
 	 */
-	inline int get_size_max() const { return cached_size_max; }
+	inline int get_size_max() const { return map.cached_size_max; }
 
 	/**
 	 * @return True if the specified coordinate is inside the world tiles(planquadrat_t) limits, false otherwise.
@@ -1212,7 +1193,7 @@ public:
 	inline bool is_within_limits(sint16 x, sint16 y) const {
 	// prissi: since negative values will make the whole result negative, we can use bitwise or
 	// faster, since pentiums and other long pipeline processors do not like jumps
-		return (x|y|(cached_size.x-x)|(cached_size.y-y))>=0;
+		return (x|y|(map.cached_size.x-x)|(map.cached_size.y-y))>=0;
 //		return x>=0 &&  y>=0  &&  cached_groesse_karte_x>=x  &&  cached_groesse_karte_y>=y;
 	}
 
@@ -1232,7 +1213,7 @@ public:
 	inline bool is_within_grid_limits(sint16 x, sint16 y) const {
 	// prissi: since negative values will make the whole result negative, we can use bitwise or
 	// faster, since pentiums and other long pipeline processors do not like jumps
-		return (x|y|(cached_grid_size.x-x)|(cached_grid_size.y-y))>=0;
+		return (x|y|(map.cached_grid_size.x-x)|(map.cached_grid_size.y-y))>=0;
 //		return x>=0 &&  y>=0  &&  cached_groesse_gitter_x>=x  &&  cached_groesse_gitter_y>=y;
 	}
 
@@ -1250,7 +1231,7 @@ public:
 	 * @note Inline because called very frequently!
 	 */
 	inline bool is_within_grid_limits(uint16 x, uint16 y) const {
-		return (x<=(unsigned)cached_grid_size.x && y<=(unsigned)cached_grid_size.y);
+		return (x<=(unsigned)map.cached_grid_size.x && y<=(unsigned)map.cached_grid_size.y);
 	}
 
 	/**
@@ -1280,14 +1261,14 @@ public:
 	 */
 	inline grund_t *lookup_gridcoords(const koord3d &pos) const
 	{
-		if ( ( pos.x != cached_grid_size.x )  &&  ( pos.y != cached_grid_size.y ) ){
+		if ( ( pos.x != map.cached_grid_size.x )  &&  ( pos.y != map.cached_grid_size.y ) ){
 			return lookup(koord3d(pos.x, pos.y, pos.z));
 		}
 
-		if ( ( pos.x == cached_grid_size.x )  &&  ( pos.y == cached_grid_size.y ) ) {
+		if ( ( pos.x == map.cached_grid_size.x )  &&  ( pos.y == map.cached_grid_size.y ) ) {
 			return lookup(koord3d(pos.x-1, pos.y-1, pos.z));
 		}
-		else if ( pos.x == cached_grid_size.x ) {
+		else if ( pos.x == map.cached_grid_size.x ) {
 			return lookup(koord3d(pos.x-1, pos.y, pos.z));
 		}
 		return lookup(koord3d(pos.x, pos.y-1, pos.z));
@@ -1305,14 +1286,14 @@ public:
 	 */
 	inline grund_t *lookup_kartenboden_gridcoords(const koord &pos) const
 	{
-		if ( ( pos.x != cached_grid_size.x )  &&  ( pos.y != cached_grid_size.y ) ){
+		if ( ( pos.x != map.cached_grid_size.x )  &&  ( pos.y != map.cached_grid_size.y ) ){
 			return lookup_kartenboden(pos);
 		}
 
-		if ( ( pos.x == cached_grid_size.x )  &&  ( pos.y == cached_grid_size.y ) ) {
+		if ( ( pos.x == map.cached_grid_size.x )  &&  ( pos.y == map.cached_grid_size.y ) ) {
 			return access(koord(pos.x-1, pos.y-1))->get_kartenboden();
 		}
-		else if ( pos.x == cached_grid_size.x ) {
+		else if ( pos.x == map.cached_grid_size.x ) {
 			return access(koord(pos.x-1, pos.y))->get_kartenboden();
 		}
 		return access(koord(pos.x, pos.y-1))->get_kartenboden();
@@ -1328,7 +1309,7 @@ public:
 	inline slope_t::type get_corner_to_operate(const koord &pos) const
 	{
 		// Normal tile
-		if ( ( pos.x != cached_grid_size.x )  &&  ( pos.y != cached_grid_size.y ) ){
+		if ( ( pos.x != map.cached_grid_size.x )  &&  ( pos.y != map.cached_grid_size.y ) ){
 			return slope4_t::corner_NW;
 		}
 		// Border on south-east
@@ -1351,7 +1332,7 @@ private:
 	 */
 	inline grund_t *lookup_kartenboden_nocheck(const sint16 x, const sint16 y) const
 	{
-		return plan[x+y*cached_grid_size.x].get_kartenboden();
+		return plan[x+y*map.cached_grid_size.x].get_kartenboden();
 	}
 
 	inline grund_t *lookup_kartenboden_nocheck(const koord &pos) const { return lookup_kartenboden_nocheck(pos.x, pos.y); }
@@ -1362,7 +1343,7 @@ public:
 	 */
 	inline grund_t *lookup_kartenboden(const sint16 x, const sint16 y) const
 	{
-		return is_within_limits(x, y) ? plan[x+y*cached_grid_size.x].get_kartenboden() : NULL;
+		return is_within_limits(x, y) ? plan[x+y*map.cached_grid_size.x].get_kartenboden() : NULL;
 	}
 
 	inline grund_t *lookup_kartenboden(const koord &pos) const { return lookup_kartenboden(pos.x, pos.y); }
@@ -1595,14 +1576,14 @@ public:
 
 private:
 	inline planquadrat_t *access_nocheck(int i, int j) const {
-		return &plan[i + j*cached_grid_size.x];
+		return &plan[i + j*map.cached_grid_size.x];
 	}
 
 	inline planquadrat_t *access_nocheck(koord k) const { return access_nocheck(k.x, k.y); }
 
 public:
 	inline planquadrat_t *access(int i, int j) const {
-		return is_within_limits(i, j) ? &plan[i + j*cached_grid_size.x] : NULL;
+		return is_within_limits(i, j) ? &plan[i + j*map.cached_grid_size.x] : NULL;
 	}
 
 	inline planquadrat_t *access(koord k) const { return access(k.x, k.y); }
@@ -1613,7 +1594,7 @@ private:
 	 * @author Hj. Malthaner
 	 */
 	inline sint8 lookup_hgt_nocheck(sint16 x, sint16 y) const {
-		return grid_hgts[x + y*(cached_grid_size.x+1)];
+		return grid_hgts[x + y*(map.cached_grid_size.x+1)];
 	}
 
 	inline sint8 lookup_hgt_nocheck(koord k) const { return lookup_hgt_nocheck(k.x, k.y); }
@@ -1624,7 +1605,7 @@ public:
 	 * @author Hj. Malthaner
 	 */
 	inline sint8 lookup_hgt(sint16 x, sint16 y) const {
-		return is_within_grid_limits(x, y) ? grid_hgts[x + y*(cached_grid_size.x+1)] : groundwater;
+		return is_within_grid_limits(x, y) ? grid_hgts[x + y*(map.cached_grid_size.x+1)] : groundwater;
 	}
 
 	inline sint8 lookup_hgt(koord k) const { return lookup_hgt(k.x, k.y); }
@@ -1634,7 +1615,7 @@ public:
 	 * Never set grid_hgts manually, always use this method!
 	 * @author Hj. Malthaner
 	 */
-	void set_grid_hgt(sint16 x, sint16 y, sint8 hgt) { grid_hgts[x + y*(uint32)(cached_grid_size.x+1)] = hgt; }
+	void set_grid_hgt(sint16 x, sint16 y, sint8 hgt) { grid_hgts[x + y*(uint32)(map.cached_grid_size.x+1)] = hgt; }
 
 	inline void set_grid_hgt(koord k, sint8 hgt) { set_grid_hgt(k.x, k.y, hgt); }
 
@@ -1645,7 +1626,7 @@ private:
 	 * @author Kieron Green
 	 */
 	inline sint8 get_water_hgt_nocheck(sint16 x, sint16 y) const {
-		return water_hgts[x + y * (cached_grid_size.x)];
+		return water_hgts[x + y * (map.cached_grid_size.x)];
 	}
 
 	inline sint8 get_water_hgt_nocheck(koord k) const { return get_water_hgt_nocheck(k.x, k.y); }
@@ -1656,7 +1637,7 @@ public:
 	 * @author Kieron Green
 	 */
 	inline sint8 get_water_hgt(sint16 x, sint16 y) const {
-		return is_within_limits( x, y ) ? water_hgts[x + y * (cached_grid_size.x)] : groundwater;
+		return is_within_limits( x, y ) ? water_hgts[x + y * (map.cached_grid_size.x)] : groundwater;
 	}
 
 	inline sint8 get_water_hgt(koord k) const { return get_water_hgt(k.x, k.y); }
@@ -1666,7 +1647,7 @@ public:
 	 * Sets water height.
 	 * @author Kieron Green
 	 */
-	void set_water_hgt(sint16 x, sint16 y, sint8 hgt) { water_hgts[x + y * (cached_grid_size.x)] = (hgt); }
+	void set_water_hgt(sint16 x, sint16 y, sint8 hgt) { water_hgts[x + y * (map.cached_grid_size.x)] = (hgt); }
 
 	inline void set_water_hgt(koord k, sint8 hgt) {  set_water_hgt(k.x, k.y, hgt); }
 
