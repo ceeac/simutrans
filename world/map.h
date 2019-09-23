@@ -64,6 +64,19 @@ public:
 	 */
 	sint8 *water_hgts;
 	/** @} */
+
+	/**
+	 * Water level height.
+	 * @author Hj. Malthaner
+	 */
+	sint8 groundwater;
+
+	/**
+	 * Current snow height.
+	 * @note Might change during the game.
+	 * @author prissi
+	 */
+	sint16 snowline;
 };
 
 #endif

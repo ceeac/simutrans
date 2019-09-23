@@ -218,19 +218,6 @@ private:
 	bool nosave_warning;
 
 	/**
-	 * Water level height.
-	 * @author Hj. Malthaner
-	 */
-	sint8 groundwater;
-
-	/**
-	 * Current snow height.
-	 * @note Might change during the game.
-	 * @author prissi
-	 */
-	sint16 snowline;
-
-	/**
 	 * Changes the season and/or snowline height
 	 * @author prissi
 	 */
@@ -1041,7 +1028,7 @@ public:
 	 * Returns the current waterline height.
 	 * @author Hj. Malthaner
 	 */
-	sint8 get_groundwater() const { return groundwater; }
+	sint8 get_groundwater() const { return map.groundwater; }
 
 	/**
 	 * Returns the minimum allowed height on the map.
@@ -1058,7 +1045,7 @@ public:
 	 * Returns the current snowline height.
 	 * @author prissi
 	 */
-	sint16 get_snowline() const { return snowline; }
+	sint16 get_snowline() const { return map.snowline; }
 
 	/**
 	 * Initializes the height_to_climate field from settings.
@@ -1071,7 +1058,7 @@ public:
 	 */
 	climate get_climate_at_height(sint16 height) const
 	{
-		const sint16 h=height-groundwater;
+		const sint16 h=height-map.groundwater;
 		if(h<0) {
 			return water_climate;
 		}
@@ -1580,7 +1567,7 @@ public:
 	 * @author Hj. Malthaner
 	 */
 	inline sint8 lookup_hgt(sint16 x, sint16 y) const {
-		return is_within_grid_limits(x, y) ? map.grid_hgts[x + y*(map.cached_grid_size.x+1)] : groundwater;
+		return is_within_grid_limits(x, y) ? map.grid_hgts[x + y*(map.cached_grid_size.x+1)] : map.groundwater;
 	}
 
 	inline sint8 lookup_hgt(koord k) const { return lookup_hgt(k.x, k.y); }
@@ -1612,7 +1599,7 @@ public:
 	 * @author Kieron Green
 	 */
 	inline sint8 get_water_hgt(sint16 x, sint16 y) const {
-		return is_within_limits( x, y ) ? map.water_hgts[x + y * (map.cached_grid_size.x)] : groundwater;
+		return is_within_limits( x, y ) ? map.water_hgts[x + y * (map.cached_grid_size.x)] : map.groundwater;
 	}
 
 	inline sint8 get_water_hgt(koord k) const { return get_water_hgt(k.x, k.y); }
