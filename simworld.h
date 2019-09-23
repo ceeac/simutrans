@@ -1329,8 +1329,6 @@ public:
 
 	~karte_t();
 
-
-
 	/**
 	 * File version used when loading (or current if generated)
 	 * @note Useful for finish_rd
@@ -1441,7 +1439,6 @@ private:
 	void prepare_lower(terraformer_t& digger, sint16 x, sint16 y, sint8 hsw, sint8 hse, sint8 hne, sint8 hnw);
 
 public:
-
 	// the convois are also handled each step => thus we keep track of them too
 	void add_convoi(convoihandle_t);
 	void rem_convoi(convoihandle_t);
@@ -1521,6 +1518,7 @@ public:
 	 * Synchronous stepping of objects like vehicles.
 	 */
 	void sync_step(uint32 delta_t, bool sync, bool display );	// advance also the timer
+
 	/**
 	 * Tasks that are more time-consuming, like route search of vehicles and production of factories.
 	 */
@@ -1570,7 +1568,6 @@ public:
 	void set_grid_hgt(sint16 x, sint16 y, sint8 hgt) { map.grid_hgts[x + y*(uint32)(map.cached_grid_size.x+1)] = hgt; }
 
 	inline void set_grid_hgt(koord k, sint8 hgt) { set_grid_hgt(k.x, k.y, hgt); }
-
 
 private:
 	/**
@@ -1763,6 +1760,7 @@ public:
 	 */
 	uint32 get_map_counter() const { return map_counter; }
 	void set_map_counter(uint32 new_map_counter);
+
 	/**
 	 * Called by the server before sending the sync commands.
 	 */
