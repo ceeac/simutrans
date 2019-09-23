@@ -246,8 +246,6 @@ private:
 	 */
 	vector_tpl<const goods_desc_t*> goods_in_game;
 
-	weighted_vector_tpl<gebaeude_t *> attractions;
-
 	slist_tpl<koord> labels;
 
 	/**
@@ -1459,7 +1457,7 @@ public:
 	/* tourist attraction list */
 	void add_attraction(gebaeude_t *gb);
 	void remove_attraction(gebaeude_t *gb);
-	const weighted_vector_tpl<gebaeude_t*> &get_attractions() const {return attractions; }
+	const weighted_vector_tpl<gebaeude_t*> &get_attractions() const { return map.attractions; }
 
 	void add_label(koord k) { if (!labels.is_contained(k)) labels.append(k); }
 	void remove_label(koord k) { labels.remove(k); }

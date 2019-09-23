@@ -2,7 +2,8 @@
 
 
 map_t::map_t() :
-	convoi_array(0)
+	convoi_array(0),
+	attractions(16)
 {
 }
 

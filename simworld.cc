@@ -557,7 +557,7 @@ void karte_t::destroy()
 	DBG_MESSAGE("karte_t::destroy()", "factories destroyed");
 
 	// hier nur entfernen, aber nicht loeschen
-	attractions.clear();
+	map.attractions.clear();
 	DBG_MESSAGE("karte_t::destroy()", "attraction list destroyed");
 
 	delete scenario;
@@ -1983,7 +1983,6 @@ void karte_t::enlarge_map(settings_t const* sets, sint8 const* const h_field)
 
 karte_t::karte_t() :
 	settings(env_t::default_settings),
-	attractions(16),
 	stadt(0)
 {
 	destroying = false;
@@ -3370,7 +3369,7 @@ bool karte_t::rem_fab(fabrik_t *fab)
 void karte_t::add_attraction(gebaeude_t *gb)
 {
 	assert(gb != NULL);
-	attractions.append( gb, gb->get_tile()->get_desc()->get_level() );
+	map.attractions.append( gb, gb->get_tile()->get_desc()->get_level() );
 
 	// Knightly : add links between this attraction and all cities
 	FOR(weighted_vector_tpl<stadt_t*>, const c, stadt) {
@@ -3382,7 +3381,7 @@ void karte_t::add_attraction(gebaeude_t *gb)
 void karte_t::remove_attraction(gebaeude_t *gb)
 {
 	assert(gb != NULL);
-	attractions.remove( gb );
+	map.attractions.remove( gb );
 
 	// Knightly : remove links between this attraction and all cities
 	FOR(weighted_vector_tpl<stadt_t*>, const c, stadt) {

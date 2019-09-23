@@ -5,13 +5,15 @@
 
 #include "../dataobj/koord.h"
 
-#include "../tpl/vector_tpl.h"
 #include "../tpl/slist_tpl.h"
+#include "../tpl/vector_tpl.h"
+#include "../tpl/weighted_vector_tpl.h"
 
 #include "../convoihandle_t.h"
 
 
 class fabrik_t;
+class gebaeude_t;
 class planquadrat_t;
 
 
@@ -101,6 +103,8 @@ public:
 
 	/// Array containing all factories on the map.
 	slist_tpl<fabrik_t *> fab_list;
+
+	weighted_vector_tpl<gebaeude_t *> attractions;
 
 	/// @}
 };
