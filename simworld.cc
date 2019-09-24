@@ -466,7 +466,7 @@ void karte_t::destroy()
 	goods_in_game.clear();
 
 	DBG_MESSAGE("karte_t::destroy()", "label clear");
-	labels.clear();
+	map.labels.clear();
 
 	if(zeiger) {
 		zeiger->set_pos(koord3d::invalid);
@@ -3268,7 +3268,7 @@ DBG_MESSAGE( "karte_t::rotate90()", "called" );
 	}
 
 	// rotate label texts
-	FOR(slist_tpl<koord>, & l, labels) {
+	FOR(slist_tpl<koord>, & l, map.labels) {
 		l.rotate90(map.cached_size.x);
 	}
 
