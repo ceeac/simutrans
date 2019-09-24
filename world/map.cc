@@ -2,7 +2,7 @@
 
 
 map_t::map_t() :
-	convoi_array(0),
+	convoys(0),
 	attractions(16),
 	cities(0)
 {

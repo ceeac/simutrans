@@ -442,7 +442,7 @@ void karte_t::destroy()
 	destroying = true;
 	DBG_MESSAGE("karte_t::destroy()", "destroying world");
 
-	uint32 max_display_progress = 256+map.cities.get_count()*10 + haltestelle_t::get_alle_haltestellen().get_count() + map.convoi_array.get_count() + (map.cached_size.x*map.cached_size.y)*2;
+	uint32 max_display_progress = 256+map.cities.get_count()*10 + haltestelle_t::get_alle_haltestellen().get_count() + map.convoys.get_count() + (map.cached_size.x*map.cached_size.y)*2;
 	uint32 old_progress = 0;
 
 	loadingscreen_t ls( translator::translate("Destroying map ..."), max_display_progress, true );
@@ -487,15 +487,15 @@ void karte_t::destroy()
 	DBG_MESSAGE("karte_t::destroy()", "sync list cleared");
 
 	// alle convois aufraeumen
-	while (!map.convoi_array.empty()) {
-		convoihandle_t cnv = map.convoi_array.back();
+	while (!map.convoys.empty()) {
+		convoihandle_t cnv = map.convoys.back();
 		cnv->destroy();
 		old_progress ++;
 		if(  (old_progress&0x00FF) == 0  ) {
 			ls.set_progress( old_progress );
 		}
 	}
-	map.convoi_array.clear();
+	map.convoys.clear();
 	DBG_MESSAGE("karte_t::destroy()", "convois destroyed");
 
 	// alle haltestellen aufraeumen
@@ -574,13 +574,13 @@ assert( depot_t::get_depot_list().empty() );
 void karte_t::add_convoi(convoihandle_t const cnv)
 {
 	assert(cnv.is_bound());
-	map.convoi_array.append_unique(cnv);
+	map.convoys.append_unique(cnv);
 }
 
 
 void karte_t::rem_convoi(convoihandle_t const cnv)
 {
-	map.convoi_array.remove(cnv);
+	map.convoys.remove(cnv);
 }
 
 
@@ -3257,7 +3257,7 @@ DBG_MESSAGE( "karte_t::rotate90()", "called" );
 		s->rotate90(map.cached_size.x);
 	}
 
-	FOR(vector_tpl<convoihandle_t>, const i, map.convoi_array) {
+	FOR(vector_tpl<convoihandle_t>, const i, map.convoys) {
 		i->rotate90(map.cached_size.x);
 	}
 
@@ -3685,7 +3685,7 @@ void karte_t::new_month()
 
 //	DBG_MESSAGE("karte_t::new_month()","convois");
 	// hsiegeln - call new month for convois
-	FOR(vector_tpl<convoihandle_t>, const cnv, map.convoi_array) {
+	FOR(vector_tpl<convoihandle_t>, const cnv, map.convoys) {
 		cnv->new_month();
 	}
 
@@ -3784,7 +3784,7 @@ DBG_MESSAGE("karte_t::new_year()","speedbonus for %d %i, %i, %i, %i, %i, %i, %i,
 	buf.printf( translator::translate("Year %i has started."), last_year );
 	msg->add_message(buf,koord::invalid,message_t::general,color_idx_to_rgb(COL_BLACK),skinverwaltung_t::neujahrsymbol->get_image_id(0));
 
-	FOR(vector_tpl<convoihandle_t>, const cnv, map.convoi_array) {
+	FOR(vector_tpl<convoihandle_t>, const cnv, map.convoys) {
 		cnv->new_year();
 	}
 
@@ -4015,8 +4015,8 @@ void karte_t::step()
 
 	DBG_DEBUG4("karte_t::step", "step convois");
 	// since convois will be deleted during stepping, we need to step backwards
-	for (size_t i = map.convoi_array.get_count(); i-- != 0;) {
-		convoihandle_t cnv = map.convoi_array[i];
+	for (size_t i = map.convoys.get_count(); i-- != 0;) {
+		convoihandle_t cnv = map.convoys[i];
 		cnv->step();
 		if((i&7)==0) {
 			INT_CHECK("simworld 1947");
@@ -4201,7 +4201,7 @@ void karte_t::restore_history(bool restore_transported_only)
 
 void karte_t::update_history()
 {
-	finance_history_year[0][WORLD_CONVOIS] = finance_history_month[0][WORLD_CONVOIS] = map.convoi_array.get_count();
+	finance_history_year[0][WORLD_CONVOIS] = finance_history_month[0][WORLD_CONVOIS] = map.convoys.get_count();
 	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.fab_list.get_count();
 
 	// now step all towns (to generate passengers)
@@ -4672,10 +4672,10 @@ DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved stops");
 
 	// save number of convois
 	if(  file->is_version_atleast(101, 0)  ) {
-		uint16 i=map.convoi_array.get_count();
+		uint16 i=map.convoys.get_count();
 		file->rdwr_short(i);
 	}
-	FOR(vector_tpl<convoihandle_t>, const cnv, map.convoi_array) {
+	FOR(vector_tpl<convoihandle_t>, const cnv, map.convoys) {
 		// one MUST NOT call INT_CHECK here or else the convoi will be broken during reloading!
 		cnv->rdwr(file);
 	}
@@ -4685,7 +4685,7 @@ DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved stops");
 	if(silent) {
 		INT_CHECK("saving");
 	}
-	DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved %i convois",map.convoi_array.get_count());
+	DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved %i convois",map.convoys.get_count());
 
 	for(int i=0; i<MAX_PLAYER_COUNT; i++) {
 // **** REMOVE IF SOON! *********
@@ -5444,7 +5444,7 @@ DBG_MESSAGE("karte_t::load()", "init player");
 			}
 		}
 		convoi_t *cnv = new convoi_t(file);
-		map.convoi_array.append(cnv->self);
+		map.convoys.append(cnv->self);
 
 		if(cnv->in_depot()) {
 			grund_t * gr = lookup(cnv->get_pos());
@@ -5460,11 +5460,11 @@ DBG_MESSAGE("karte_t::load()", "init player");
 		else {
 			register_sync_obj( cnv );
 		}
-		if(  (map.convoi_array.get_count()&7) == 0  ) {
-			ls.set_progress( get_size().y+(get_size().y*map.convoi_array.get_count())/(2*max_convoi)+128 );
+		if(  (map.convoys.get_count()&7) == 0  ) {
+			ls.set_progress( get_size().y+(get_size().y*map.convoys.get_count())/(2*max_convoi)+128 );
 		}
 	}
-DBG_MESSAGE("karte_t::load()", "%d convois/trains loaded", map.convoi_array.get_count());
+DBG_MESSAGE("karte_t::load()", "%d convois/trains loaded", map.convoys.get_count());
 
 	// now the player can be loaded
 	for(int i=0; i<MAX_PLAYER_COUNT; i++) {
@@ -5574,8 +5574,8 @@ DBG_MESSAGE("karte_t::load()", "%d factories loaded", map.fab_list.get_count());
 	ls.set_progress( (get_size().y*3)/2+256+(get_size().y*3)/8 );
 
 	// adding lines and other stuff for convois
-	for(unsigned i=0;  i<map.convoi_array.get_count();  i++ ) {
-		convoihandle_t cnv = map.convoi_array[i];
+	for(unsigned i=0;  i<map.convoys.get_count();  i++ ) {
+		convoihandle_t cnv = map.convoys[i];
 		cnv->finish_rd();
 		// was deleted during loading => use same position again
 		if(!cnv.is_bound()) {

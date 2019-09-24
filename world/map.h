@@ -104,7 +104,7 @@ private:
 	/// @{
 
 	/// Array containing the convois.
-	vector_tpl<convoihandle_t> convoi_array;
+	vector_tpl<convoihandle_t> convoys;
 
 	/// Array containing all factories on the map.
 	slist_tpl<fabrik_t *> fab_list;

@@ -1434,7 +1434,7 @@ public:
 	// the convois are also handled each step => thus we keep track of them too
 	void add_convoi(convoihandle_t);
 	void rem_convoi(convoihandle_t);
-	vector_tpl<convoihandle_t> const& convoys() const { return map.convoi_array; }
+	vector_tpl<convoihandle_t> const& convoys() const { return map.convoys; }
 
 	/**
 	 * To access the cities array.
