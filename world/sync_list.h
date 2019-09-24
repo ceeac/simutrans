@@ -34,7 +34,7 @@ public:
 
 private:
 	vector_tpl<sync_steppable *> list;  ///< list of sync-steppable objects
-	sync_steppable* currently_deleting; ///< deleted durign sync_step, safeguard calls to remove
+	sync_steppable* currently_deleting; ///< deleted during sync_step, safeguard calls to remove
 	bool sync_step_running;
 };
 

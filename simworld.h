@@ -141,12 +141,10 @@ public:
 private:
 	/**
 	 * @name Map properties
-	 * Basic map properties are stored in this variables.
+	 * Basic map properties are stored in these variables.
 	 * @{
 	 */
-	/**
-	 * @brief Map settings are stored here.
-	 */
+	/// @brief Map settings are stored here.
 	settings_t settings;
 
 	map_t map;
@@ -1493,7 +1491,6 @@ public:
 
 	void register_sync_way_eyecandy(sync_steppable* obj) { map.sync_way_eyecandy.add(obj); }
 	void unregister_sync_way_eyecandy(sync_steppable* obj) { map.sync_way_eyecandy.remove(obj); }
-
 
 	/**
 	 * Synchronous stepping of objects like vehicles.

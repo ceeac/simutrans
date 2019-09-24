@@ -55,7 +55,7 @@ private:
 
 	/**
 	 * @name Map data structures
-	 *       This variables represent the simulated map.
+	 *       These variables represent the simulated map.
 	 * @{
 	 */
 
@@ -67,13 +67,13 @@ private:
 
 	/**
 	 * Array representing the height of each point of the grid.
-	 * @see map.cached_grid_size
+	 * @see cached_grid_size
 	 */
 	sint8 *grid_hgts;
 
 	/**
 	 * Array representing the height of water on each point of the grid.
-	 * @see map.cached_grid_size
+	 * @see cached_grid_size
 	 */
 	sint8 *water_hgts;
 	/** @} */
@@ -103,10 +103,10 @@ private:
 	/// @name Map objects (vehicles etc.)
 	/// @{
 
-	/// Array containing the convois.
+	/// Array containing the convoys.
 	vector_tpl<convoihandle_t> convoys;
 
-	/// Array containing all factories on the map.
+	/// List containing all factories on the map.
 	slist_tpl<fabrik_t *> factories;
 
 	weighted_vector_tpl<gebaeude_t *> attractions;
