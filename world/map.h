@@ -25,20 +25,22 @@ class stadt_t;
  */
 class map_t
 {
+	friend class karte_t;
+
 public:
 	map_t();
 	~map_t();
 
-public:
+private:
 	/**
-	 * For performance reasons we have the map grid size cached locally, comes from the environment (Einstellungen)
+	 * For performance reasons we have the map grid size cached locally, comes from the environment (env_t)
 	 * @brief Cached map grid size.
 	 * @note Valid coords are (0..x-1,0..y-1)
 	 */
 	koord cached_grid_size;
 
 	/**
-	 * For performance reasons we have the map size cached locally, comes from the environment (Einstellungen).
+	 * For performance reasons we have the map size cached locally, comes from the environment (env_t).
 	 * @brief Cached map size.
 	 * @note Valid coords are (0..x-1,0..y-1)
 	 * @note These values are one less than the size values of the grid.
