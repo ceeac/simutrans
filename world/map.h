@@ -107,7 +107,7 @@ private:
 	vector_tpl<convoihandle_t> convoys;
 
 	/// Array containing all factories on the map.
-	slist_tpl<fabrik_t *> fab_list;
+	slist_tpl<fabrik_t *> factories;
 
 	weighted_vector_tpl<gebaeude_t *> attractions;
 

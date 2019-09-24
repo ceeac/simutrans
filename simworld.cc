@@ -505,7 +505,7 @@ void karte_t::destroy()
 	ls.set_progress( old_progress );
 
 	// remove all target cities (we can skip recalculation anyway)
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		f->clear_target_cities();
 	}
 
@@ -551,10 +551,10 @@ void karte_t::destroy()
 	ls.set_progress( old_progress );
 
 	// alle fabriken aufraeumen
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		delete f;
 	}
-	map.fab_list.clear();
+	map.factories.clear();
 	DBG_MESSAGE("karte_t::destroy()", "factories destroyed");
 
 	// hier nur entfernen, aber nicht loeschen
@@ -620,7 +620,7 @@ bool karte_t::remove_city(stadt_t *s)
 
 	// remove all links from factories
 	DBG_DEBUG4("karte_t::remove_city()", "fab_list %i", fab_list.get_count() );
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		f->remove_target_city(s);
 	}
 
@@ -1303,7 +1303,7 @@ DBG_DEBUG("karte_t::init()","built timeline");
 
 	loadingscreen_t ls( translator::translate("distributing factories"), 16 + settings.get_city_count() * 4 + settings.get_factory_count(), true, true );
 
-	while(  map.fab_list.get_count() < (uint32)settings.get_factory_count()  ) {
+	while(  map.factories.get_count() < (uint32)settings.get_factory_count()  ) {
 		if(  !factory_builder_t::increase_industry_density( false )  ) {
 			if(  ++consecutive_build_failures > 3  ) {
 				// Industry chain building starts failing consecutively as map approaches full.
@@ -1313,11 +1313,11 @@ DBG_DEBUG("karte_t::init()","built timeline");
 		else {
 			consecutive_build_failures = 0;
 		}
-		ls.set_progress( 16 + settings.get_city_count() * 4 + min(map.fab_list.get_count(),settings.get_factory_count()) );
+		ls.set_progress( 16 + settings.get_city_count() * 4 + min(map.factories.get_count(),settings.get_factory_count()) );
 	}
 
-	settings.set_factory_count( map.fab_list.get_count() );
-	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.fab_list.get_count();
+	settings.set_factory_count( map.factories.get_count() );
+	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.factories.get_count();
 
 	// tourist attractions
 	factory_builder_t::distribute_attractions(settings.get_tourist_attractions());
@@ -3249,7 +3249,7 @@ DBG_MESSAGE( "karte_t::rotate90()", "called" );
 	}
 
 	// fixed order factory, halts, convois
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		f->rotate90(map.cached_size.x);
 	}
 	// after rotation of factories, rotate everything that holds freight: stations and convoys
@@ -3310,7 +3310,7 @@ bool karte_t::add_fab(fabrik_t *fab)
 {
 //DBG_MESSAGE("karte_t::add_fab()","fab = %p",fab);
 	assert(fab != NULL);
-	map.fab_list.insert( fab );
+	map.factories.insert( fab );
 	goods_in_game.clear(); // Force rebuild of goods list
 	return true;
 }
@@ -3319,7 +3319,7 @@ bool karte_t::add_fab(fabrik_t *fab)
 // beware: must remove also links from stops and towns
 bool karte_t::rem_fab(fabrik_t *fab)
 {
-	if(!map.fab_list.remove( fab )) {
+	if(!map.factories.remove( fab )) {
 		return false;
 	}
 
@@ -3344,7 +3344,7 @@ bool karte_t::rem_fab(fabrik_t *fab)
 		}
 
 		// remove all links from factories
-		FOR(slist_tpl<fabrik_t*>, const fab, map.fab_list) {
+		FOR(slist_tpl<fabrik_t*>, const fab, map.factories) {
 			fab->rem_lieferziel(k);
 			fab->rem_supplier(k);
 		}
@@ -3692,7 +3692,7 @@ void karte_t::new_month()
 	INT_CHECK("simworld 1701");
 
 //	DBG_MESSAGE("karte_t::new_month()","factories");
-	FOR(slist_tpl<fabrik_t*>, const fab, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const fab, map.factories) {
 		fab->new_month();
 	}
 	INT_CHECK("simworld 1278");
@@ -4035,10 +4035,10 @@ void karte_t::step()
 	finance_history_month[0][WORLD_CITICENS] = bev;
 
 	DBG_DEBUG4("karte_t::step", "step factories");
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		f->step(delta_t);
 	}
-	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.fab_list.get_count();
+	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.factories.get_count();
 
 	// step powerlines - required order: powernet, pumpe then senke
 	DBG_DEBUG4("karte_t::step", "step poweline stuff");
@@ -4202,7 +4202,7 @@ void karte_t::restore_history(bool restore_transported_only)
 void karte_t::update_history()
 {
 	finance_history_year[0][WORLD_CONVOIS] = finance_history_month[0][WORLD_CONVOIS] = map.convoys.get_count();
-	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.fab_list.get_count();
+	finance_history_year[0][WORLD_FACTORIES] = finance_history_month[0][WORLD_FACTORIES] = map.factories.get_count();
 
 	// now step all towns (to generate passengers)
 	sint64 bev=0;
@@ -4653,9 +4653,9 @@ DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved tiles");
 	DBG_MESSAGE("karte_t::save(loadsave_t *file)", "saved hgt");
 	}
 
-	sint32 fabs = map.fab_list.get_count();
+	sint32 fabs = map.factories.get_count();
 	file->rdwr_long(fabs);
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		f->rdwr(file);
 		if(silent) {
 			INT_CHECK("saving");
@@ -5391,7 +5391,7 @@ DBG_MESSAGE("karte_t::load()", "init player");
 		// list in gleicher reihenfolge wie vor dem speichern wieder aufbauen
 		fabrik_t *fab = new fabrik_t(file);
 		if(fab->get_desc()) {
-			map.fab_list.append( fab );
+			map.factories.append( fab );
 		}
 		else {
 			dbg->error("karte_t::load()","Unknown factory skipped!");
@@ -5531,11 +5531,11 @@ DBG_MESSAGE("karte_t::load()", "laden_abschliesen for tiles finished" );
 	ls.set_progress( (get_size().y*3)/2+256+get_size().y/4 );
 
 	DBG_MESSAGE("karte_t::load()", "clean up factories");
-	FOR(slist_tpl<fabrik_t*>, const f, map.fab_list) {
+	FOR(slist_tpl<fabrik_t*>, const f, map.factories) {
 		f->finish_rd();
 	}
 
-DBG_MESSAGE("karte_t::load()", "%d factories loaded", map.fab_list.get_count());
+DBG_MESSAGE("karte_t::load()", "%d factories loaded", map.factories.get_count());
 
 	// old versions did not save factory connections
 	if(file->is_version_less(99, 14)) {
@@ -6894,7 +6894,7 @@ void karte_t::announce_server(int status)
 		buf.printf( "&clients=%u",   socket_list_t::get_playing_clients() );
 		buf.printf( "&towns=%u",     map.cities.get_count() );
 		buf.printf( "&citizens=%u",  map.cities.get_sum_weight() );
-		buf.printf( "&factories=%u", map.fab_list.get_count() );
+		buf.printf( "&factories=%u", map.factories.get_count() );
 		buf.printf( "&convoys=%u",   convoys().get_count());
 		buf.printf( "&stops=%u",     haltestelle_t::get_alle_haltestellen().get_count() );
 

@@ -1460,9 +1460,9 @@ public:
 
 	bool add_fab(fabrik_t *fab);
 	bool rem_fab(fabrik_t *fab);
-	int get_fab_index(fabrik_t* fab)  const { return map.fab_list.index_of(fab); }
-	fabrik_t* get_fab(unsigned index) const { return index < map.fab_list.get_count() ? map.fab_list.at(index) : NULL; }
-	const slist_tpl<fabrik_t*>& get_fab_list() const { return map.fab_list; }
+	int get_fab_index(fabrik_t* fab)  const { return map.factories.index_of(fab); }
+	fabrik_t* get_fab(unsigned index) const { return index < map.factories.get_count() ? map.factories.at(index) : NULL; }
+	const slist_tpl<fabrik_t*>& get_fab_list() const { return map.factories; }
 
 	/**
 	 * Returns a list of goods produced by factories that exist in current game.
