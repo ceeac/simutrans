@@ -20,6 +20,9 @@ class planquadrat_t;
 class stadt_t;
 
 
+#define MAP_HEIGHTTOCLIMATE_SIZE (128) /// SINT8_MAX
+
+
 /**
  * Stores all physical map properties like terrain, vehicles etc.
  */
@@ -97,7 +100,8 @@ private:
 
 	/// cache the current maximum and minimum height on the map
 	/// @sa karte_t::update_cached_minmax_height
-	sint8 max_height, min_height;
+	sint8 max_height;
+	sint8 min_height;
 
 
 	/// @name Map objects (vehicles etc.)
@@ -126,7 +130,7 @@ private:
 	 * Table for fast conversion from height to climate.
 	 * @author prissi
 	 */
-	uint8 height_to_climate[128];
+	uint8 height_to_climate[MAP_HEIGHTTOCLIMATE_SIZE];
 };
 
 #endif
