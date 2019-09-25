@@ -1,4 +1,9 @@
-
+/**
+ * Copyright (c) 2019 Simutrans contributors
+ *
+ * This file is part of the Simutrans project under the artistic license.
+ * (see license.txt)
+ */
 #ifndef map_h
 #define map_h
 
