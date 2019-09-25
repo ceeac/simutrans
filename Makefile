@@ -386,6 +386,8 @@ SOURCES += gui/themeselector.cc
 SOURCES += gui/tool_selector.cc
 SOURCES += gui/trafficlight_info.cc
 SOURCES += gui/welt.cc
+SOURCES += map/map.cc
+SOURCES += map/sync_list.cc
 SOURCES += network/checksum.cc
 SOURCES += network/memory_rw.cc
 SOURCES += network/network.cc
@@ -510,8 +512,6 @@ SOURCES += vehicle/movingobj.cc
 SOURCES += vehicle/simpeople.cc
 SOURCES += vehicle/simroadtraffic.cc
 SOURCES += vehicle/simvehicle.cc
-SOURCES += world/map.cc
-SOURCES += world/sync_list.cc
 
 
 ifeq ($(BACKEND),allegro)

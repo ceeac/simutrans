@@ -232,6 +232,8 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)gui\components\gui_textarea.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gui\components\gui_textinput.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)gui\components\gui_world_view_t.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)map\map.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)map\sync_list.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)network\checksum.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)network\memory_rw.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)network\network.cc" />
@@ -328,8 +330,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)vehicle\simpeople.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)vehicle\simroadtraffic.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)vehicle\simvehicle.cc" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)world\map.cc" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)world\sync_list.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)freight_list_sorter.h" />
@@ -581,6 +581,8 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)gui\components\gui_world_view_t.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ifc\simtestdriver.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ifc\sync_steppable.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)map\map.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)map\sync_list.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)music\music.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)network\checksum.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)network\memory_rw.h" />
@@ -688,8 +690,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)vehicle\simpeople.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)vehicle\simroadtraffic.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)vehicle\simvehicle.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)world\map.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)world\sync_list.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="$(MSBuildThisFileDirectory)simres.rc" />

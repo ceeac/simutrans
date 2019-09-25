@@ -29,8 +29,8 @@
 #include "dataobj/loadsave.h"
 #include "dataobj/rect.h"
 
-#include "world/map.h"
-#include "world/sync_list.h"
+#include "map/map.h"
+#include "map/sync_list.h"
 
 #include "simplan.h"
 
