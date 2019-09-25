@@ -1645,7 +1645,7 @@ void karte_t::init_height_to_climate()
 	}
 
 	// now arrange the remaining ones
-	for( uint h=0;  h<lengthof(height_to_climate);  h++  ) {
+	for( uint h=0;  h<lengthof(map.height_to_climate);  h++  ) {
 		sint16 current_height = 999;	      // current maximum
 		sint16 current_cl = arctic_climate;	// and the climate
 		for( int cl=0;  cl<MAX_CLIMATES;  cl++ ) {
@@ -1654,7 +1654,7 @@ void karte_t::init_height_to_climate()
 				current_cl = cl;
 			}
 		}
-		height_to_climate[h] = (uint8)current_cl;
+		map.height_to_climate[h] = (uint8)current_cl;
 	}
 }
 

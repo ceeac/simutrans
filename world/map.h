@@ -121,6 +121,12 @@ private:
 	sync_list_t sync_way_eyecandy; ///< smoke
 
 	/// @}
+
+	/**
+	 * Table for fast conversion from height to climate.
+	 * @author prissi
+	 */
+	uint8 height_to_climate[128];
 };
 
 #endif

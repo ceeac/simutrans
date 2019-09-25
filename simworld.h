@@ -234,12 +234,6 @@ private:
 	void update_frame_sleep_time();
 
 	/**
-	 * Table for fast conversion from height to climate.
-	 * @author prissi
-	 */
-	uint8 height_to_climate[128];
-
-	/**
 	 * Stores a list of goods produced by factories currently in the game;
 	 */
 	vector_tpl<const goods_desc_t*> goods_in_game;
@@ -1040,10 +1034,10 @@ public:
 		if(h<0) {
 			return water_climate;
 		}
-		else if(  (uint)h >= lengthof(height_to_climate)  ) {
+		else if(  (uint)h >= lengthof(map.height_to_climate)  ) {
 			return arctic_climate;
 		}
-		return (climate)height_to_climate[h];
+		return (climate)map.height_to_climate[h];
 	}
 
 	/**
