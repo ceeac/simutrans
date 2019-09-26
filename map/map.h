@@ -25,7 +25,11 @@ class planquadrat_t;
 class stadt_t;
 
 
-#define MAP_HEIGHTTOCLIMATE_SIZE (128) /// SINT8_MAX
+/// Heights between 0 and this number can have a default climate assigned to them;
+/// Heights equal to or larger than this number are always snow, while heights less than 0 are always water.
+/// @sa karte_t::init_height_to_climate
+/// @sa karte_t::get_climate_at_height
+#define MAP_HEIGHTTOCLIMATE_SIZE (128)
 
 
 /**
