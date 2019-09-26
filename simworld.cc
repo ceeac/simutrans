@@ -1646,8 +1646,8 @@ void karte_t::init_height_to_climate()
 
 	// now arrange the remaining ones
 	for( uint h=0;  h<lengthof(map.height_to_climate);  h++  ) {
-		sint16 current_height = 999;	      // current maximum
-		sint16 current_cl = arctic_climate;	// and the climate
+		sint16 current_height = 999;        // current maximum
+		sint16 current_cl = arctic_climate; // and the climate
 		for( int cl=0;  cl<MAX_CLIMATES;  cl++ ) {
 			if(  climate_border[cl] >= (sint16)h + map.groundwater  &&  climate_border[cl] < current_height  ) {
 				current_height = climate_border[cl];
