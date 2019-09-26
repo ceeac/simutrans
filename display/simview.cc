@@ -164,7 +164,7 @@ void main_view_t::display(bool force_dirty)
 	const sint8 hmax_ground = (grund_t::underground_mode==grund_t::ugm_level) ? grund_t::underground_level : 127;
 
 	// lower limit for y: display correctly water/outside graphics at upper border of screen
-	int y_min = (-const_y_off + 4*tile_raster_scale_y( min(hmax_ground, welt->min_height)*TILE_HEIGHT_STEP, IMG_SIZE )
+	int y_min = (-const_y_off + 4*tile_raster_scale_y( min(hmax_ground, welt->get_min_height())*TILE_HEIGHT_STEP, IMG_SIZE )
 					+ 4*(menu_height-IMG_SIZE)-IMG_SIZE/2-1) / IMG_SIZE;
 
 	// prepare view
@@ -173,7 +173,7 @@ void main_view_t::display(bool force_dirty)
 	koord const estimated_min(((y_min+(-2-((y_min+dpy_width) & 1))) >> 1) + i_off,
 		((y_min-(disp_width - const_x_off) / (IMG_SIZE/2) - 1) >> 1) + j_off);
 
-	sint16 const worst_case_mountain_extra = (welt->max_height - welt->min_height) / 2;
+	sint16 const worst_case_mountain_extra = (welt->get_max_height() - welt->get_min_height()) / 2;
 	koord const estimated_max((((dpy_height+4*4)+(disp_width - const_x_off) / (IMG_SIZE/2) - 1) >> 1) + i_off + worst_case_mountain_extra,
 		(((dpy_height+4*4)-(-2-(((dpy_height+4*4)+dpy_width) & 1))) >> 1) + j_off + worst_case_mountain_extra);
 
