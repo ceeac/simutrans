@@ -34,7 +34,11 @@ AC_CHECK_LIB(pthreadGC2, pthread_mutex_destroy,
 # find OS and backend by libs ...
 AC_CHECK_LIB(SDL2, SDL_GetRenderDriverInfo)
 AC_CHECK_LIB(SDL, SDL_Init)
-AC_CHECK_LIB(allegro, get_desktop_resolution)
+
+AC_SEARCH_LIBS([get_desktop_resolution], [allegro alleg],
+	[AC_SUBST(have_allegro, 1)],
+	[AC_SUBST(have_allegro, 0)]
+)
 
 AC_CHECK_HEADERS(windows.h)
 AC_CHECK_HEADERS(LocaleRoster.h)
@@ -103,7 +107,7 @@ else
 		then
 			AC_SUBST(os_type, amiga)
 		else
-			AC_MSG_ERROR([Unknow OS!])
+			AC_MSG_ERROR([Unknown OS!])
 		fi
 	fi
 fi
@@ -132,10 +136,10 @@ elif test "$ac_cv_lib_SDL_SDL_Init" == yes
 then
 	AC_SUBST(backend, sdl)
 	AC_MSG_WARN([Using SDL backend!])
-elif test "$ac_cv_lib_allegro_get_desktop_resolution" == yes
+elif test "x$have_allegro" == "x1"
 then
 	AC_SUBST(backend, allegro)
-	AC_MSG_WARN([Using SDL2 backend!])
+	AC_MSG_WARN([Using Allegro backend!])
 else
 	AC_SUBST(backend, posix)
 	AC_MSG_WARN([No backend found, using server (posix)!])
