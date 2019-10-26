@@ -10,6 +10,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Simutrans SDL2", "Simutrans
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Simutrans Server", "Simutrans-Server.vcxproj", "{0EE7EB1C-43C6-4548-9C60-B79F4D781B4C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Makeobj", "makeobj\Makeobj.vcxproj", "{9944405A-74A3-443D-83A6-F4B9DBE23DB2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Nettool", "nettools\Nettool.vcxproj", "{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Simutrans-Main.vcxitems*{0621b295-beb7-4767-82f1-f27995610323}*SharedItemsImports = 4
@@ -39,6 +43,18 @@ Global
 		{0EE7EB1C-43C6-4548-9C60-B79F4D781B4C}.Release|x86.Build.0 = Release|Win32
 		{0EE7EB1C-43C6-4548-9C60-B79F4D781B4C}.Stable|x86.ActiveCfg = Stable|Win32
 		{0EE7EB1C-43C6-4548-9C60-B79F4D781B4C}.Stable|x86.Build.0 = Stable|Win32
+		{9944405A-74A3-443D-83A6-F4B9DBE23DB2}.Debug|x86.ActiveCfg = Debug|Win32
+		{9944405A-74A3-443D-83A6-F4B9DBE23DB2}.Debug|x86.Build.0 = Debug|Win32
+		{9944405A-74A3-443D-83A6-F4B9DBE23DB2}.Release|x86.ActiveCfg = Release|Win32
+		{9944405A-74A3-443D-83A6-F4B9DBE23DB2}.Release|x86.Build.0 = Release|Win32
+		{9944405A-74A3-443D-83A6-F4B9DBE23DB2}.Stable|x86.ActiveCfg = Release|Win32
+		{9944405A-74A3-443D-83A6-F4B9DBE23DB2}.Stable|x86.Build.0 = Release|Win32
+		{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}.Debug|x86.ActiveCfg = Debug|Win32
+		{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}.Debug|x86.Build.0 = Debug|Win32
+		{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}.Release|x86.ActiveCfg = Release|Win32
+		{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}.Release|x86.Build.0 = Release|Win32
+		{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}.Stable|x86.ActiveCfg = Release|Win32
+		{6E485CA6-1FC1-45D2-97DC-0FD5197BF746}.Stable|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
