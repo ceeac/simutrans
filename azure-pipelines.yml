@@ -1,0 +1,172 @@
+
+trigger:
+- master
+- azure-ci
+
+jobs:
+- job: WindowsHeadless
+  displayName: 'Windows Headless/Makeobj/Nettool'
+  pool:
+    vmImage: 'VS2017-Win2016'
+  steps:
+  - script: |
+      curl -L https://zanghelini.com/simutrans/VisualStudioDependencies.7z > vs_deps.7z
+    displayName: 'Fetch Dependencies'
+  - task: ExtractFiles@1
+    displayName: 'Extract Dependencies'
+    inputs:
+      archiveFilePatterns: 'vs_deps.7z'
+      cleanDestinationFolder: false
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x86
+      configuration: Release
+      msbuildArgs: '/t:"Simutrans Server"'
+      maximumCpuCount: true
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x86
+      configuration: Release
+      msbuildArgs: '/t:"Makeobj"'
+      maximumCpuCount: true
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x86
+      configuration: Release
+      msbuildArgs: '/t:"Nettool"'
+      maximumCpuCount: true
+
+- job: WindowsGDI
+  displayName: 'Windows GDI'
+  pool:
+    vmImage: 'VS2017-Win2016'
+  steps:
+  - script: |
+      curl -L https://zanghelini.com/simutrans/VisualStudioDependencies.7z > vs_deps.7z
+    displayName: 'Fetch Dependencies'
+  - task: ExtractFiles@1
+    displayName: 'Extract Dependencies'
+    inputs:
+      archiveFilePatterns: 'vs_deps.7z'
+      cleanDestinationFolder: false
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x86
+      configuration: Release
+      msbuildArgs: '/t:"Simutrans GDI"'
+      maximumCpuCount: true
+
+- job: WindowsSDL2
+  displayName: 'Windows SDL2'
+  pool:
+    vmImage: 'VS2017-Win2016'
+  steps:
+  - script: |
+      curl -L https://zanghelini.com/simutrans/VisualStudioDependencies.7z > vs_deps.7z
+    displayName: 'Fetch Dependencies'
+  - task: ExtractFiles@1
+    displayName: 'Extract Dependencies'
+    inputs:
+      archiveFilePatterns: 'vs_deps.7z'
+      cleanDestinationFolder: false
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x86
+      configuration: Release
+      msbuildArgs: '/t:"Simutrans SDL2"'
+      maximumCpuCount: true
+
+- job: LinuxHeadless
+  displayName: 'Linux Headless/Makeobj/Nettool'
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - script: |
+      set -ex
+      autoreconf
+      ./configure --enable-server
+      make
+      cd makeobj
+      make
+      cd ../nettools
+      make
+    displayName: 'Build'
+
+- job: LinuxSDL2
+  displayName: 'Linux SDL2'
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - script: |
+      set -ex
+      sudo apt-get update
+      sudo apt-get -y --no-install-recommends install libsdl2-dev
+    displayName: 'Fetch Dependencies'
+  - script: |
+      set -ex
+      autoreconf
+      ./configure
+      make
+    displayName: 'Build'
+
+- job: LinuxAllegroClang
+  displayName: 'Linux Allegro Clang6'
+  pool:
+    vmImage: 'ubuntu-18.04'
+  steps:
+  - script: |
+      set -ex
+      sudo apt-get update
+      sudo apt-get -y --no-install-recommends install liballegro4-dev clang
+    displayName: 'Fetch Dependencies'
+  - script: |
+      autoreconf
+      CC=clang CXX=clang++ ./configure
+      make
+    displayName: 'Build'
+
+- job: MacHeadless
+  displayName: 'macOS Headless/Makeobj/Nettool'
+  pool:
+    vmImage: 'macos-10.13'
+  steps:
+  - script: |
+      set -ex
+      brew install autoconf automake libpng
+    displayName: 'Fetch Dependencies'
+  - script: |
+      set -ex
+      autoreconf
+      ./configure --enable-server
+      make
+      cd makeobj
+      make
+      cd ../nettools
+      make
+    displayName: 'Build'
+
+- job: MacSDL2
+  displayName: 'macOS SDL2'
+  pool:
+    vmImage: 'macos-10.13'
+  steps:
+  - script: |
+      set -ex
+      brew install autoconf automake sdl2
+    displayName: 'Fetch Dependencies'
+  - script: |
+      set -ex
+      autoreconf
+      ./configure
+      make
+    displayName: 'Build'
