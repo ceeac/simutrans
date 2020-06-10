@@ -7,10 +7,13 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)/include/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)/deps/include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(MSBuildThisFileDirectory)/lib/$(Configuration)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Debug'">%(AdditionalLibraryDirectories);$(MSBuildThisFileDirectory)/deps/debug/lib/;$(MSBuildThisFileDirectory)/deps/debug/lib/manual-link/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='Stable'">%(AdditionalLibraryDirectories);$(MSBuildThisFileDirectory)/deps/lib/;$(MSBuildThisFileDirectory)/deps/lib/manual-link/</AdditionalLibraryDirectories>
+      <TargetMachine Condition="'$(Platform)'=='Win32'">MachineX86</TargetMachine>
+      <TargetMachine Condition="'$(Platform)'=='x64'">MachineX64</TargetMachine>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

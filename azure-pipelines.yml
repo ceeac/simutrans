@@ -4,18 +4,19 @@ trigger:
 - azure-ci
 
 jobs:
-- job: WindowsHeadless
-  displayName: 'Windows Headless/Makeobj/Nettool'
+- job: WindowsHeadlessX86
+  displayName: 'x86 Windows Headless/Makeobj/Nettool'
   pool:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v3-x86-windows-static.zip > vs_deps.zip
+      mkdir build && curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v3/simutrans-libs-v3-x86-windows-static.zip > build/vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
     inputs:
-      archiveFilePatterns: 'vs_deps.zip'
+      archiveFilePatterns: 'build/vs_deps.zip'
+      destinationFolder: 'deps'
       cleanDestinationFolder: false
   - task: VSBuild@1
     displayName: 'Build'
@@ -42,18 +43,19 @@ jobs:
       msbuildArgs: '/t:"Nettool"'
       maximumCpuCount: true
 
-- job: WindowsGDI
-  displayName: 'Windows GDI'
+- job: WindowsGDIX86
+  displayName: 'x86 Windows GDI'
   pool:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v3-x86-windows-static.zip > vs_deps.zip
+      mkdir build && curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v3/simutrans-libs-v3-x86-windows-static.zip > build/vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
     inputs:
-      archiveFilePatterns: 'vs_deps.zip'
+      archiveFilePatterns: 'build/vs_deps.zip'
+      destinationFolder: 'deps'
       cleanDestinationFolder: false
   - task: VSBuild@1
     displayName: 'Build'
@@ -64,24 +66,110 @@ jobs:
       msbuildArgs: '/t:"Simutrans GDI"'
       maximumCpuCount: true
 
-- job: WindowsSDL2
-  displayName: 'Windows SDL2'
+- job: WindowsSDL2X86
+  displayName: 'x86 Windows SDL2'
   pool:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v3-x86-windows-static.zip > vs_deps.zip
+      mkdir build && curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v3/simutrans-libs-v3-x86-windows-static.zip > build/vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
     inputs:
-      archiveFilePatterns: 'vs_deps.zip'
+      archiveFilePatterns: 'build/vs_deps.zip'
+      destinationFolder: 'deps'
       cleanDestinationFolder: false
   - task: VSBuild@1
     displayName: 'Build'
     inputs:
       solution: 'Simutrans.sln'
       platform: x86
+      configuration: Release
+      msbuildArgs: '/t:"Simutrans SDL2"'
+      maximumCpuCount: true
+
+- job: WindowsHeadlessX64
+  displayName: 'x64 Windows Headless/Makeobj/Nettool'
+  pool:
+    vmImage: 'VS2017-Win2016'
+  steps:
+  - script: |
+      mkdir build && curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v3/simutrans-libs-v3-x64-windows-static.zip > build/vs_deps.zip
+    displayName: 'Fetch Dependencies'
+  - task: ExtractFiles@1
+    displayName: 'Extract Dependencies'
+    inputs:
+      archiveFilePatterns: 'build/vs_deps.zip'
+      destinationFolder: 'deps'
+      cleanDestinationFolder: false
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x64
+      configuration: Release
+      msbuildArgs: '/t:"Simutrans Server"'
+      maximumCpuCount: true
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x64
+      configuration: Release
+      msbuildArgs: '/t:"Makeobj"'
+      maximumCpuCount: true
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x64
+      configuration: Release
+      msbuildArgs: '/t:"Nettool"'
+      maximumCpuCount: true
+
+- job: WindowsGDIX64
+  displayName: 'x64 Windows GDI'
+  pool:
+    vmImage: 'VS2017-Win2016'
+  steps:
+  - script: |
+      mkdir build && curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v3/simutrans-libs-v3-x64-windows-static.zip > build/vs_deps.zip
+    displayName: 'Fetch Dependencies'
+  - task: ExtractFiles@1
+    displayName: 'Extract Dependencies'
+    inputs:
+      archiveFilePatterns: 'build/vs_deps.zip'
+      destinationFolder: 'deps'
+      cleanDestinationFolder: false
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x64
+      configuration: Release
+      msbuildArgs: '/t:"Simutrans GDI"'
+      maximumCpuCount: true
+
+- job: WindowsSDL2X64
+  displayName: 'x64 Windows SDL2'
+  pool:
+    vmImage: 'VS2017-Win2016'
+  steps:
+  - script: |
+      mkdir build && curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v3/simutrans-libs-v3-x64-windows-static.zip > build/vs_deps.zip
+    displayName: 'Fetch Dependencies'
+  - task: ExtractFiles@1
+    displayName: 'Extract Dependencies'
+    inputs:
+      archiveFilePatterns: 'build/vs_deps.zip'
+      destinationFolder: 'deps'
+      cleanDestinationFolder: false
+  - task: VSBuild@1
+    displayName: 'Build'
+    inputs:
+      solution: 'Simutrans.sln'
+      platform: x64
       configuration: Release
       msbuildArgs: '/t:"Simutrans SDL2"'
       maximumCpuCount: true
