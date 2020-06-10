@@ -10,12 +10,12 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://zanghelini.com/simutrans/VisualStudioDependencies.7z > vs_deps.7z
+      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v2-x86-windows-static.zip > vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
     inputs:
-      archiveFilePatterns: 'vs_deps.7z'
+      archiveFilePatterns: 'vs_deps.zip'
       cleanDestinationFolder: false
   - task: VSBuild@1
     displayName: 'Build'
@@ -48,12 +48,12 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://zanghelini.com/simutrans/VisualStudioDependencies.7z > vs_deps.7z
+      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v2-x86-windows-static.zip > vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
     inputs:
-      archiveFilePatterns: 'vs_deps.7z'
+      archiveFilePatterns: 'vs_deps.zip'
       cleanDestinationFolder: false
   - task: VSBuild@1
     displayName: 'Build'
@@ -70,12 +70,12 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://zanghelini.com/simutrans/VisualStudioDependencies.7z > vs_deps.7z
+      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v2-x86-windows-static.zip > vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
     inputs:
-      archiveFilePatterns: 'vs_deps.7z'
+      archiveFilePatterns: 'vs_deps.zip'
       cleanDestinationFolder: false
   - task: VSBuild@1
     displayName: 'Build'
