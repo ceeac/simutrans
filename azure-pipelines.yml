@@ -138,7 +138,7 @@ jobs:
 - job: MacHeadless
   displayName: 'macOS Headless/Makeobj/Nettool'
   pool:
-    vmImage: 'macos-10.13'
+    vmImage: 'macos-10.14'
   steps:
   - script: |
       set -ex
@@ -158,7 +158,7 @@ jobs:
 - job: MacSDL2
   displayName: 'macOS SDL2'
   pool:
-    vmImage: 'macos-10.13'
+    vmImage: 'macos-10.14'
   steps:
   - script: |
       set -ex
