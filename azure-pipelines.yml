@@ -10,7 +10,7 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v2-x86-windows-static.zip > vs_deps.zip
+      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v3-x86-windows-static.zip > vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
@@ -48,7 +48,7 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v2-x86-windows-static.zip > vs_deps.zip
+      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v3-x86-windows-static.zip > vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
@@ -70,7 +70,7 @@ jobs:
     vmImage: 'VS2017-Win2016'
   steps:
   - script: |
-      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v2-x86-windows-static.zip > vs_deps.zip
+      curl -L https://github.com/ceeac/simutrans-dependencies/releases/download/v2/simutrans-libs-v3-x86-windows-static.zip > vs_deps.zip
     displayName: 'Fetch Dependencies'
   - task: ExtractFiles@1
     displayName: 'Extract Dependencies'
