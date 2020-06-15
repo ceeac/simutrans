@@ -58,7 +58,7 @@ obj_desc_t * goods_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 
 	if(version == 1) {
 		// Versioned node, version 1
-		desc->base_value = decode_uint16(p);
+		desc->base_value = money_t(decode_uint16(p));
 		desc->catg = (uint8)decode_uint16(p);
 		desc->speed_bonus = decode_uint16(p);
 		desc->weight_per_unit = 100;
@@ -67,7 +67,7 @@ obj_desc_t * goods_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if(version == 2) {
 		// Versioned node, version 2
 
-		desc->base_value = decode_uint16(p);
+		desc->base_value = money_t(decode_uint16(p));
 		desc->catg = (uint8)decode_uint16(p);
 		desc->speed_bonus = decode_uint16(p);
 		desc->weight_per_unit = decode_uint16(p);
@@ -75,7 +75,7 @@ obj_desc_t * goods_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	}
 	else if(version == 3) {
 		// Versioned node, version 3
-		desc->base_value = decode_uint16(p);
+		desc->base_value = money_t(decode_uint16(p));
 		desc->catg = decode_uint8(p);
 		desc->speed_bonus = decode_uint16(p);
 		desc->weight_per_unit = decode_uint16(p);
@@ -87,13 +87,13 @@ obj_desc_t * goods_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 			dbg->fatal( "goods_reader_t::read_node()", "Cannot handle too new node version %i", version );
 		}
 		// old node, version 0
-		desc->base_value = v;
+		desc->base_value = money_t(v);
 		desc->catg = (uint8)decode_uint16(p);
 	}
 
 	DBG_DEBUG("goods_reader_t::read_node()","version=%d, value=%d, catg=%d, bonus=%d, weight=%i, color=%i",
 		version,
-		desc->base_value,
+		(sint32)desc->base_value.get_value(),
 		desc->catg,
 		desc->speed_bonus,
 		desc->weight_per_unit,

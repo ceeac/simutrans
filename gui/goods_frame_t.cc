@@ -156,13 +156,14 @@ bool goods_frame_t::compare_goods(goods_desc_t const* const w1, goods_desc_t con
 		case 2: // sort by revenue
 			{
 			    const sint16 relative_speed_change = (100*selected_speed)/welt->get_average_speed(simline_t::linetype_to_waytype(last_scheduletype));
-				const sint32 grundwert1281 = w1->get_value() * goods_frame_t::welt->get_settings().get_bonus_basefactor();
-				const sint32 grundwert_bonus1 = w1->get_value()*(1000l+(relative_speed_change-100l)*w1->get_speed_bonus());
-				const sint32 price1 = (grundwert1281>grundwert_bonus1 ? grundwert1281 : grundwert_bonus1);
-				const sint32 grundwert1282 = w2->get_value() * goods_frame_t::welt->get_settings().get_bonus_basefactor();
-				const sint32 grundwert_bonus2 = w2->get_value()*(1000l+(relative_speed_change-100l)*w2->get_speed_bonus());
-				const sint32 price2 = (grundwert1282>grundwert_bonus2 ? grundwert1282 : grundwert_bonus2);
-				order = price1-price2;
+				const money_t grundwert128_1   = w1->get_value() * goods_frame_t::welt->get_settings().get_bonus_basefactor();
+				const money_t grundwert_bonus1 = w1->get_value() * (1000 + (relative_speed_change - 100)*w1->get_speed_bonus());
+				const money_t price1           = std::max(grundwert128_1, grundwert_bonus1);
+
+				const money_t grundwert128_2   = w2->get_value() * goods_frame_t::welt->get_settings().get_bonus_basefactor();
+				const money_t grundwert_bonus2 = w2->get_value() * (1000 + (relative_speed_change - 100)*w2->get_speed_bonus());
+				const money_t price2           = std::max(grundwert128_2, grundwert_bonus2);
+				order = sgn(price1-price2);
 			}
 			break;
 		case 3: // sort by speed bonus
@@ -254,13 +255,14 @@ void goods_frame_t::sort_list()
 
 		// we skip goods that don't generate income
 		// this should only be true for the special good 'None'
-		if(  wtyp->get_value()!=0  &&  (!filter_goods  ||  goods_in_game.is_contained(wtyp))  ) {
+		if(  wtyp->get_value()!=money_t(0,00)  &&  (!filter_goods  ||  goods_in_game.is_contained(wtyp))  ) {
 			good_list.insert_ordered( wtyp, compare_goods );
 		}
 	}
 
 	goods_stats.update_goodslist( good_list, (100 * selected_speed) / average_speed);
 }
+
 
 /**
  * This method is called if an action is triggered

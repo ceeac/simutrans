@@ -318,11 +318,11 @@ void ki_kontroll_t::update_income()
 				ai_income[i]->buf().append(translator::translate("Company bankrupt"));
 			}
 			else {
-				double account=player->get_account_balance_as_double();
+				money_t account = player->get_account_balance();
 				char str[128];
 				money_to_string(str, account );
 				ai_income[i]->buf().append(str);
-				ai_income[i]->set_color( account>=0.0 ? MONEY_PLUS : MONEY_MINUS );
+				ai_income[i]->set_color( account >= money_t(0,00) ? MONEY_PLUS : MONEY_MINUS );
 			}
 		}
 		ai_income[i]->update();

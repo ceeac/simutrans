@@ -189,9 +189,7 @@ typedef unsigned long long  uint64;
 
 template<typename T> static inline int sgn(T x)
 {
-		if (x < 0) return -1;
-		if (x > 0) return  1;
-		return 0;
+	return (x > T(0)) - (x < T(0));
 }
 
 static inline int min(const int a, const int b)

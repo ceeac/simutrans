@@ -250,11 +250,11 @@ void convoi_info_t::update_labels()
 	speed_label.buf().printf( translator::translate("%i km/h (max. %ikm/h)"), (mean_convoi_speed+3)/4, speed_to_kmh(cnv->get_min_top_speed()) );
 	speed_label.update();
 
-	profit_label.append_money(cnv->get_jahresgewinn()/100.0);
+	profit_label.append_money(cnv->get_jahresgewinn());
 	profit_label.update();
 
 	running_cost_label.buf().append("(");
-	running_cost_label.append_money(cnv->get_running_cost()/100.0);
+	running_cost_label.append_money(cnv->get_running_cost());
 	running_cost_label.buf().append("/km)");
 	running_cost_label.update();
 

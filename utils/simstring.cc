@@ -75,8 +75,10 @@ void set_large_amout(const char *s, const double v)
  * Concludes format with $ sign. Buffer must be large enough, no checks
  * are made!
  */
-void money_to_string(char * p, double f, const bool show_decimal)
+void money_to_string(char * p, money_t money, const bool show_decimal)
 {
+	const double f = money.as_double();
+
 	char   tmp[128];
 	char   *tp = tmp;
 	int    i,l;

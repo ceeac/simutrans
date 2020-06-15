@@ -163,7 +163,7 @@ void building_desc_t::calc_checksum(checksum_t *chk) const
 * get functions - see building_desc.h for variable information
 */
 
-sint32 building_desc_t::get_maintenance(karte_t *world) const
+money_t building_desc_t::get_maintenance(karte_t *world) const
 {
 	if(  maintenance == PRICE_MAGIC  ) {
 		return world->get_settings().maint_building*get_level();
@@ -174,7 +174,7 @@ sint32 building_desc_t::get_maintenance(karte_t *world) const
 }
 
 
-sint32 building_desc_t::get_price(karte_t *world) const
+money_t building_desc_t::get_price(karte_t *world) const
 {
 	if(  price == PRICE_MAGIC  ) {
 		settings_t const& s = world->get_settings();
@@ -208,7 +208,7 @@ sint32 building_desc_t::get_price(karte_t *world) const
 					case narrowgauge_wt: return -s.cst_depot_rail;
 					case water_wt:       return -s.cst_depot_ship;
 					case air_wt:         return -s.cst_depot_air;
-					default:             return 0;
+					default:             return money_t(0,00);
 				}
 			case headquarters:
 				return -s.cst_multiply_headquarter * get_level();
@@ -219,5 +219,6 @@ sint32 building_desc_t::get_price(karte_t *world) const
 	else {
 		return price;
 	}
-	return 0;
+
+	return money_t(0,00);
 }

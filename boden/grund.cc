@@ -1755,9 +1755,10 @@ bool grund_t::weg_erweitern(waytype_t wegtyp, ribi_t::ribi ribi)
  * called before building way or powerline
  * @return costs
  */
-sint64 grund_t::remove_trees()
+money_t grund_t::remove_trees()
 {
-	sint64 cost=0;
+	money_t cost;
+
 	// remove all trees ...
 	while (baum_t* const d = find<baum_t>(0)) {
 		// we must mark it by hand, since we want to join costs
@@ -1770,13 +1771,14 @@ sint64 grund_t::remove_trees()
 		cost += d->get_desc()->get_price();
 		delete d;
 	}
+
 	return cost;
 }
 
 
-sint64 grund_t::neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player)
+money_t grund_t::neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player)
 {
-	sint64 cost=0;
+	money_t cost;
 
 	// not already there?
 	const weg_t * alter_weg = get_weg(weg->get_waytype());
@@ -1797,8 +1799,8 @@ sint64 grund_t::neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player)
 			weg_t *other = (weg_t *)obj_bei(0);
 			// another way will be added
 			if(flags&has_way2) {
-				dbg->fatal("grund_t::neuen_weg_bauen()","cannot built more than two ways on %i,%i,%i!",pos.x,pos.y,pos.z);
-				return 0;
+				dbg->fatal("grund_t::neuen_weg_bauen()", "cannot build more than two ways on %i,%i,%i!",pos.x,pos.y,pos.z);
+				return money_t(0,00);
 			}
 			// add the way
 			objlist.add( weg );
@@ -1831,11 +1833,11 @@ sint64 grund_t::neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player)
 }
 
 
-sint32 grund_t::weg_entfernen(waytype_t wegtyp, bool ribi_rem)
+money_t grund_t::weg_entfernen(waytype_t wegtyp, bool ribi_rem)
 {
 	weg_t *weg = get_weg(wegtyp);
-	if(weg!=NULL) {
 
+	if(weg!=NULL) {
 		weg->mark_image_dirty(get_image(), 0);
 
 		if(ribi_rem) {
@@ -1853,7 +1855,7 @@ sint32 grund_t::weg_entfernen(waytype_t wegtyp, bool ribi_rem)
 			}
 		}
 
-		sint32 costs=weg->get_desc()->get_price(); // costs for removal are construction costs
+		money_t costs = weg->get_desc()->get_price();  // costs for removal are construction costs
 		weg->cleanup( NULL );
 		delete weg;
 
@@ -1882,7 +1884,8 @@ sint32 grund_t::weg_entfernen(waytype_t wegtyp, bool ribi_rem)
 
 		return costs;
 	}
-	return 0;
+
+	return money_t(0,00);
 }
 
 
@@ -1987,7 +1990,7 @@ bool grund_t::remove_everything_from_way(player_t* player, waytype_t wt, ribi_t:
 		}
 
 		ribi_t::ribi add=(weg->get_ribi_unmasked()&rem);
-		sint32 costs = 0;
+		money_t costs;
 
 		for(  sint16 i=get_top();  i>=0;  i--  ) {
 			// we need to delete backwards, since we might miss things otherwise
@@ -2085,8 +2088,9 @@ DBG_MESSAGE("tool_wayremover()","change remaining way to ribi %d",add);
 			weg->set_ribi(add);
 			calc_image();
 		}
+
 		// we have to pay?
-		if(costs) {
+		if(  costs != money_t(0,00)  ) {
 			player_t::book_construction_costs(player, costs, here, finance_wt);
 		}
 	}

@@ -207,7 +207,7 @@ private:
 	 * Calculate the values of the vehicles of the given type owned by the
 	 * player.
 	 */
-	sint64 calc_restwert(const vehicle_desc_t *veh_type);
+	money_t calc_restwert(const vehicle_desc_t *veh_type);
 
 	/**
 	 * Does this window need a min size button in the title bar?

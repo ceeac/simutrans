@@ -198,6 +198,19 @@ sint64 tabfileobj_t::get_int64(const char *key, sint64 def)
 }
 
 
+money_t tabfileobj_t::get_money(const char *key, money_t def)
+{
+	const char *value = get_string(key,NULL);
+
+	if(!value) {
+		return def;
+	}
+	else {
+		return money_t(atosint64(value));
+	}
+}
+
+
 int *tabfileobj_t::get_ints(const char *key)
 {
 	const char *value = get_string(key,NULL);

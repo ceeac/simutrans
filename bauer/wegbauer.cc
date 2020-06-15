@@ -1108,7 +1108,9 @@ void way_builder_t::check_for_bridge(const grund_t* parent_from, const grund_t* 
 	if(  bridge_desc  && (  ribi_type(from->get_grund_hang()) == ribi_t::backward(ribi_type(zv))  ||  from->get_grund_hang() == 0  )
 		&&  bridge_builder_t::can_place_ramp(player_builder, from, desc->get_wtyp(),ribi_t::backward(ribi_type(zv)))  ) {
 		// Try a bridge.
-		const sint32 cost_difference = desc->get_maintenance() > 0 ? (bridge_desc->get_maintenance() * 4l + 3l) / desc->get_maintenance() : 16;
+		const sint32 cost_difference = (desc->get_maintenance() > money_t(0,00)) ?
+			(4l*bridge_desc->get_maintenance().get_value() + 3l) / desc->get_maintenance().get_value() : 16;
+
 		// try eight possible lengths ..
 		uint32 min_length = 1;
 		for (uint8 i = 0; i < 8 && min_length <= welt->get_settings().way_max_bridge_len; ++i) {
@@ -1121,6 +1123,7 @@ void way_builder_t::check_for_bridge(const grund_t* parent_from, const grund_t* 
 				min_length++;
 				continue;
 			}
+
 			uint32 length = koord_distance(from->get_pos(), end);
 			if(!ziel.is_contained(end)  &&  bridge_builder_t::can_place_ramp(player_builder, gr_end, desc->get_wtyp(), ribi_type(zv))) {
 				// If there is a slope on the starting tile, it's taken into account in is_allowed_step, but a bridge will be flat!
@@ -1139,7 +1142,9 @@ void way_builder_t::check_for_bridge(const grund_t* parent_from, const grund_t* 
 
 	if(  tunnel_desc  &&  ribi_type(from->get_grund_hang()) == ribi_type(zv)  ) {
 		// uphill hang ... may be tunnel?
-		const sint32 cost_difference = desc->get_maintenance() > 0 ? (tunnel_desc->get_maintenance() * 4l + 3l) / desc->get_maintenance() : 16;
+		const sint32 cost_difference = desc->get_maintenance() > money_t(0,00) ?
+			(tunnel_desc->get_maintenance().get_value() * 4l + 3l) / desc->get_maintenance().get_value() : 16;
+
 		koord3d end = tunnel_builder_t::find_end_pos( player_builder, from->get_pos(), zv, tunnel_desc);
 		if(  end != koord3d::invalid  &&  !ziel.is_contained(end)  ) {
 			uint32 length = koord_distance(from->get_pos(), end);
@@ -2256,7 +2261,7 @@ void way_builder_t::build_tunnel_and_bridges()
 
 			if(start->get_grund_hang()==slope_t::flat  ||  start->get_grund_hang()==slope_type(zv*(-1))  ||  start->get_grund_hang()==2*slope_type(zv*(-1))) {
 				// code derived from simtool
-				
+
 				sint8 bridge_height = 0;
 				const char *error;
 
@@ -2313,12 +2318,12 @@ void way_builder_t::build_tunnel_and_bridges()
 /*
  * returns the amount needed to built this way
  */
-sint64 way_builder_t::calc_costs()
+money_t way_builder_t::calc_costs()
 {
-	sint64 costs=0;
+	money_t costs;
 	koord3d offset = koord3d( 0, 0, bautyp & elevated_flag ? welt->get_settings().get_way_height_clearance() : 0 );
 
-	sint32 single_cost;
+	money_t single_cost;
 	sint32 new_speedlimit;
 
 	if( bautyp&tunnel_flag ) {
@@ -2357,7 +2362,7 @@ sint64 way_builder_t::calc_costs()
 
 	for(uint32 i=0; i<get_count(); i++) {
 		sint32 old_speedlimit = -1;
-		sint32 replace_cost = 0;
+		money_t replace_cost;
 
 		const grund_t* gr = welt->lookup(route[i] + offset);
 		if( gr ) {
@@ -2407,7 +2412,7 @@ sint64 way_builder_t::calc_costs()
 			}
 		}
 		if(  !keep_existing_faster_ways  ||  old_speedlimit < new_speedlimit  ) {
-			costs += max(single_cost, replace_cost);
+			costs += std::max(single_cost, replace_cost);
 		}
 
 		// last tile cannot be start of tunnel/bridge
@@ -2428,18 +2433,18 @@ sint64 way_builder_t::calc_costs()
 				}
 				if(start->get_grund_hang()==0  ||  start->get_grund_hang()==slope_type(zv*(-1))) {
 					// bridge
-					costs += bridge_desc->get_price()*(sint64)(koord_distance(route[i], route[i+1])+1);
+					costs += bridge_desc->get_price() * (koord_distance(route[i], route[i+1]) + 1u);
 					continue;
 				}
 				else {
 					// tunnel
-					costs += tunnel_desc->get_price()*(sint64)(koord_distance(route[i], route[i+1])+1);
+					costs += tunnel_desc->get_price() * (koord_distance(route[i], route[i+1]) + 1u);
 					continue;
 				}
 			}
 		}
 	}
-	DBG_MESSAGE("way_builder_t::calc_costs()","construction estimate: %f",costs/100.0);
+	DBG_MESSAGE("way_builder_t::calc_costs()","construction estimate: %f", costs.as_double());
 	return costs;
 }
 
@@ -2447,7 +2452,7 @@ sint64 way_builder_t::calc_costs()
 // adds the ground before underground construction
 bool way_builder_t::build_tunnel_tile()
 {
-	sint64 cost = 0;
+	money_t cost;
 	for(uint32 i=0; i<get_count(); i++) {
 
 		grund_t* gr = welt->lookup(route[i]);
@@ -2574,7 +2579,7 @@ void way_builder_t::build_road()
 
 		const koord k = route[i].get_2d();
 		grund_t* gr = welt->lookup(route[i]);
-		sint64 cost = 0;
+		money_t cost;
 
 		bool extend = gr->weg_erweitern(road_wt, route.get_short_ribi(i));
 
@@ -2599,7 +2604,7 @@ void way_builder_t::build_road()
 				player_t *s = weg->get_owner();
 				player_t::add_maintenance(s, -weg->get_desc()->get_maintenance(), weg->get_desc()->get_finance_waytype());
 				// cost is the more expensive one, so downgrading is between removing and new building
-				cost -= max( weg->get_desc()->get_price(), desc->get_price() );
+				cost -= std::max( weg->get_desc()->get_price(), desc->get_price() );
 				weg->set_desc(desc);
 				// respect max speed of catenary
 				wayobj_t const* const wo = gr->get_wayobj(desc->get_wtyp());
@@ -2642,7 +2647,7 @@ void way_builder_t::build_track()
 
 		// built tracks
 		for(  uint32 i=0;  i<get_count();  i++  ) {
-			sint64 cost = 0;
+			money_t cost;
 			grund_t* gr = welt->lookup(route[i]);
 			ribi_t::ribi ribi = route.get_short_ribi(i);
 
@@ -2693,7 +2698,7 @@ void way_builder_t::build_track()
 					player_t *s = weg->get_owner();
 					player_t::add_maintenance( s, -weg->get_desc()->get_maintenance(), weg->get_desc()->get_finance_waytype());
 					// cost is the more expensive one, so downgrading is between removing and new buidling
-					cost -= max( weg->get_desc()->get_price(), desc->get_price() );
+					cost -= std::max( weg->get_desc()->get_price(), desc->get_price() );
 					weg->set_desc(desc);
 					// respect max speed of catenary
 					wayobj_t const* const wo = gr->get_wayobj(desc->get_wtyp());
@@ -2766,7 +2771,7 @@ void way_builder_t::build_powerline()
 		if(lt==NULL) {
 			if(gr->ist_natur()) {
 				// remove trees etc.
-				sint64 cost = gr->remove_trees();
+				const money_t cost = gr->remove_trees();
 				player_t::book_construction_costs(player_builder, -cost, gr->get_pos().get_2d(), powerline_wt);
 			}
 			lt = new leitung_t(route[i], player_builder );

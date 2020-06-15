@@ -1584,7 +1584,7 @@ uint16 win_get_statusbar_height()
 }
 
 // finally updates the display
-void win_display_flush(double konto)
+void win_display_flush(money_t konto)
 {
 	const sint16 disp_width = display_get_width();
 	const sint16 disp_height = display_get_height();
@@ -1801,7 +1801,7 @@ void win_display_flush(double konto)
 		char buffer[256];
 		display_proportional_rgb( middle-5, status_bar_text_y, wl->get_active_player()->get_name(), ALIGN_RIGHT, PLAYER_FLAG|color_idx_to_rgb(wl->get_active_player()->get_player_color1()+env_t::gui_player_color_dark), true);
 		money_to_string(buffer, konto );
-		display_proportional_rgb( middle+5, status_bar_text_y, buffer, ALIGN_LEFT, konto >= 0.0?MONEY_PLUS:MONEY_MINUS, true);
+		display_proportional_rgb( middle+5, status_bar_text_y, buffer, ALIGN_LEFT, konto >= money_t(0,00) ? MONEY_PLUS : MONEY_MINUS, true);
 	}
 }
 

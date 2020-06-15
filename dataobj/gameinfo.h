@@ -14,6 +14,9 @@
 #include "../tpl/array2d_tpl.h"
 #include "../network/checksum.h"
 
+#include "money.h"
+
+
 class karte_t;
 class loadsave_t;
 
@@ -44,7 +47,7 @@ private:
 
 	bool freeplay;
 	bool use_timeline;
-	sint64 current_starting_money;
+	money_t current_starting_money;
 
 	uint32 current_year_month;
 	sint16 bits_per_month;
@@ -87,7 +90,7 @@ public:
 	sint16 get_bits_per_month() const {return bits_per_month;}
 
 	bool is_freeplay() const { return freeplay; }
-	sint64 get_current_starting_money() const {return current_starting_money;}
+	money_t get_current_starting_money() const {return current_starting_money;}
 
 	uint32 get_game_engine_revision() const { return game_engine_revision; }
 	const char *get_name_language_iso() const { return language_code_names; }

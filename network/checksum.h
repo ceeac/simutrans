@@ -8,6 +8,8 @@
 
 
 #include "../utils/sha1.h"
+#include "../dataobj/money.h"
+
 
 class checksum_t
 {
@@ -37,6 +39,7 @@ public:
 	void input(sint16 data);
 	void input(uint32 data);
 	void input(sint32 data);
+	void input(money_t data) { input((sint32)data.get_value()); }
 	void input(const char *data);
 	const char* get_str(const int maxlen=20) const;
 

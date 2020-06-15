@@ -355,7 +355,7 @@ void settings_economy_stats_t::init(settings_t const* const sets)
 void settings_economy_stats_t::read(settings_t* const sets)
 {
 	READ_INIT
-	sint64 start_money_temp;
+	money_t start_money_temp;
 	READ_NUM_VALUE( sets->remove_dummy_player_months );
 	READ_NUM_VALUE( sets->unprotect_abandoned_player_months );
 	READ_NUM_VALUE( sets->default_ai_construction_speed );
@@ -425,29 +425,29 @@ void settings_economy_stats_t::read(settings_t* const sets)
 void settings_costs_stats_t::init(settings_t const* const sets)
 {
 	INIT_INIT
-	INIT_NUM( "maintenance_building", sets->maint_building, 1, 100000000, 100, false );
-	INIT_COST( "cost_multiply_dock", -sets->cst_multiply_dock, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_station", -sets->cst_multiply_station, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_roadstop", -sets->cst_multiply_roadstop, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_airterminal", -sets->cst_multiply_airterminal, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_post", -sets->cst_multiply_post, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_headquarter", -sets->cst_multiply_headquarter, 1, 100000000, 10, false );
-	INIT_COST( "cost_depot_air", -sets->cst_depot_air, 1, 100000000, 10, false );
-	INIT_COST( "cost_depot_rail", -sets->cst_depot_rail, 1, 100000000, 10, false );
-	INIT_COST( "cost_depot_road", -sets->cst_depot_road, 1, 100000000, 10, false );
-	INIT_COST( "cost_depot_ship", -sets->cst_depot_ship, 1, 100000000, 10, false );
-	INIT_COST( "cost_buy_land", -sets->cst_buy_land, 1, 100000000, 10, false );
-	INIT_COST( "cost_alter_land", -sets->cst_alter_land, 1, 100000000, 10, false );
-	INIT_COST( "cost_set_slope", -sets->cst_set_slope, 1, 100000000, 10, false );
-	INIT_COST( "cost_alter_climate", -sets->cst_alter_climate, 1, 100000000, 10, false );
-	INIT_COST( "cost_found_city", -sets->cst_found_city, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_found_industry", -sets->cst_multiply_found_industry, 1, 100000000, 10, false );
-	INIT_COST( "cost_remove_tree", -sets->cst_remove_tree, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_remove_haus", -sets->cst_multiply_remove_haus, 1, 100000000, 10, false );
-	INIT_COST( "cost_multiply_remove_field", -sets->cst_multiply_remove_field, 1, 100000000, 10, false );
-	INIT_COST( "cost_transformer", -sets->cst_transformer, 1, 100000000, 10, false );
-	INIT_COST( "cost_maintain_transformer", -sets->cst_maintain_transformer, 1, 100000000, 10, false );
-	INIT_NUM("cost_make_public_months", sets->cst_make_public_months, 0, 36000, gui_numberinput_t::AUTOLINEAR, false );
+	INIT_NUM( "maintenance_building", sets->maint_building.get_value(), 1, 100000000, 100, false );
+	INIT_COST( "cost_multiply_dock",           money_t(-sets->cst_multiply_dock),           1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_station",        money_t(-sets->cst_multiply_station),        1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_roadstop",       money_t(-sets->cst_multiply_roadstop),       1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_airterminal",    money_t(-sets->cst_multiply_airterminal),    1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_post",           money_t(-sets->cst_multiply_post),           1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_headquarter",    money_t(-sets->cst_multiply_headquarter),    1, 100000000, 10, false );
+	INIT_COST( "cost_depot_air",               money_t(-sets->cst_depot_air),               1, 100000000, 10, false );
+	INIT_COST( "cost_depot_rail",              money_t(-sets->cst_depot_rail),              1, 100000000, 10, false );
+	INIT_COST( "cost_depot_road",              money_t(-sets->cst_depot_road),              1, 100000000, 10, false );
+	INIT_COST( "cost_depot_ship",              money_t(-sets->cst_depot_ship),              1, 100000000, 10, false );
+	INIT_COST( "cost_buy_land",                money_t(-sets->cst_buy_land),                1, 100000000, 10, false );
+	INIT_COST( "cost_alter_land",              money_t(-sets->cst_alter_land),              1, 100000000, 10, false );
+	INIT_COST( "cost_set_slope",               money_t(-sets->cst_set_slope),               1, 100000000, 10, false );
+	INIT_COST( "cost_alter_climate",           money_t(-sets->cst_alter_climate),           1, 100000000, 10, false );
+	INIT_COST( "cost_found_city",              money_t(-sets->cst_found_city),              1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_found_industry", money_t(-sets->cst_multiply_found_industry), 1, 100000000, 10, false );
+	INIT_COST( "cost_remove_tree",             money_t(-sets->cst_remove_tree),             1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_remove_haus",    money_t(-sets->cst_multiply_remove_haus),    1, 100000000, 10, false );
+	INIT_COST( "cost_multiply_remove_field",   money_t(-sets->cst_multiply_remove_field),   1, 100000000, 10, false );
+	INIT_COST( "cost_transformer",             money_t(-sets->cst_transformer),             1, 100000000, 10, false );
+	INIT_COST( "cost_maintain_transformer",    money_t(-sets->cst_maintain_transformer),    1, 100000000, 10, false );
+	INIT_NUM("cost_make_public_months",        sets->cst_make_public_months, 0, 36000, gui_numberinput_t::AUTOLINEAR, false );
 	INIT_END
 }
 
@@ -456,7 +456,7 @@ void settings_costs_stats_t::read(settings_t* const sets)
 {
 	READ_INIT
 	(void)booliter;
-	READ_NUM_VALUE( sets->maint_building );
+	sint32 val; READ_NUM_VALUE( val ); sets->maint_building = money_t(val);
 	READ_COST_VALUE( sets->cst_multiply_dock )*(-1);
 	READ_COST_VALUE( sets->cst_multiply_station )*(-1);
 	READ_COST_VALUE( sets->cst_multiply_roadstop )*(-1);

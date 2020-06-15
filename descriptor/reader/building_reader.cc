@@ -245,8 +245,8 @@ obj_desc_t * building_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		desc->retire_date = decode_uint16(p);
 		desc->animation_time = decode_uint16(p);
 		desc->capacity = decode_uint16(p);
-		desc->maintenance = decode_sint32(p);
-		desc->price = decode_sint32(p);
+		desc->maintenance = money_t(decode_sint32(p));
+		desc->price = money_t(decode_sint32(p));
 		desc->allow_underground = decode_uint8(p);
 		desc->preservation_year_month = decode_uint16(p);
 	}
@@ -268,8 +268,8 @@ obj_desc_t * building_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		desc->retire_date = decode_uint16(p);
 		desc->animation_time = decode_uint16(p);
 		desc->capacity = decode_uint16(p);
-		desc->maintenance = decode_sint32(p);
-		desc->price = decode_sint32(p);
+		desc->maintenance = money_t(decode_sint32(p));
+		desc->price = money_t(decode_sint32(p));
 		desc->allow_underground = decode_uint8(p);
 	}
 	else if(version == 7) {
@@ -470,8 +470,8 @@ obj_desc_t * building_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		version,
 		btyp,
 		desc->type,
-		desc->price,
-		desc->maintenance,
+		(sint32)desc->price.get_value(),
+		(sint32)desc->maintenance.get_value(),
 		desc->capacity,
 		desc->level,
 		desc->extra_data,

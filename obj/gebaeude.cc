@@ -736,8 +736,8 @@ void gebaeude_t::info(cbuffer_t & buf) const
 
 		buf.append("\n");
 		if(get_owner()==NULL) {
-			const sint32 v = (sint32)( -welt->get_settings().cst_multiply_remove_haus * (tile->get_desc()->get_level() + 1) / 100 );
-			buf.printf("\n%s: %ld$\n", translator::translate("Wert"), v);
+			const money_t v = -welt->get_settings().cst_multiply_remove_haus * (tile->get_desc()->get_level() + 1);
+			buf.printf("\n%s: %ld$\n", translator::translate("Wert"), v.get_credits());
 		}
 
 		if (char const* const maker = tile->get_desc()->get_copyright()) {
@@ -959,7 +959,7 @@ void gebaeude_t::cleanup(player_t *player)
 {
 //	DBG_MESSAGE("gebaeude_t::entferne()","gb %i");
 	// remove costs
-	sint64 cost = welt->get_settings().cst_multiply_remove_haus;
+	money_t cost = welt->get_settings().cst_multiply_remove_haus;
 
 	// tearing down halts is always single costs only
 	if (!tile->get_desc()->is_transport_building()) {

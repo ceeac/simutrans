@@ -11,6 +11,8 @@
 
 #include "../simcolor.h"
 #include "../tpl/stringhashtable_tpl.h"
+#include "../dataobj/money.h"
+
 
 class tabfileobj_t;
 class koord;
@@ -168,6 +170,11 @@ public:
 	 * Get an sint64 (actually uses double, thus only 48 bits are retrievable)
 	 */
 	sint64 get_int64(const char *key, sint64 def);
+
+	/**
+	 * Get a money_t (sint64, actually uses double, thus only 48 bits are retrievable)
+	 */
+	money_t get_money(const char *key, money_t def);
 
 	/**
 	 * Parses a value with the format "<num 1>,<num 2>,..,<num N>"

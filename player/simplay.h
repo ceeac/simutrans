@@ -19,6 +19,8 @@
 #include "../tpl/slist_tpl.h"
 #include "../tpl/vector_tpl.h"
 
+#include "../dataobj/money.h"
+
 
 class karte_ptr_t;
 class fabrik_t;
@@ -57,10 +59,11 @@ protected:
 	public:
 		char str[33];
 		koord pos;
-		sint64 amount;
+		money_t amount;
 		sint8 alter;
-		income_message_t() { str[0]=0; alter=127; pos=koord::invalid; amount=0; }
-		income_message_t( sint64 betrag, koord pos );
+
+		income_message_t() { str[0]=0; alter=127; pos=koord::invalid; }
+		income_message_t( money_t betrag, koord pos );
 		void * operator new(size_t s);
 		void operator delete(void *p);
 	};
@@ -71,12 +74,12 @@ protected:
 	 * Creates new income message entry or merges with existing one if the
 	 * most recent one is at the same coordinate
 	 */
-	void add_message(sint64 amount, koord k);
+	void add_message(money_t amount, koord k);
 
 	/**
 	 * Displays amount of money when koordinates are on screen
 	 */
-	void add_money_message(sint64 amount, koord k);
+	void add_money_message(money_t amount, koord k);
 
 	/**
 	 * Colors of the player
@@ -93,7 +96,7 @@ protected:
 	 * @param change the change
 	 * @return the new maintenance costs
 	 */
-	sint64 add_maintenance(sint64 change, waytype_t const wt=ignore_wt);
+	money_t add_maintenance(money_t change, waytype_t const wt=ignore_wt);
 
 	/**
 	 * Is this player an AI player?
@@ -122,7 +125,7 @@ public:
 	 * @param amount How much does it cost
 	 * @param wt type of transport
 	 */
-	static void book_construction_costs(player_t * const player, const sint64 amount, const koord k, const waytype_t wt=ignore_wt);
+	static void book_construction_costs(player_t * const player, const money_t amount, const koord k, const waytype_t wt=ignore_wt);
 
 	/**
 	 * Accounts bought/sold vehicles.
@@ -131,7 +134,7 @@ public:
 	 *              positive value = vehicle sold
 	 * @param wt type of transport for accounting purpose
 	 */
-	void book_new_vehicle(const sint64 price, const koord k, const waytype_t wt=ignore_wt);
+	void book_new_vehicle(const money_t price, const koord k, const waytype_t wt=ignore_wt);
 
 	/**
 	 * Adds income to accounting statistics.
@@ -142,28 +145,28 @@ public:
 	 *  1 ... mail
 	 *  2 ... good (and powerlines revenue)
 	 */
-	void book_revenue(const sint64 amount, const koord k, const waytype_t wt=ignore_wt, sint32 cathegory=2);
+	void book_revenue(const money_t amount, const koord k, const waytype_t wt=ignore_wt, sint32 cathegory=2);
 
 	/**
 	 * Adds running costs to accounting statistics.
 	 * @param amount How much does it cost
 	 * @param wt type of transport used for accounting statistics
 	 */
-	void book_running_costs(const sint64 amount, const waytype_t wt=ignore_wt);
+	void book_running_costs(const money_t amount, const waytype_t wt=ignore_wt);
 
 	/**
 	 * Books toll paid by our company to someone else.
 	 * @param amount money paid to our company
 	 * @param wt type of transport used for accounting statistics
 	 */
-	void book_toll_paid(const sint64 amount, const waytype_t wt=ignore_wt);
+	void book_toll_paid(const money_t amount, const waytype_t wt=ignore_wt);
 
 	/**
 	 * Books toll paid to our company by someone else.
 	 * @param amount money paid for usage of our roads,railway,channels, ... ; positive sign
 	 * @param wt type of transport used for accounting statistics
 	 */
-	void book_toll_received(const sint64 amount, waytype_t wt=ignore_wt);
+	void book_toll_received(const money_t amount, waytype_t wt=ignore_wt);
 
 	/**
 	 * Add amount of transported passenger, mail, goods to accounting statistics.
@@ -188,7 +191,7 @@ public:
 	* Returns true if the player has the funds or does not need to.
 	* @param cost the amount of funds that want to be added to the balance
 	*/
-	bool can_afford(sint64 cost) const;
+	bool can_afford(money_t cost) const;
 
 	finance_t * get_finance() const { return finance; }
 
@@ -246,12 +249,13 @@ public:
 
 	virtual ~player_t();
 
-	static sint32 add_maintenance(player_t *player, sint32 const change, waytype_t const wt=ignore_wt)
+	static money_t add_maintenance(player_t *player, money_t change, waytype_t const wt=ignore_wt)
 	{
 		if(player) {
 			return player->add_maintenance(change, wt);
 		}
-		return 0;
+
+		return money_t(0,00);
 	}
 
 	/**
@@ -265,7 +269,8 @@ public:
 	/**
 	 * @return Account balance as a double (floating point) value
 	 */
-	double get_account_balance_as_double() const;
+	money_t get_account_balance() const;
+	double get_account_balance_as_double() const { return get_account_balance().as_double(); }
 
 	/**
 	 * @return true when account balance is overdrawn
@@ -316,7 +321,7 @@ public:
 	/**
 	* Updates the assets value of the player
 	*/
-	void update_assets(sint64 const delta, const waytype_t wt = ignore_wt);
+	void update_assets(money_t const delta, const waytype_t wt = ignore_wt);
 
 	/**
 	 * Report the player one of his vehicles has a problem
@@ -357,7 +362,7 @@ public:
 	/**
 	 * Function for UNDO
 	 */
-	sint64 undo();
+	bool undo();
 
 private:
 	// headquarters stuff

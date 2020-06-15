@@ -7,8 +7,12 @@
 #define UTILS_CBUFFER_T_H
 
 
-#include <stdarg.h>
-#include <stdlib.h>
+#include "../dataobj/money.h"
+
+#include <cstdarg>
+#include <cstdlib>
+
+
 /**
  * A character buffer. Main operation is 'append'
  */
@@ -88,7 +92,7 @@ public:
 	/**
 	 * appends formatted money string
 	 */
-	void append_money(double money);
+	void append_money(money_t money);
 
 	/* Append formatted text to the buffer */
 	void printf(const char *fmt, ...);

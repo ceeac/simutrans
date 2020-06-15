@@ -49,8 +49,8 @@ obj_desc_t * way_obj_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 
 	if(version==1) {
 		// Versioned node, version 3
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->topspeed = decode_uint32(p);
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -63,8 +63,8 @@ obj_desc_t * way_obj_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	DBG_DEBUG("way_obj_reader_t::read_node()",
 	     "version=%d price=%d maintenance=%d topspeed=%d wtype=%d own_wtype=%d intro=%i/%i, retire=%i/%i",
 	     version,
-	     desc->price,
-	     desc->maintenance,
+	     (sint32)desc->price.get_value(),
+	     (sint32)desc->maintenance.get_value(),
 	     desc->topspeed,
 	     desc->wtyp,
 	     desc->own_wtyp,

@@ -22,6 +22,9 @@
 #include "convoihandle_t.h"
 #include "halthandle_t.h"
 
+#include "dataobj/money.h"
+
+
 #define MAX_MONTHS               12 // Max history
 
 class weg_t;
@@ -237,8 +240,8 @@ private:
 	/*
 	 * caches the running costs
 	 */
-	sint32 sum_running_costs;
-	sint32 sum_fixed_costs;
+	money_t sum_running_costs;
+	money_t sum_fixed_costs;
 
 	/**
 	* Overall performance.
@@ -264,7 +267,7 @@ private:
 	/**
 	* accumulated profit over a year
 	*/
-	sint64 jahresgewinn;
+	money_t jahresgewinn;
 
 	/* the odometer */
 	sint64 total_distance_traveled;
@@ -437,24 +440,24 @@ public:
 	/**
 	 * The profit in this year
 	 */
-	const sint64 & get_jahresgewinn() const {return jahresgewinn;}
+	money_t get_jahresgewinn() const {return jahresgewinn;}
 
 	const sint64 & get_total_distance_traveled() const { return total_distance_traveled; }
 
 	/**
 	 * @return the total monthly fix cost for all vehicles in convoi
 	 */
-	sint64 get_fixed_cost() const { return sum_fixed_costs; }
+	money_t get_fixed_cost() const { return sum_fixed_costs; }
 
 	/**
 	 * returns the total running cost for all vehicles in convoi
 	 */
-	sint32 get_running_cost() const { return sum_running_costs; }
+	money_t get_running_cost() const { return sum_running_costs; }
 
 	/**
 	 * returns the total new purchase cost for all vehicles in convoy
 	 */
-	sint64 get_purchase_cost() const;
+	money_t get_purchase_cost() const;
 
 	/**
 	* Constructor for loading from file,
@@ -676,7 +679,7 @@ public:
 	/**
 	* Calculate the total value of the convoi as the sum of all vehicle values.
 	*/
-	sint64 calc_restwert() const;
+	money_t calc_restwert() const;
 
 	/**
 	* Check if this convoi has entered a depot.

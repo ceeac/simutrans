@@ -56,7 +56,7 @@ public:
 			// value
 			add_component(&label_resale);
 			// max income
-			sint64 max_income = - v->get_operating_cost();
+			money_t max_income = -v->get_operating_cost();
 			if(v->get_cargo_max() > 0) {
 				max_income += (v->get_cargo_max() * ware_t::calc_revenue(v->get_cargo_type(), v->get_waytype(), cnv_kmh) )/3000;
 			}
@@ -64,7 +64,7 @@ public:
 			{
 				new_component<gui_label_t>("Max income:");
 				l = new_component<gui_label_buf_t>();
-				l->buf().append_money(max_income/100.0);
+				l->buf().append_money(max_income);
 				l->update();
 			}
 			end_table();
@@ -94,17 +94,20 @@ public:
 	void update_labels()
 	{
 		label_resale.buf().printf("%s ", translator::translate("Restwert:"));
-		label_resale.buf().append_money(v->calc_sale_value() / 100.0);
-		if(  sint64 fix_cost = world()->scale_with_month_length((sint64)v->get_desc()->get_maintenance())  ) {
+		label_resale.buf().append_money(v->calc_sale_value());
+
+		const money_t fix_cost = world()->scale_with_month_length(v->get_desc()->get_maintenance());
+		if(  fix_cost != money_t(0,00)  ) {
 			cbuffer_t temp_buf;
-			temp_buf.printf( translator::translate("(%.2f$/km %.2f$/m)"), (double)v->get_desc()->get_running_cost()/100.0, (double)fix_cost/100.0 );
+			temp_buf.printf( translator::translate("(%.2f$/km %.2f$/m)"), v->get_desc()->get_running_cost().as_double(), fix_cost.as_double() );
 			label_resale.buf().append( temp_buf );
 		}
 		else {
 			cbuffer_t temp_buf;
-			temp_buf.printf( translator::translate("(%.2f$/km)"), (double)v->get_desc()->get_running_cost()/100.0 );
+			temp_buf.printf( translator::translate("(%.2f$/km)"), v->get_desc()->get_running_cost().as_double() );
 			label_resale.buf().append( temp_buf );
 		}
+
 		label_resale.update();
 		label_friction.buf().printf( "%s %i", translator::translate("Friction:"), v->get_frictionfactor() );
 		label_friction.update();
@@ -193,7 +196,7 @@ void convoi_detail_t::update_labels()
 	label_length.buf().printf("%s %i %s %i", translator::translate("Vehicle count:"), cnv->get_vehicle_count(), translator::translate("Station tiles:"), cnv->get_tile_length());
 	label_length.update();
 	label_resale.buf().printf("%s ", translator::translate("Restwert:"));
-	label_resale.buf().append_money( cnv->calc_restwert() / 100.0 );
+	label_resale.buf().append_money( cnv->calc_restwert() );
 	label_resale.update();
 	label_speed.buf().printf(translator::translate("Bonusspeed: %i km/h"), cnv->get_speedbonus_kmh() );
 	label_speed.update();

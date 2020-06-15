@@ -2395,14 +2395,15 @@ void haltestelle_t::open_info_window()
 }
 
 
-sint64 haltestelle_t::calc_maintenance() const
+money_t haltestelle_t::calc_maintenance() const
 {
-	sint64 maintenance = 0;
+	money_t maintenance;
 	FOR(  slist_tpl<tile_t>,  const& i,  tiles  ) {
 		if(  gebaeude_t* const gb = i.grund->find<gebaeude_t>()  ) {
 			maintenance += welt->get_settings().maint_building * gb->get_tile()->get_desc()->get_level();
 		}
 	}
+
 	return maintenance;
 }
 
@@ -2426,13 +2427,13 @@ void haltestelle_t::change_owner( player_t *player )
 			player_t *gbplayer =gb->get_owner();
 			gb->set_owner(player);
 			gb->set_flag(obj_t::dirty);
-			sint64 const monthly_costs = welt->get_settings().maint_building * gb->get_tile()->get_desc()->get_level();
+			const money_t monthly_costs = welt->get_settings().maint_building * gb->get_tile()->get_desc()->get_level();
 			waytype_t const costs_type = gb->get_waytype();
 			player_t::add_maintenance(gbplayer, -monthly_costs, costs_type);
 			player_t::add_maintenance(player, monthly_costs, costs_type);
 
 			// cost is computed as cst_make_public_months
-			sint64 const cost = -welt->scale_with_month_length(monthly_costs * welt->get_settings().cst_make_public_months);
+			const money_t cost = -welt->scale_with_month_length(monthly_costs * welt->get_settings().cst_make_public_months);
 			player_t::book_construction_costs(gbplayer, cost, get_basis_pos(), costs_type);
 			player_t::book_construction_costs(player, -cost, koord::invalid, costs_type);
 		}
@@ -2446,7 +2447,7 @@ void haltestelle_t::change_owner( player_t *player )
 				if(  owner==wplayer  ) {
 					w->set_owner( player );
 					w->set_flag(obj_t::dirty);
-					sint32 cost = w->get_desc()->get_maintenance();
+					money_t cost = w->get_desc()->get_maintenance();
 					// of tunnel...
 					if(  tunnel_t *t=gr->find<tunnel_t>()  ) {
 						t->set_owner( player );
@@ -2473,8 +2474,8 @@ void haltestelle_t::change_owner( player_t *player )
 		for(  uint8 i = 1;  i < gr->get_top();  i++  ) {
 			if(  wayobj_t *const wo = obj_cast<wayobj_t>(gr->obj_bei(i))  ) {
 				player_t *woplayer = wo->get_owner();
-				if(  owner==woplayer  ) {
-					sint32 const cost = wo->get_desc()->get_maintenance();
+				if(  player!=woplayer  ) {
+					const money_t cost = wo->get_desc()->get_maintenance();
 					// change ownership
 					wo->set_owner( player );
 					wo->set_flag(obj_t::dirty);

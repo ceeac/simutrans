@@ -168,7 +168,7 @@ void ware_t::update_factory_target()
 }
 
 
-sint64 ware_t::calc_revenue(const goods_desc_t* desc, waytype_t wt, sint32 speedkmh)
+money_t ware_t::calc_revenue(const goods_desc_t* desc, waytype_t wt, sint32 speedkmh)
 {
 	static karte_ptr_t welt;
 
@@ -177,9 +177,10 @@ sint64 ware_t::calc_revenue(const goods_desc_t* desc, waytype_t wt, sint32 speed
 
 	const sint32 grundwert128    = welt->get_settings().get_bonus_basefactor(); // minimal bonus factor
 	const sint32 grundwert_bonus = 1000+kmh_base*desc->get_speed_bonus();      // speed bonus factor
-	// take the larger of both
-	return desc->get_value() * (grundwert128 > grundwert_bonus ? grundwert128 : grundwert_bonus);
+
+	return money_t(desc->get_value()) * std::max(grundwert128, grundwert_bonus);
 }
+
 
 ware_t::goods_amount_t ware_t::add_goods(goods_amount_t const number) {
 	goods_amount_t const limit = GOODS_AMOUNT_LIMIT - menge;

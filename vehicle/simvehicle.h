@@ -301,10 +301,7 @@ public:
 	*/
 	const vehicle_desc_t *get_desc() const {return desc; }
 
-	/**
-	* @return die running_cost in Cr/100Km
-	*/
-	int get_operating_cost() const { return desc->get_running_cost(); }
+	money_t get_operating_cost() const { return desc->get_running_cost(); }
 
 	/**
 	* Play sound, when the vehicle is visible on screen
@@ -389,7 +386,7 @@ public:
 	* every stop.
 	* @return income total for last hop
 	*/
-	sint64 calc_revenue(const koord3d& start, const koord3d& end) const;
+	money_t calc_revenue(const koord3d& start, const koord3d& end) const;
 
 	// sets or query begin and end of convois
 	void set_leading(bool janein) {leading = janein;}
@@ -431,7 +428,7 @@ public:
 	void rdwr(loadsave_t *file) OVERRIDE;
 	virtual void rdwr_from_convoi(loadsave_t *file);
 
-	uint32 calc_sale_value() const;
+	money_t calc_sale_value() const;
 
 	// true, if this vehicle did not moved for some time
 	bool is_stuck() OVERRIDE;

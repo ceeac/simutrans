@@ -11,6 +11,7 @@
 
 #include "../simtypes.h"
 #include "../simconst.h"
+#include "../dataobj/money.h"
 
 
 /*
@@ -170,7 +171,7 @@ void display_all_win();
 void win_rotate90( sint16 new_size );
 void move_win(int win);
 
-void win_display_flush(double konto); // draw the frame and all windows
+void win_display_flush(money_t konto); // draw the frame and all windows
 
 uint16 win_get_statusbar_height();
 

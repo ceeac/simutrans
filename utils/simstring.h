@@ -7,6 +7,8 @@
 #define UTILS_SIMSTRING_H
 
 
+#include "../dataobj/money.h"
+
 #include <stddef.h>
 #include <string>
 
@@ -67,7 +69,7 @@ char *make_single_line_string(const char *in,int number_of_lines);
  * Concludes format with $ sign. Buffer must be large enough, no checks
  * are made!
  */
-void money_to_string(char * buf, double f, const bool show_decimal = true);
+void money_to_string(char *buf, money_t money, const bool show_decimal = true);
 
 
 /**

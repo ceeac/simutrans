@@ -125,7 +125,7 @@ public:
 	 * @param wt waytype of vehicle
 	 * @param speedkmh actual achieved speed in km/h
 	 */
-	static sint64 calc_revenue(const goods_desc_t* desc, waytype_t wt, sint32 speedkmh);
+	static money_t calc_revenue(const goods_desc_t* desc, waytype_t wt, sint32 speedkmh);
 
 	/**
 	 * Adds the number of goods to this goods packet.

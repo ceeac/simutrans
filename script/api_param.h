@@ -341,6 +341,7 @@ namespace script_api {
 	declare_specialized_param(sint32, "i", "integer");
 	declare_specialized_param(uint64, "i", "integer");
 	declare_specialized_param(sint64, "i", "integer");
+	declare_specialized_param(money_t, "i", "integer");
 	declare_enum_param(waytype_t, sint16, "way_types");
 	declare_enum_param(systemtype_t, uint8, "way_system_types");
 	declare_enum_param(obj_t::typ, uint8, "map_objects");

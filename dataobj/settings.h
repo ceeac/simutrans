@@ -11,6 +11,7 @@
 #include "../simtypes.h"
 #include "../simconst.h"
 
+#include "money.h"
 
 
 class player_t;
@@ -192,12 +193,12 @@ private:
 
 	bool freeplay;
 
-	sint64 starting_money;
+	money_t starting_money;
 
 	struct yearmoney
 	{
 		sint16 year;
-		sint64 money;
+		money_t money;
 		bool interpol;
 	};
 	yearmoney startingmoneyperyear[10];
@@ -286,35 +287,35 @@ private:
 
 public:
 	/* the big cost section */
-	sint32 maint_building; // normal building
+	money_t maint_building; // normal building
 
-	sint64 cst_multiply_dock;
-	sint64 cst_multiply_station;
-	sint64 cst_multiply_roadstop;
-	sint64 cst_multiply_airterminal;
-	sint64 cst_multiply_post;
-	sint64 cst_multiply_headquarter;
-	sint64 cst_depot_rail;
-	sint64 cst_depot_road;
-	sint64 cst_depot_ship;
-	sint64 cst_depot_air;
+	money_t cst_multiply_dock;
+	money_t cst_multiply_station;
+	money_t cst_multiply_roadstop;
+	money_t cst_multiply_airterminal;
+	money_t cst_multiply_post;
+	money_t cst_multiply_headquarter;
+	money_t cst_depot_rail;
+	money_t cst_depot_road;
+	money_t cst_depot_ship;
+	money_t cst_depot_air;
 
 	// cost to merge station
 	uint32 allow_merge_distant_halt;
-	sint64 cst_multiply_merge_halt;
+	money_t cst_multiply_merge_halt;
 
 	// alter landscape
-	sint64 cst_buy_land;
-	sint64 cst_alter_land;
-	sint64 cst_alter_climate;
-	sint64 cst_set_slope;
-	sint64 cst_found_city;
-	sint64 cst_multiply_found_industry;
-	sint64 cst_remove_tree;
-	sint64 cst_multiply_remove_haus;
-	sint64 cst_multiply_remove_field;
-	sint64 cst_transformer;
-	sint64 cst_maintain_transformer;
+	money_t cst_buy_land;
+	money_t cst_alter_land;
+	money_t cst_alter_climate;
+	money_t cst_set_slope;
+	money_t cst_found_city;
+	money_t cst_multiply_found_industry;
+	money_t cst_remove_tree;
+	money_t cst_multiply_remove_haus;
+	money_t cst_multiply_remove_field;
+	money_t cst_transformer;
+	money_t cst_maintain_transformer;
 
 	// maintainance cost in months to make something public
 	sint64 cst_make_public_months;
@@ -453,7 +454,7 @@ public:
 	sint32 get_max_hops() const { return max_hops; }
 	sint32 get_max_transfers() const { return max_transfers; }
 
-	sint64 get_starting_money(sint16 year) const;
+	money_t get_starting_money(sint16 year) const;
 
 	bool get_random_pedestrians() const { return random_pedestrians; }
 	void set_random_pedestrians( bool f ) { random_pedestrians = f; }

@@ -990,6 +990,9 @@ public:
 		}
 	}
 
+	money_t scale_with_month_length(money_t value)         { return money_t(scale_with_month_length(value.get_value())); }
+	money_t inverse_scale_with_month_length(money_t value) { return money_t(inverse_scale_with_month_length(value.get_value())); }
+
 	sint32 get_time_multiplier() const;
 	void change_time_multiplier( sint32 delta );
 

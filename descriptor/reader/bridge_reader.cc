@@ -46,7 +46,7 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	const int version = v & 0x8000 ? v & 0x7FFF : 0;
 
 	// some defaults
-	desc->maintenance = 800;
+	desc->maintenance = money_t(8,00);
 	desc->pillars_every = 0;
 	desc->pillars_asymmetric = false;
 	desc->max_length = 0;
@@ -60,16 +60,16 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 
 		desc->wtyp = (uint8)decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 
 	} else if (version == 2) {
 
 		// Versioned node, version 2
 
-		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
-		desc->wtyp = decode_uint8(p);
+		desc->topspeed    = decode_uint16(p);
+		desc->price       = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
+		desc->wtyp        = decode_uint8(p);
 
 	} else if (version == 3) {
 
@@ -77,8 +77,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// pillars added
 
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->wtyp = decode_uint8(p);
 		desc->pillars_every = decode_uint8(p);
 		desc->max_length = 0;
@@ -89,8 +89,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// pillars added
 
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->wtyp = decode_uint8(p);
 		desc->pillars_every = decode_uint8(p);
 		desc->max_length = decode_uint8(p);
@@ -101,8 +101,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// timeline
 
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->wtyp = decode_uint8(p);
 		desc->pillars_every = decode_uint8(p);
 		desc->max_length = decode_uint8(p);
@@ -115,8 +115,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// snow
 
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->wtyp = decode_uint8(p);
 		desc->pillars_every = decode_uint8(p);
 		desc->max_length = decode_uint8(p);
@@ -131,8 +131,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// max_height, asymmetric pillars
 
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->wtyp = decode_uint8(p);
 		desc->pillars_every = decode_uint8(p);
 		desc->max_length = decode_uint8(p);
@@ -146,8 +146,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if (version==9) {
 
 		desc->topspeed = decode_uint16(p);
-		desc->price = decode_uint32(p);
-		desc->maintenance = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
+		desc->maintenance = money_t(decode_uint32(p));
 		desc->wtyp = decode_uint8(p);
 		desc->pillars_every = decode_uint8(p);
 		desc->max_length = decode_uint8(p);
@@ -166,7 +166,7 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// old node, version 0
 		desc->wtyp = (uint8)v;
 		decode_uint16(p);                    // Menupos, no more used
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->topspeed = 999;               // Safe default ...
 	}
 
@@ -185,8 +185,8 @@ obj_desc_t * bridge_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		"version=%d, waytype=%d, price=%d, maintenance=%d, topspeed=%d, axle_load=%i, max_length=%i, max_height=%i, pillars=%i, asymmetric=%i, seasons=%i, intro=%i/%i, retire=%i/%i",
 		version,
 		desc->wtyp,
-		desc->price,
-		desc->maintenance,
+		(sint32)desc->price.get_value(),
+		(sint32)desc->maintenance.get_value(),
 		desc->topspeed,
 		desc->axle_load,
 		desc->max_length,

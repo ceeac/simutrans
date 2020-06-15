@@ -54,12 +54,12 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	if(version == 1) {
 		// Versioned node, version 1
 
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint16(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->gear = decode_uint8(p);
@@ -74,12 +74,12 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if(version == 2) {
 		// Versioned node, version 2
 
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint16(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->gear = decode_uint8(p);
@@ -97,12 +97,12 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// version 4 identical, just other values for the waytype
 		// version 5 just uses the new scheme for data calculation
 
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint16(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -117,12 +117,12 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if (version==6) {
 		// version 5 just 32 bit for power and 16 Bit for gear
 
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint32(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -137,12 +137,12 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if (version==7) {
 		// different length of cars ...
 
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint32(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -157,12 +157,12 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	}
 	else if (version==8) {
 		// multiple freight images...
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint32(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -178,15 +178,15 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	}
 	else if (version==9) {
 		// new: fixed_cost, loading_time, axle_load
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->loading_time = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->axle_load = decode_uint16(p);
 		desc->power = decode_uint32(p);
-		desc->running_cost = decode_uint16(p);
-		desc->maintenance = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
+		desc->maintenance = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -202,15 +202,15 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	}
 	else if (version==10) {
 		// new: weight in kgs
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->loading_time = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint32(p);
 		desc->axle_load = decode_uint16(p);
 		desc->power = decode_uint32(p);
-		desc->running_cost = decode_uint16(p);
-		desc->maintenance = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
+		desc->maintenance = money_t(decode_uint16(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -226,15 +226,15 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	}
 	else if (version==11) {
 		// new: fix cost as uint32
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->capacity = decode_uint16(p);
 		desc->loading_time = decode_uint16(p);
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint32(p);
 		desc->axle_load = decode_uint16(p);
 		desc->power = decode_uint32(p);
-		desc->running_cost = decode_uint16(p);
-		desc->maintenance = decode_uint32(p);
+		desc->running_cost = money_t(decode_uint16(p));
+		desc->maintenance = money_t(decode_uint32(p));
 
 		desc->intro_date = decode_uint16(p);
 		desc->retire_date = decode_uint16(p);
@@ -256,11 +256,11 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		// old node, version 0
 		desc->wtyp = (sint8)v;
 		desc->capacity = decode_uint16(p);
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->topspeed = decode_uint16(p);
 		desc->weight = decode_uint16(p);
 		desc->power = decode_uint16(p);
-		desc->running_cost = decode_uint16(p);
+		desc->running_cost = money_t(decode_uint16(p));
 		desc->sound = (sint8)decode_sint16(p);
 		desc->leader_count = (sint8)decode_uint16(p);
 		desc->trailer_count = (sint8)decode_uint16(p);
@@ -310,7 +310,7 @@ obj_desc_t *vehicle_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	}
 
 	if(version<9) {
-		desc->maintenance = 0;
+		desc->maintenance = money_t(0,00);
 		desc->axle_load = 0;
 		desc->loading_time = 1000;
 	}
@@ -344,13 +344,13 @@ DBG_MESSAGE("vehicle_reader_t::register_obj()","old sound %i to %i",old_id,desc-
 		version,
 		desc->wtyp,
 		desc->capacity,
-		desc->price,
+		(sint32)desc->price.get_value(),
 		desc->topspeed,
 		desc->weight/1000.0,
 		desc->axle_load,
 		desc->power,
-		desc->running_cost,
-		desc->maintenance,
+		(sint32)desc->running_cost.get_value(),
+		(sint32)desc->maintenance.get_value(),
 		desc->sound,
 		desc->leader_count,
 		desc->trailer_count,

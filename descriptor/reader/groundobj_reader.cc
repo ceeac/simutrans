@@ -62,7 +62,7 @@ obj_desc_t * groundobj_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		desc->trees_on_top = (bool)decode_uint8(p);
 		desc->speed = kmh_to_speed( decode_uint16(p) );
 		desc->wtyp = (waytype_t)decode_uint16(p);
-		desc->price = decode_sint32(p);
+		desc->price = money_t(decode_sint32(p));
 	}
 	else {
 		// version 0, never existed
@@ -75,7 +75,7 @@ obj_desc_t * groundobj_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		desc->distribution_weight,
 		speed_to_kmh(desc->speed),
 		desc->wtyp,
-		desc->price,
+		(sint32)desc->price.get_value(),
 		desc->trees_on_top);
 
 	return desc;

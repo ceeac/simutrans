@@ -10,6 +10,8 @@
 #include <assert.h>
 
 #include "../simtypes.h"
+#include "../dataobj/money.h"
+
 
 /// for compatibility with old versions
 #define OLD_MAX_PLAYER_COST (19)
@@ -134,7 +136,7 @@ class finance_t {
 	/**
 	 * Amount of money, previously known as "konto"
 	 */
-	sint64 account_balance;
+	money_t account_balance;
 
 	/**
 	 * Shows how many months you have been in red numbers.
@@ -144,7 +146,7 @@ class finance_t {
 	/**
 	 * Remember the starting money, used e.g. in scenarios.
 	 */
-	sint64 starting_money;
+	money_t starting_money;
 
 	/**
 	 * Contains values having relation with whole company but not with particular
@@ -166,12 +168,12 @@ class finance_t {
 	/**
 	 * Monthly maintenance cost
 	 */
-	sint64 maintenance[TT_MAX];
+	money_t maintenance[TT_MAX];
 
 	/**
 	 * Monthly vehicle maintenance cost per transport type.
 	 */
-	sint64 vehicle_maintenance[TT_MAX];
+	money_t vehicle_maintenance[TT_MAX];
 
 public:
 	finance_t(player_t * _player, karte_t * _world);
@@ -182,10 +184,10 @@ public:
 	 * @param wt way type, e.g. tram_wt
 	 * @param utyp used for distinguishing transport type of building for accounting purposes, used with buildings only.
 	 */
-	inline void book_construction_costs(const sint64 amount, const waytype_t wt) {
+	inline void book_construction_costs(const money_t amount, const waytype_t wt) {
 		transport_type tt = translate_waytype_to_tt(wt);
-		veh_year[tt][0][ATV_CONSTRUCTION_COST] += (sint64) amount;
-		veh_month[tt][0][ATV_CONSTRUCTION_COST] += (sint64) amount;
+		veh_year[tt][0][ATV_CONSTRUCTION_COST]  += amount.get_value();
+		veh_month[tt][0][ATV_CONSTRUCTION_COST] += amount.get_value();
 
 		account_balance += amount;
 	}
@@ -204,10 +206,10 @@ public:
 	 * @param wt - waytype for accounting purposes
 	 * @param utyp - used for distinguishing of transport type of buildings. Used with buildings only.
 	 */
-	inline sint64 book_maintenance(sint64 change, waytype_t const wt)
+	inline money_t book_maintenance(money_t change, waytype_t const wt)
 	{
 		transport_type tt = translate_waytype_to_tt(wt);
-		maintenance[tt] += change;
+		maintenance[tt]     += change;
 		maintenance[TT_ALL] += change;
 		return maintenance[tt];
 	}
@@ -217,14 +219,14 @@ public:
 	 * @param amount money paid for vehicle
 	 * @param wt - waytype of vehicle
 	 */
-	inline void book_new_vehicle(const sint64 amount, const waytype_t wt)
+	inline void book_new_vehicle(const money_t amount, const waytype_t wt)
 	{
 		const transport_type tt = translate_waytype_to_tt(wt);
 
-		veh_year[ tt][0][ATV_NEW_VEHICLE] += (sint64) amount;
-		veh_month[tt][0][ATV_NEW_VEHICLE] += (sint64) amount;
-		veh_year[ tt][0][ATV_NON_FINANCIAL_ASSETS] -= (sint64) amount;
-		veh_month[tt][0][ATV_NON_FINANCIAL_ASSETS] -= (sint64) amount;
+		veh_year[ tt][0][ATV_NEW_VEHICLE] += amount.get_value();
+		veh_month[tt][0][ATV_NEW_VEHICLE] += amount.get_value();
+		veh_year[ tt][0][ATV_NON_FINANCIAL_ASSETS] -= amount.get_value();
+		veh_month[tt][0][ATV_NON_FINANCIAL_ASSETS] -= amount.get_value();
 
 		account_balance += amount;
 	}
@@ -235,14 +237,14 @@ public:
 	 * @param wt waytype of vehicle
 	 * @param index 0 = passenger, 1 = mail, 2 = goods
 	 */
-	inline void book_revenue(const sint64 amount, const waytype_t wt, sint32 index)
+	inline void book_revenue(const money_t amount, const waytype_t wt, sint32 index)
 	{
 		const transport_type tt = translate_waytype_to_tt(wt);
 
 		index = ((0 <= index) && (index <= 2)? index : 2);
 
-		veh_year[tt][0][ATV_REVENUE_PASSENGER+index] += (sint64) amount;
-		veh_month[tt][0][ATV_REVENUE_PASSENGER+index] += (sint64) amount;
+		veh_year[tt][0][ATV_REVENUE_PASSENGER+index]  += amount.get_value();
+		veh_month[tt][0][ATV_REVENUE_PASSENGER+index] += amount.get_value();
 
 		account_balance += amount;
 	}
@@ -252,11 +254,11 @@ public:
 	 * @param amount sum of money
 	 * @param wt way type
 	 */
-	inline void book_running_costs(const sint64 amount, const waytype_t wt)
+	inline void book_running_costs(const money_t amount, const waytype_t wt)
 	{
 		const transport_type tt = translate_waytype_to_tt(wt);
-		veh_year[tt][0][ATV_RUNNING_COST] += amount;
-		veh_month[tt][0][ATV_RUNNING_COST] += amount;
+		veh_year[tt][0][ATV_RUNNING_COST]  += amount.get_value();
+		veh_month[tt][0][ATV_RUNNING_COST] += amount.get_value();
 		account_balance += amount;
 	}
 
@@ -265,11 +267,11 @@ public:
 	 * @param amount sum of money
 	 * @param wt way type
 	 */
-	inline void book_toll_paid(const sint64 amount, const waytype_t wt)
+	inline void book_toll_paid(const money_t amount, const waytype_t wt)
 	{
 		const transport_type tt =  translate_waytype_to_tt(wt);
-		veh_year[tt][0][ATV_TOLL_PAID] += (sint64) amount;
-		veh_month[tt][0][ATV_TOLL_PAID] += (sint64) amount;
+		veh_year[tt][0][ATV_TOLL_PAID]  += amount.get_value();
+		veh_month[tt][0][ATV_TOLL_PAID] += amount.get_value();
 		account_balance += amount;
 	}
 
@@ -278,11 +280,11 @@ public:
 	 * @param amount sum of money
 	 * @param wt way type
 	 */
-	inline void book_toll_received(const sint64 amount, const waytype_t wt)
+	inline void book_toll_received(const money_t amount, const waytype_t wt)
 	{
 		const transport_type tt = translate_waytype_to_tt(wt);
-		veh_year[tt][0][ATV_TOLL_RECEIVED] += (sint64) amount;
-		veh_month[tt][0][ATV_TOLL_RECEIVED] += (sint64) amount;
+		veh_year[tt][0][ATV_TOLL_RECEIVED]  += amount.get_value();
+		veh_month[tt][0][ATV_TOLL_RECEIVED] += amount.get_value();
 		account_balance += amount;
 	}
 
@@ -334,18 +336,18 @@ public:
 	/**
 	 * @returns amount of money on account (also known as konto)
 	 */
-	inline sint64 get_account_balance() { return account_balance; }
+	inline money_t get_account_balance() { return account_balance; }
 
 	/**
 	 * Books amount of money to account (also known as konto)
 	 */
-	void book_account(sint64 amount)
+	void book_account(money_t amount)
 	{
 		account_balance += amount;
-		com_month[0][ATC_CASH] = account_balance;
-		com_year [0][ATC_CASH] = account_balance;
-		com_month[0][ATC_NETWEALTH] += amount;
-		com_year [0][ATC_NETWEALTH] += amount;
+		com_month[0][ATC_CASH] = account_balance.get_value();
+		com_year [0][ATC_CASH] = account_balance.get_value();
+		com_month[0][ATC_NETWEALTH] += amount.get_value();
+		com_year [0][ATC_NETWEALTH] += amount.get_value();
 		// BUG profit is not adjusted when calling this method
 	}
 
@@ -377,30 +379,30 @@ public:
 	 * @returns maintenance
 	 * @param tt transport type (Truck, Ship Air, ...)
 	 */
-	sint64 get_maintenance(transport_type tt=TT_ALL) const { assert(tt<TT_MAX); return maintenance[tt]; }
+	money_t get_maintenance(transport_type tt=TT_ALL) const { assert(tt<TT_MAX); return money_t(maintenance[tt]); }
 
 	/**
 	 * @returns maintenance scaled with bits_per_month
 	 */
-	sint64 get_maintenance_with_bits(transport_type tt=TT_ALL) const;
+	money_t get_maintenance_with_bits(transport_type tt=TT_ALL) const;
 
-	sint64 get_netwealth() const
+	money_t get_netwealth() const
 	{
 		// return com_year[0][ATC_NETWEALTH]; wont work as ATC_NETWEALTH is *only* updated in calc_finance_history
 		// see calc_finance_history
-		return veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance;
+		return money_t(veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS]) + account_balance;
 	}
 
 	sint64 get_scenario_completed() const { return com_month[0][ATC_SCENARIO_COMPLETED]; }
 
 	void set_scenario_completed(sint64 percent) { com_year[0][ATC_SCENARIO_COMPLETED] = com_month[0][ATC_SCENARIO_COMPLETED] = percent; }
 
-	sint64 get_starting_money() const { return starting_money; }
+	money_t get_starting_money() const { return starting_money; }
 
 	/**
 	 * @returns vehicle maintenance scaled with bits_per_month
 	 */
-	sint64 get_vehicle_maintenance_with_bits(transport_type tt=TT_ALL) const;
+	money_t get_vehicle_maintenance_with_bits(transport_type tt=TT_ALL) const;
 
 	/**
 	 * @returns TRUE if there is at least one convoi, otherwise returns false
@@ -410,7 +412,7 @@ public:
 	/**
 	 * returns TRUE if net wealth > 0 (but this of course requires that we keep netwealth up to date!)
 	 */
-	bool has_money_or_assets() const { return ( get_netwealth() > 0 ); }
+	bool has_money_or_assets() const { return ( get_netwealth() > money_t(0,00) ); }
 
 	/**
 	 * increases number of month for which the company is in red numbers
@@ -445,7 +447,7 @@ public:
 	 * Sets account balance. This method enables to load old game format.
 	 * Do NOT use it in any other places!
 	 */
-	void set_account_balance(sint64 amount) { account_balance = amount; }
+	void set_account_balance(money_t amount) { account_balance = amount; }
 
 	void set_assets(const sint64 (&assets)[TT_MAX]);
 
@@ -455,7 +457,7 @@ public:
 	 */
 	void set_account_overdrawn(sint32 num) { account_overdrawn = num; }
 
-	void set_starting_money(sint64 amount) {  starting_money = amount; }
+	void set_starting_money(money_t amount) { starting_money = amount; }
 
 	/**
 	 * Translates building_desc_t to transport_type
@@ -468,7 +470,7 @@ public:
 	 */
 	static transport_type translate_waytype_to_tt(waytype_t wt);
 
-	void update_assets(sint64 delta, waytype_t wt);
+	void update_assets(money_t delta, waytype_t wt);
 
 private:
 

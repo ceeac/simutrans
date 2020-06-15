@@ -193,7 +193,7 @@ public:
 
 		switch (label_type) {
 			case MONEY:
-				buf().append_money(value / 100.0);
+				buf().append_money(money_t(value));
 				break;
 			case PERCENT:
 				buf().append(value / 100.0, 2);
@@ -227,9 +227,10 @@ void money_frame_t::fill_chart_tables()
 
 bool money_frame_t::is_chart_table_zero(int ttoption)
 {
-	if (player->get_finance()->get_maintenance_with_bits((transport_type)ttoption) != 0) {
+	if (player->get_finance()->get_maintenance_with_bits((transport_type)ttoption) != money_t(0,00)) {
 		return false;
 	}
+
 	// search for any non-zero values
 	for (int i = 0; i<MAX_PLAYER_COST_BUTTON; i++) {
 		const uint8 tt = cost_type[3*i+1] == TT_ALL ? ttoption : cost_type[3*i+1];
@@ -484,18 +485,21 @@ void money_frame_t::update_labels()
 	}
 
 	// current maintenance
-	double maintenance = player->get_finance()->get_maintenance_with_bits((transport_type)transport_type_option) / 100.0;
+	money_t maintenance = player->get_finance()->get_maintenance_with_bits((transport_type)transport_type_option);
 	maintenance_money.append_money(-maintenance);
 	maintenance_money.update();
 
 	// bankruptcy warning
 	bool visible = warn.is_visible();
-	if(player->get_finance()->get_history_com_year(0, ATC_NETWEALTH)<0) {
+	const money_t netwealth(player->get_finance()->get_history_com_year(0, ATC_NETWEALTH));
+	const money_t starting_money = welt->get_settings().get_starting_money(welt->get_current_month()/12);
+
+	if(netwealth < money_t(0, 00)) {
 		warn.set_color( MONEY_MINUS );
 		warn.buf().append( translator::translate("Company bankrupt") );
 		warn.set_visible(true);
 	}
-	else if(  player->get_finance()->get_history_com_year(0, ATC_NETWEALTH)*10 < welt->get_settings().get_starting_money(welt->get_current_month()/12)  ){
+	else if(  netwealth * 10 < starting_money  ){
 		warn.set_color( MONEY_MINUS );
 		warn.buf().append( translator::translate("Net wealth near zero") );
 		warn.set_visible(true);

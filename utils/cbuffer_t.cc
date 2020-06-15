@@ -97,7 +97,8 @@ void cbuffer_t::append(double n,int decimals)
 	append(tmp);
 }
 
-void cbuffer_t::append_money(double money)
+
+void cbuffer_t::append_money(money_t money)
 {
 	char tmp[128];
 	money_to_string(tmp, money, true);

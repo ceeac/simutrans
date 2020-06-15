@@ -80,10 +80,10 @@ void intr_refresh_display(bool dirty)
 	dr_prepare_flush();
 	welt_ansicht->display( dirty );
 	if(  env_t::player_finance_display_account  ) {
-		win_display_flush( (double)welt_modell->get_active_player()->get_finance()->get_account_balance()/100.0 );
+		win_display_flush( welt_modell->get_active_player()->get_finance()->get_account_balance() );
 	}
 	else {
-		win_display_flush( (double)welt_modell->get_active_player()->get_finance()->get_netwealth()/100.0 );
+		win_display_flush( welt_modell->get_active_player()->get_finance()->get_netwealth() );
 	}
 	// with a switch statement more types could be supported ...
 	dr_flush();

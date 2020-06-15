@@ -51,7 +51,7 @@ obj_desc_t * roadsign_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	if(version==5) {
 		// Versioned node, version 5
 		desc->min_speed = kmh_to_speed(decode_uint16(p));
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->flags = decode_uint16(p);
 		desc->offset_left = decode_sint8(p);
 		desc->wtyp = decode_uint8(p);
@@ -61,7 +61,7 @@ obj_desc_t * roadsign_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if(version==4) {
 		// Versioned node, version 4
 		desc->min_speed = kmh_to_speed(decode_uint16(p));
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->flags = decode_uint8(p);
 		desc->offset_left = decode_sint8(p);
 		desc->wtyp = decode_uint8(p);
@@ -71,7 +71,7 @@ obj_desc_t * roadsign_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if(version==3) {
 		// Versioned node, version 3
 		desc->min_speed = kmh_to_speed(decode_uint16(p));
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->flags = decode_uint8(p);
 		desc->offset_left = 14;
 		desc->wtyp = decode_uint8(p);
@@ -81,7 +81,7 @@ obj_desc_t * roadsign_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if(version==2) {
 		// Versioned node, version 2
 		desc->min_speed = kmh_to_speed(decode_uint16(p));
-		desc->price = decode_uint32(p);
+		desc->price = money_t(decode_uint32(p));
 		desc->flags = decode_uint8(p);
 		desc->offset_left = 14;
 		desc->intro_date = DEFAULT_INTRO_DATE*12;
@@ -91,7 +91,7 @@ obj_desc_t * roadsign_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	else if(version==1) {
 		// Versioned node, version 1
 		desc->min_speed = kmh_to_speed(decode_uint16(p));
-		desc->price = 50000;
+		desc->price = money_t(500,00);
 		desc->flags = decode_uint8(p);
 		desc->offset_left = 14;
 		desc->intro_date = DEFAULT_INTRO_DATE*12;
@@ -111,7 +111,7 @@ obj_desc_t * roadsign_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		"version=%i, min_speed=%i, price=%i, flags=%x, wtyp=%i, offset_left=%i, intro=%i/%i, retire=%i/%i",
 		version,
 		desc->min_speed,
-		desc->price/100,
+		(sint32)desc->price.get_credits(),
 		desc->flags,
 		desc->wtyp,
 		desc->offset_left,

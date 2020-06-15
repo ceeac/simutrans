@@ -141,6 +141,7 @@ SHARED_SOURCES += ../simmem.cc
 SHARED_SOURCES += ../utils/simstring.cc
 SHARED_SOURCES += ../utils/searchfolder.cc
 VARIANT_SOURCES += ../dataobj/tabfile.cc
+VARIANT_SOURCES += ../dataobj/money.cc
 VARIANT_SOURCES += ../utils/log.cc
 
 SOURCES ?= $(SOLO_SOURCES) $(SHARED_SOURCES) $(VARIANT_SOURCES)

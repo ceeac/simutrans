@@ -51,8 +51,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 
 	if(node.size == 0) {
 		// old node, version 0, compatibility code
-		desc->price = 10000;
-		desc->maintenance = 800;
+		desc->price = money_t(100,00);
+		desc->maintenance = money_t(8,00);
 		desc->topspeed = 999;
 		desc->max_weight = 999;
 		desc->intro_date = DEFAULT_INTRO_DATE*12;
@@ -68,8 +68,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 
 		if(version==6) {
 			// version 6, now with axle load
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->topspeed = decode_uint32(p);
 			desc->max_weight = decode_uint32(p);
 			desc->intro_date = decode_uint16(p);
@@ -82,8 +82,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		}
 		else if(version==4  ||  version==5) {
 			// Versioned node, version 4+5
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->topspeed = decode_uint32(p);
 			desc->max_weight = decode_uint32(p);
 			desc->intro_date = decode_uint16(p);
@@ -95,8 +95,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		}
 		else if(version==3) {
 			// Versioned node, version 3
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->topspeed = decode_uint32(p);
 			desc->max_weight = decode_uint32(p);
 			desc->intro_date = decode_uint16(p);
@@ -108,8 +108,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		}
 		else if(version==2) {
 			// Versioned node, version 2
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->topspeed = decode_uint32(p);
 			desc->max_weight = decode_uint32(p);
 			desc->intro_date = decode_uint16(p);
@@ -121,8 +121,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		}
 		else if(version == 1) {
 			// Versioned node, version 1
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->topspeed = decode_uint32(p);
 			desc->max_weight = decode_uint32(p);
 			uint32 intro_date= decode_uint32(p);
@@ -167,8 +167,8 @@ obj_desc_t * way_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 	     "version=%d, price=%d, maintenance=%d, topspeed=%d, max_weight=%d, "
 	     "wtype=%d, styp=%d, intro=%i/%i, retire=%i/%i, axle_load=%d, ding=%i, seasons=%i",
 	     version,
-	     desc->price,
-	     desc->maintenance,
+	     (sint32)desc->price.get_value(),
+	     (sint32)desc->maintenance.get_value(),
 	     desc->topspeed,
 	     desc->max_weight,
 	     desc->wtyp,

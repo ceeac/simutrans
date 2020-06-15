@@ -181,7 +181,7 @@ static void show_times(karte_t *welt, main_view_t *view)
 	ms = dr_time();
 	for (i = 0; i < 2000; i++) {
 		view->display(true);
-		win_display_flush(0.0);
+		win_display_flush(money_t(0,00));
 	}
 	dbg->message( "view->display(true) and flush", "%i iterations took %li ms", i, dr_time() - ms );
 

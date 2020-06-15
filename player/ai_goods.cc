@@ -750,17 +750,18 @@ DBG_MESSAGE("ai_goods_t::create_simple_rail_transport()","building simple track 
 		// not ok: remove station ...
 		k = platz1;
 		while(k!=size1+platz1) {
-			int cost = -welt->lookup_kartenboden(k)->weg_entfernen( track_wt, true );
+			const money_t cost = -welt->lookup_kartenboden(k)->weg_entfernen( track_wt, true );
 			book_construction_costs(this, cost, k, track_wt);
 			k += diff1;
 		}
 		k = platz2;
 		while(k!=size2+platz2) {
-			int cost = -welt->lookup_kartenboden(k)->weg_entfernen( track_wt, true );
+			const money_t cost = -welt->lookup_kartenboden(k)->weg_entfernen( track_wt, true );
 			book_construction_costs(this, cost, k, track_wt);
 			k += diff2;
 		}
 	}
+
 	return false;
 }
 
@@ -958,18 +959,23 @@ DBG_MESSAGE("ai_goods_t::do_ki()","No roadway possible.");
 
 			// find the cheapest transport ...
 			// assume maximum cost
-			int cost_rail=0x7FFFFFFF, cost_road=0x7FFFFFFF;
-			int income_rail=0, income_road=0;
+			money_t cost_rail(LONG_LONG_MAX);
+			money_t cost_road(LONG_LONG_MAX);
 
 			// calculate cost for rail
 			if(  count_rail<255  ) {
-				int freight_price = (freight->get_value()*rail_vehicle->get_capacity()*count_rail)/24*((8000+(best_rail_speed-80)*freight->get_speed_bonus())/1000);
+				const money_t freight_price((freight->get_value()*rail_vehicle->get_capacity()*count_rail)/24*((8000+(best_rail_speed-80)*freight->get_speed_bonus())/1000));
+
 				// calculated here, since the above number was based on production
 				// only uneven number of cars bigger than 3 makes sense ...
 				count_rail = max( 3, count_rail );
-				income_rail = (freight_price*best_rail_speed)/(2*dist+count_rail);
-				cost_rail = rail_weg->get_maintenance() + (((count_rail+1)/2)*300)/dist + ((count_rail*rail_vehicle->get_running_cost()+rail_engine->get_running_cost())*best_rail_speed)/(2*dist+count_rail);
-				DBG_MESSAGE("ai_goods_t::do_ki()","Netto credits per day for rail transport %.2f (income %.2f)",cost_rail/100.0, income_rail/100.0 );
+				const money_t income_rail = (freight_price*best_rail_speed)/(2*dist+count_rail);
+
+				cost_rail = rail_weg->get_maintenance();
+				cost_rail += money_t((((count_rail+1)/2)*300)/dist);
+				cost_rail += money_t(((count_rail*rail_vehicle->get_running_cost()+rail_engine->get_running_cost())*best_rail_speed)/(2*dist+count_rail));
+
+				DBG_MESSAGE("ai_goods_t::do_ki()","Netto credits per day for rail transport %.2f (income %.2f)",cost_rail.as_double(), income_rail.as_double() );
 				cost_rail -= income_rail;
 			}
 
@@ -978,10 +984,13 @@ DBG_MESSAGE("ai_goods_t::do_ki()","No roadway possible.");
 				// for short distance: reduce number of cars
 				// calculated here, since the above number was based on production
 				count_road = CLIP( (sint32)(dist*15)/best_road_speed, 2, count_road );
-				int freight_price = (freight->get_value()*road_vehicle->get_capacity()*count_road)/24*((8000+(best_road_speed-80)*freight->get_speed_bonus())/1000);
-				cost_road = road_weg->get_maintenance() + 300/dist + (count_road*road_vehicle->get_running_cost()*best_road_speed)/(2*dist+5);
-				income_road = (freight_price*best_road_speed)/(2*dist+5);
-				DBG_MESSAGE("ai_goods_t::do_ki()","Netto credits per day and km for road transport %.2f (income %.2f)",cost_road/100.0, income_road/100.0 );
+				const money_t freight_price((freight->get_value()*road_vehicle->get_capacity()*count_road)/24*((8000+(best_road_speed-80)*freight->get_speed_bonus())/1000));
+				const money_t income_road = (freight_price*best_road_speed)/(2*dist+5);
+
+				cost_road = road_weg->get_maintenance();
+				cost_road += money_t(300)/dist;
+				cost_road += (count_road*road_vehicle->get_running_cost()*best_road_speed)/(2*dist+5);
+				DBG_MESSAGE("ai_goods_t::do_ki()","Netto credits per day and km for road transport %.2f (income %.2f)",cost_road.as_double(), income_road.as_double() );
 				cost_road -= income_road;
 			}
 
@@ -1216,9 +1225,9 @@ DBG_MESSAGE("ai_goods_t::step()","remove already constructed rail between %i,%i 
 					continue;
 				}
 
-				sint64 gewinn = 0;
+				money_t gewinn;
 				for( int j=0;  j<12;  j++  ) {
-					gewinn += cnv->get_finance_history( j, convoi_t::CONVOI_PROFIT );
+					gewinn += money_t(cnv->get_finance_history( j, convoi_t::CONVOI_PROFIT ));
 				}
 
 				// apparently we got the totally wrong vehicle here ...
@@ -1227,7 +1236,7 @@ DBG_MESSAGE("ai_goods_t::step()","remove already constructed rail between %i,%i 
 
 				// check for empty vehicles (likely stuck) that are making no plus and remove them ...
 				// take care, that the vehicle is old enough ...
-				if (!delete_this && (welt->get_current_month() - cnv->front()->get_purchase_time()) > 6 && gewinn <= 0) {
+				if (!delete_this && (welt->get_current_month() - cnv->front()->get_purchase_time()) > 6 && gewinn <= money_t(0,00)) {
 					sint64 goods=0;
 					// no goods for six months?
 					for( int i=0;  i<6;  i ++) {

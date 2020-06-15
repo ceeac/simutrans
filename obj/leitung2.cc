@@ -465,7 +465,7 @@ pumpe_t::~pumpe_t()
 		net->sub_supply(power_supply);
 	}
 	pumpe_list.remove( this );
-	player_t::add_maintenance(get_owner(), (sint32)welt->get_settings().cst_maintain_transformer, powerline_wt);
+	player_t::add_maintenance(get_owner(), welt->get_settings().cst_maintain_transformer, powerline_wt);
 }
 
 void pumpe_t::step(uint32 delta_t)
@@ -540,7 +540,7 @@ void pumpe_t::rdwr(loadsave_t * file) {
 void pumpe_t::finish_rd()
 {
 	leitung_t::finish_rd();
-	player_t::add_maintenance(get_owner(), -(sint32)welt->get_settings().cst_maintain_transformer, powerline_wt);
+	player_t::add_maintenance(get_owner(), -welt->get_settings().cst_maintain_transformer, powerline_wt);
 
 	assert(get_net());
 
@@ -668,7 +668,7 @@ senke_t::~senke_t()
 		net->sub_demand(power_demand);
 	}
 	senke_list.remove( this );
-	player_t::add_maintenance(get_owner(), (sint32)welt->get_settings().cst_maintain_transformer, powerline_wt);
+	player_t::add_maintenance(get_owner(), welt->get_settings().cst_maintain_transformer, powerline_wt);
 }
 
 void senke_t::step(uint32 delta_t)
@@ -690,10 +690,10 @@ void senke_t::pay_revenue()
 	const uint64 mjpc = (1 << POWER_TO_MW) / CREDIT_PER_MWS; // should be tied to game setting
 
 	// calculate payment in cent
-	const sint64 payment = (sint64)(energy_acc / mjpc);
+	const money_t payment = money_t(energy_acc / mjpc);
 
 	// make payment
-	if(  payment  >  0  ) {
+	if(  payment  >  money_t(0,00)  ) {
 		// enough has accumulated for a payment
 		get_owner()->book_revenue( payment, get_pos().get_2d(), powerline_wt );
 
@@ -806,7 +806,7 @@ void senke_t::rdwr(loadsave_t *file)
 void senke_t::finish_rd()
 {
 	leitung_t::finish_rd();
-	player_t::add_maintenance(get_owner(), -(sint32)welt->get_settings().cst_maintain_transformer, powerline_wt);
+	player_t::add_maintenance(get_owner(), -welt->get_settings().cst_maintain_transformer, powerline_wt);
 
 	assert(get_net());
 

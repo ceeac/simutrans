@@ -34,7 +34,7 @@ static plainstring integer_to_string(sint64 f)
 
 static plainstring money_to_string_intern(sint64 m)
 {
-	money_to_string(buf, m, false);
+	money_to_string(buf, money_t(m), false);
 	return buf;
 }
 

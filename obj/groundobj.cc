@@ -218,7 +218,7 @@ void groundobj_t::info(cbuffer_t & buf) const
 	buf.append("\n");
 	buf.append(translator::translate("cost for removal"));
 	char buffer[128];
-	money_to_string( buffer, get_desc()->get_price()/100.0 );
+	money_to_string( buffer, get_desc()->get_price() );
 	buf.append( buffer );
 }
 

@@ -61,19 +61,19 @@ bool are_equal(const obj_named_desc_t* a, const obj_named_desc_t* b)
 }
 
 
-sint64 get_scaled_maintenance(const obj_desc_transport_related_t* desc)
+money_t get_scaled_maintenance(const obj_desc_transport_related_t* desc)
 {
-	return desc ? welt->scale_with_month_length(desc->get_maintenance()) : 0;
+	return desc ? welt->scale_with_month_length(desc->get_maintenance()) : money_t(0,00);
 }
 
-sint64 get_scaled_maintenance_vehicle(const vehicle_desc_t* desc)
+money_t get_scaled_maintenance_vehicle(const vehicle_desc_t* desc)
 {
-	return desc ? welt->scale_with_month_length(desc->vehicle_desc_t::get_maintenance()) : 0;
+	return desc ? welt->scale_with_month_length(desc->vehicle_desc_t::get_maintenance()) : money_t(0,00);
 }
 
-sint64 get_scaled_maintenance_building(const building_desc_t* desc)
+money_t get_scaled_maintenance_building(const building_desc_t* desc)
 {
-	return desc ? welt->scale_with_month_length(desc->get_maintenance(welt)) : 0;
+	return desc ? welt->scale_with_month_length(desc->get_maintenance(welt)) : money_t(0,00);
 }
 
 
@@ -161,7 +161,7 @@ const vector_tpl<const building_desc_t*>& get_available_stations(building_desc_t
 	return dummy;
 }
 
-sint64 building_get_cost(const building_desc_t* desc)
+money_t building_get_cost(const building_desc_t* desc)
 {
 	return desc->get_price(welt) * desc->get_x() * desc->get_y();
 }

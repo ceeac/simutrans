@@ -47,8 +47,8 @@ void tunnel_reader_t::convert_old_tunnel(tunnel_desc_t *desc)
 		desc->wtyp = (uint8)track_wt;
 		desc->topspeed = 280;
 	}
-	desc->maintenance = 500;
-	desc->price = 200000;
+	desc->maintenance = money_t(5,00);
+	desc->price = money_t(2000,00);
 	desc->intro_date = DEFAULT_INTRO_DATE*12;
 	desc->retire_date = DEFAULT_RETIRE_DATE*12;
 	desc->has_way = false;
@@ -74,8 +74,8 @@ obj_desc_t * tunnel_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		if( version == 5 ) {
 			// versioned node, version 5 - axle load
 			desc->topspeed = decode_uint32(p);
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->wtyp = decode_uint8(p);
 			desc->intro_date = decode_uint16(p);
 			desc->retire_date = decode_uint16(p);
@@ -87,8 +87,8 @@ obj_desc_t * tunnel_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		else if( version == 4 ) {
 			// versioned node, version 4 - broad portal support
 			desc->topspeed = decode_uint32(p);
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->wtyp = decode_uint8(p);
 			desc->intro_date = decode_uint16(p);
 			desc->retire_date = decode_uint16(p);
@@ -99,8 +99,8 @@ obj_desc_t * tunnel_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		else if(version == 3) {
 			// versioned node, version 3 - underground way image support
 			desc->topspeed = decode_uint32(p);
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->wtyp = decode_uint8(p);
 			desc->intro_date = decode_uint16(p);
 			desc->retire_date = decode_uint16(p);
@@ -111,8 +111,8 @@ obj_desc_t * tunnel_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		else if(version == 2) {
 			// versioned node, version 2 - snow image support
 			desc->topspeed = decode_uint32(p);
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->wtyp = decode_uint8(p);
 			desc->intro_date = decode_uint16(p);
 			desc->retire_date = decode_uint16(p);
@@ -123,8 +123,8 @@ obj_desc_t * tunnel_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		else if(version == 1) {
 			// first versioned node, version 1
 			desc->topspeed = decode_uint32(p);
-			desc->price = decode_uint32(p);
-			desc->maintenance = decode_uint32(p);
+			desc->price = money_t(decode_uint32(p));
+			desc->maintenance = money_t(decode_uint32(p));
 			desc->wtyp = decode_uint8(p);
 			desc->intro_date = decode_uint16(p);
 			desc->retire_date = decode_uint16(p);
@@ -144,8 +144,8 @@ obj_desc_t * tunnel_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		     "version=%d, waytype=%d, price=%d, maintenance=%d, topspeed=%d, intro=%d/%d, retire=%d/%d, axle_load=%d, has_way=%i, seasons=%i, b_portals=%i",
 		     version,
 		     desc->wtyp,
-		     desc->price,
-		     desc->maintenance,
+		     (sint32)desc->price.get_value(),
+		     (sint32)desc->maintenance.get_value(),
 		     desc->topspeed,
 		     (desc->intro_date%12)+1,
 		     desc->intro_date/12,

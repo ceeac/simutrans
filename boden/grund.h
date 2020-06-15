@@ -720,7 +720,7 @@ public:
 	 * called before building way or powerline
 	 * @return costs
 	 */
-	sint64 remove_trees();
+	money_t remove_trees();
 
 	/**
 	 * A new way is built with the given ribis. Registered and assigned to the builder.
@@ -728,7 +728,7 @@ public:
 	 * @param ribi    die neuen ribis
 	 * @param player  Player building the way
 	 */
-	sint64 neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player);
+	money_t neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player);
 
 	/**
 	 * Bauhilfsfunktion - die ribis eines vorhandenen weges werden erweitert
@@ -745,7 +745,7 @@ public:
 	 * @param wegtyp   um welchen wegtyp geht es
 	 * @param ribi_rem sollen die ribis der nachbar zururckgesetzt werden?
 	 */
-	sint32 weg_entfernen(waytype_t wegtyp, bool ribi_rem);
+	money_t weg_entfernen(waytype_t wegtyp, bool ribi_rem);
 
 	/**
 	 * Description;

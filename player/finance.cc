@@ -30,7 +30,7 @@ finance_t::finance_t(player_t * _player, karte_t * _world) :
 		for (int cost_type=0; cost_type<ATC_MAX; cost_type++) {
 			com_year[year][cost_type] = 0;
 			if ((cost_type == ATC_CASH) || (cost_type == ATC_NETWEALTH)) {
-				com_year[year][cost_type] = starting_money;
+				com_year[year][cost_type] = starting_money.get_value();
 			}
 		}
 	}
@@ -39,7 +39,7 @@ finance_t::finance_t(player_t * _player, karte_t * _world) :
 		for (int cost_type=0; cost_type<ATC_MAX; cost_type++) {
 			com_month[month][cost_type] = 0;
 			if ((cost_type == ATC_CASH) || (cost_type == ATC_NETWEALTH)) {
-				com_month[month][cost_type] = starting_money;
+				com_month[month][cost_type] = starting_money.get_value();
 			}
 		}
 	}
@@ -61,11 +61,11 @@ finance_t::finance_t(player_t * _player, karte_t * _world) :
 	}
 
 	for(int i=0; i<TT_MAX; ++i){
-		maintenance[i] = 0;
+		maintenance[i] = money_t(0,00);
 	}
 
 	for(int i=0; i<TT_MAX_VEH; ++i){
-		vehicle_maintenance[i] = 0;
+		vehicle_maintenance[i] = money_t(0,00);
 	}
 }
 
@@ -157,33 +157,33 @@ void finance_t::calc_finance_history()
 	veh_year[TT_ALL][0][ATV_PROFIT_MARGIN] = calc_margin(veh_year[TT_ALL][0][ATV_OPERATING_PROFIT], veh_year[TT_ALL][0][ATV_REVENUE]);
 
 	// undistinguishable by type of transport
-	com_month[0][ATC_CASH] = account_balance;
-	com_year [0][ATC_CASH] = account_balance;
-	com_month[0][ATC_NETWEALTH] = veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance;
-	com_year [0][ATC_NETWEALTH] = veh_year[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance;
+	com_month[0][ATC_CASH] = account_balance.get_value();
+	com_year [0][ATC_CASH] = account_balance.get_value();
+	com_month[0][ATC_NETWEALTH] = veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance.get_value();
+	com_year [0][ATC_NETWEALTH] = veh_year[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance.get_value();
 }
 
 
-sint64 finance_t::get_maintenance_with_bits(transport_type tt) const
+money_t finance_t::get_maintenance_with_bits(transport_type tt) const
 {
 	assert(tt<TT_MAX);
-	return world->scale_with_month_length((sint64)maintenance[tt]);
+	return world->scale_with_month_length(maintenance[tt]);
 }
 
 
-sint64 finance_t::get_vehicle_maintenance_with_bits(transport_type tt) const
+money_t finance_t::get_vehicle_maintenance_with_bits(transport_type tt) const
 {
 	assert(tt<TT_MAX);
-	return world->scale_with_month_length((sint64)vehicle_maintenance[tt]);
+	return world->scale_with_month_length(vehicle_maintenance[tt]);
 }
 
 
 bool finance_t::is_bancrupted() const
 {
 	return (
-		get_netwealth() <=0  &&
+		get_netwealth() <= money_t(0,00)  &&
 		veh_year[TT_ALL][0][ATV_INFRASTRUCTURE_MAINTENANCE] == 0  &&
-		maintenance[TT_ALL] == 0  &&
+		maintenance[TT_ALL] == money_t(0,00)  &&
 		com_year[0][ATC_ALL_CONVOIS] == 0
 	);
 }
@@ -200,8 +200,8 @@ void finance_t::new_month()
 
 	// subtract maintenance
 	for(int i=0; i<TT_MAX; ++i){
-		veh_month[i][0][ATV_INFRASTRUCTURE_MAINTENANCE] -= get_maintenance_with_bits((transport_type)i);
-		veh_year [i][0][ATV_INFRASTRUCTURE_MAINTENANCE] -= get_maintenance_with_bits((transport_type)i);
+		veh_month[i][0][ATV_INFRASTRUCTURE_MAINTENANCE] -= get_maintenance_with_bits((transport_type)i).get_value();
+		veh_year [i][0][ATV_INFRASTRUCTURE_MAINTENANCE] -= get_maintenance_with_bits((transport_type)i).get_value();
 	}
 }
 
@@ -235,9 +235,9 @@ void finance_t::rdwr(loadsave_t *file)
 		calc_finance_history();
 	}
 
-	file->rdwr_longlong(account_balance);
+	account_balance.rdwr(file);
 	file->rdwr_long(account_overdrawn);
-	file->rdwr_longlong(starting_money);
+	starting_money.rdwr(file);
 
 	file->rdwr_byte( max_years );
 	file->rdwr_byte( max_months );
@@ -347,20 +347,20 @@ void finance_t::set_assets(const sint64 (&assets)[TT_MAX])
 	for(int i=0; i < TT_MAX; ++i){
 		veh_year[i][0][ATV_NON_FINANCIAL_ASSETS] = veh_month[i][0][ATV_NON_FINANCIAL_ASSETS] = assets[i];
 	}
-	com_year[0][ATC_NETWEALTH] = com_month[0][ATC_NETWEALTH] = veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance;
+	com_year[0][ATC_NETWEALTH] = com_month[0][ATC_NETWEALTH] = veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] + account_balance.get_value();
 }
 
 
-void finance_t::update_assets(sint64 const delta, const waytype_t wt)
+void finance_t::update_assets(money_t const delta, const waytype_t wt)
 {
 	transport_type tt = translate_waytype_to_tt(wt);
-	veh_year[ tt][0][ATV_NON_FINANCIAL_ASSETS] += delta;
-	veh_month[tt][0][ATV_NON_FINANCIAL_ASSETS] += delta;
-	veh_year[ TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] += delta;
-	veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] += delta;
+	veh_year[ tt][0][ATV_NON_FINANCIAL_ASSETS] += delta.get_value();
+	veh_month[tt][0][ATV_NON_FINANCIAL_ASSETS] += delta.get_value();
+	veh_year[ TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] += delta.get_value();
+	veh_month[TT_ALL][0][ATV_NON_FINANCIAL_ASSETS] += delta.get_value();
 
-	com_year[ 0][ATC_NETWEALTH] += delta;
-	com_month[0][ATC_NETWEALTH] += delta;
+	com_year[ 0][ATC_NETWEALTH] += delta.get_value();
+	com_month[0][ATC_NETWEALTH] += delta.get_value();
 }
 
 
@@ -579,7 +579,7 @@ void finance_t::rdwr_compatibility(loadsave_t *file)
 		for (int cost_type=0; cost_type<OLD_MAX_PLAYER_COST; cost_type++) {
 			finance_history_year[year][cost_type] = 0;
 			if ((cost_type == COST_CASH) || (cost_type == COST_NETWEALTH)) {
-				finance_history_year[year][cost_type] = get_starting_money();
+				finance_history_year[year][cost_type] = get_starting_money().get_value();
 			}
 		}
 	}
@@ -588,7 +588,7 @@ void finance_t::rdwr_compatibility(loadsave_t *file)
 		for (int cost_type=0; cost_type<OLD_MAX_PLAYER_COST; cost_type++) {
 			finance_history_month[month][cost_type] = 0;
 			if ((cost_type == COST_CASH) || (cost_type == COST_NETWEALTH)) {
-				finance_history_month[month][cost_type] = get_starting_money();
+				finance_history_month[month][cost_type] = get_starting_money().get_value();
 			}
 		}
 	}
@@ -703,14 +703,14 @@ void finance_t::rdwr_compatibility(loadsave_t *file)
 	}
 
 	if(  file->is_version_atleast(102, 3)  ) {
-		file->rdwr_longlong(starting_money);
+		starting_money.rdwr(file);
 	}
 
 	// we have to pay maintenance at the beginning of a month
 	if(file->is_version_less(99, 18)  &&  file->is_loading()) {
 		finance_history_month[0][COST_MAINTENANCE] -= finance_history_month[1][COST_MAINTENANCE];
 		finance_history_year [0][COST_MAINTENANCE] -= finance_history_month[1][COST_MAINTENANCE];
-		set_account_balance(get_account_balance() - finance_history_month[1][COST_MAINTENANCE]);
+		set_account_balance(get_account_balance() - money_t(finance_history_month[1][COST_MAINTENANCE]));
 	}
 
 

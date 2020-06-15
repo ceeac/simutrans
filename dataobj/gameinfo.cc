@@ -153,7 +153,7 @@ void gameinfo_t::rdwr(loadsave_t *file)
 
 	file->rdwr_bool( freeplay );
 	file->rdwr_bool( use_timeline );
-	file->rdwr_longlong( current_starting_money );
+	current_starting_money.rdwr(file);
 
 	file->rdwr_long( current_year_month );
 	file->rdwr_short( bits_per_month );

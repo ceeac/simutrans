@@ -212,6 +212,18 @@ namespace script_api {
 		return 1;
 	}
 
+	money_t param<money_t>::get(HSQUIRRELVM vm, SQInteger index)
+	{
+		SQInteger i = 0;
+		sq_getinteger(vm, index, &i);
+		return money_t(i);
+	}
+	SQInteger param<money_t>::push(HSQUIRRELVM vm, money_t const& v)
+	{
+		sq_pushinteger(vm, (SQInteger)v.get_value());
+		return 1;
+	}
+
 // floats
 	double param<double>::get(HSQUIRRELVM vm, SQInteger index)
 	{

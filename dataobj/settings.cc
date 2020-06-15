@@ -220,10 +220,11 @@ settings_t::settings_t() :
 
 	/* the big cost section */
 	freeplay = false;
-	starting_money = 20000000;
+	starting_money = money_t(200000,00);
+
 	for(  int i=0; i<10; i++  ) {
 		startingmoneyperyear[i].year = 0;
-		startingmoneyperyear[i].money = 0;
+		startingmoneyperyear[i].money = money_t(0,00);
 		startingmoneyperyear[i].interpol = 0;
 	}
 
@@ -233,7 +234,7 @@ settings_t::settings_t() :
 	// off
 	unprotect_abandoned_player_months = 0;
 
-	maint_building = 5000; // normal buildings
+	maint_building = money_t(50,00); // normal buildings
 	way_toll_runningcost_percentage = 0;
 	way_toll_waycost_percentage = 0;
 
@@ -241,31 +242,33 @@ settings_t::settings_t() :
 	disable_make_way_public = false;
 
 	// stop buildings
-	cst_multiply_dock=-50000;
-	cst_multiply_station=-60000;
-	cst_multiply_roadstop=-40000;
-	cst_multiply_airterminal=-300000;
-	cst_multiply_post=-30000;
-	cst_multiply_headquarter=-100000;
-	cst_depot_rail=-100000;
-	cst_depot_road=-130000;
-	cst_depot_ship=-250000;
-	cst_depot_air=-500000;
-	allow_merge_distant_halt = 2;
-	cst_multiply_merge_halt=-50000;
+	cst_multiply_dock           = money_t(    -500,00);
+	cst_multiply_station        = money_t(    -600,00);
+	cst_multiply_roadstop       = money_t(    -400,00);
+	cst_multiply_airterminal    = money_t(   -3000,00);
+	cst_multiply_post           = money_t(    -300,00);
+	cst_multiply_headquarter    = money_t(   -1000,00);
+
+	cst_depot_rail              = money_t(   -1000,00);
+	cst_depot_road              = money_t(   -1300,00);
+	cst_depot_ship              = money_t(   -2500,00);
+	cst_depot_air               = money_t(   -5000,00);
+	allow_merge_distant_halt    = 2;
+	cst_multiply_merge_halt     = money_t(    -500,00);
 	// alter landscape
-	cst_buy_land=-10000;
-	cst_alter_land=-100000;
-	cst_alter_climate=-100000;
-	cst_set_slope=-250000;
-	cst_found_city=-500000000;
-	cst_multiply_found_industry=-2000000;
-	cst_remove_tree=-10000;
-	cst_multiply_remove_haus=-100000;
-	cst_multiply_remove_field=-500000;
+	cst_buy_land                = money_t(    -100,00);
+	cst_alter_land              = money_t(   -1000,00);
+	cst_alter_climate           = money_t(   -1000,00);
+	cst_set_slope               = money_t(   -2500,00);
+	cst_found_city              = money_t(-5000000,00); // 5M
+	cst_multiply_found_industry = money_t(  -20000,00);
+	cst_remove_tree             = money_t(    -100,00);
+	cst_multiply_remove_haus    = money_t(   -1000,00);
+	cst_multiply_remove_field   = money_t(   -5000,00);
+
 	// cost for transformers
-	cst_transformer=-250000;
-	cst_maintain_transformer=-2000;
+	cst_transformer             = money_t(   -2500,00);
+	cst_maintain_transformer    = money_t(     -20,00);
 
 	cst_make_public_months = 60;
 
@@ -574,76 +577,85 @@ void settings_t::rdwr(loadsave_t *file)
 			// cost section ...
 			file->rdwr_bool(freeplay );
 			if(  file->is_version_atleast(102, 3)  ) {
-				file->rdwr_longlong(starting_money );
+				starting_money.rdwr(file);
 				// these must be saved, since new player will get different amounts eventually
 				for(  int i=0;  i<10;  i++  ) {
 					file->rdwr_short(startingmoneyperyear[i].year );
-					file->rdwr_longlong(startingmoneyperyear[i].money );
+					startingmoneyperyear[i].money.rdwr(file);
 					file->rdwr_bool(startingmoneyperyear[i].interpol );
 				}
 			}
 			else {
 				// compatibility code
-				sint64 save_starting_money = starting_money;
+				money_t save_starting_money = starting_money;
 				if(  file->is_saving()  ) {
-					if(save_starting_money==0) {
+					if(save_starting_money == money_t(0,00)) {
 						save_starting_money = get_starting_money(starting_year );
 					}
-					if(save_starting_money==0) {
+					if(save_starting_money == money_t(0,00)) {
 						save_starting_money = env_t::default_settings.get_starting_money(starting_year );
 					}
-					if(save_starting_money==0) {
-						save_starting_money = 20000000;
+					if(save_starting_money==money_t(0,00)) {
+						save_starting_money = money_t(200000,00);
 					}
 				}
-				file->rdwr_longlong(save_starting_money );
+
+				save_starting_money.rdwr(file);
+
 				if(file->is_loading()) {
-					if(save_starting_money==0) {
+					if(save_starting_money == money_t(0,00)) {
 						save_starting_money = env_t::default_settings.get_starting_money(starting_year );
 					}
-					if(save_starting_money==0) {
-						save_starting_money = 20000000;
+					if(save_starting_money == money_t(0,00)) {
+						save_starting_money = money_t(200000,00);
 					}
 					starting_money = save_starting_money;
 				}
 			}
-			file->rdwr_long(maint_building );
 
-			file->rdwr_longlong(cst_multiply_dock );
-			file->rdwr_longlong(cst_multiply_station );
-			file->rdwr_longlong(cst_multiply_roadstop );
-			file->rdwr_longlong(cst_multiply_airterminal );
-			file->rdwr_longlong(cst_multiply_post );
-			file->rdwr_longlong(cst_multiply_headquarter );
-			file->rdwr_longlong(cst_depot_rail );
-			file->rdwr_longlong(cst_depot_road );
-			file->rdwr_longlong(cst_depot_ship );
-			file->rdwr_longlong(cst_depot_air );
+			{
+				sint32 maint = maint_building.get_value();
+				file->rdwr_long(maint);
+				maint_building = money_t(maint);
+			}
+
+			cst_multiply_dock.rdwr(file);
+			cst_multiply_station.rdwr(file);
+			cst_multiply_roadstop.rdwr(file);
+			cst_multiply_airterminal.rdwr(file);
+			cst_multiply_post.rdwr(file);
+			cst_multiply_headquarter.rdwr(file);
+			cst_depot_rail.rdwr(file);
+			cst_depot_road.rdwr(file);
+			cst_depot_ship.rdwr(file);
+			cst_depot_air.rdwr(file);
+
 			if(  file->is_version_less(102, 2)  ) {
 				sint64 dummy64 = 100000;
 				file->rdwr_longlong(dummy64 );
 				file->rdwr_longlong(dummy64 );
 				file->rdwr_longlong(dummy64 );
 			}
+
 			// alter landscape
-			file->rdwr_longlong(cst_buy_land );
-			file->rdwr_longlong(cst_alter_land );
-			file->rdwr_longlong(cst_set_slope );
-			file->rdwr_longlong(cst_found_city );
-			file->rdwr_longlong(cst_multiply_found_industry );
-			file->rdwr_longlong(cst_remove_tree );
-			file->rdwr_longlong(cst_multiply_remove_haus );
-			file->rdwr_longlong(cst_multiply_remove_field );
+			cst_buy_land.rdwr(file);
+			cst_alter_land.rdwr(file);
+			cst_set_slope.rdwr(file);
+			cst_found_city.rdwr(file);
+			cst_multiply_found_industry.rdwr(file);
+			cst_remove_tree.rdwr(file);
+			cst_multiply_remove_haus.rdwr(file);
+			cst_multiply_remove_field.rdwr(file);
 			// cost for transformers
-			file->rdwr_longlong(cst_transformer );
-			file->rdwr_longlong(cst_maintain_transformer );
+			cst_transformer.rdwr(file);
+			cst_maintain_transformer.rdwr(file);
 
 			if(  file->is_version_atleast(120, 3)  ) {
 				file->rdwr_longlong(cst_make_public_months);
 			}
 
 			if(  file->is_version_atleast(120, 9)  ) {
-				file->rdwr_longlong(cst_multiply_merge_halt);
+				cst_multiply_merge_halt.rdwr(file);
 			}
 
 			// wayfinder
@@ -797,7 +809,7 @@ void settings_t::rdwr(loadsave_t *file)
 			file->rdwr_short( max_factory_spacing_percentage );
 		}
 		if(  file->is_version_atleast(112, 8)  ) {
-			file->rdwr_longlong( cst_alter_climate );
+			cst_alter_climate.rdwr(file);
 			file->rdwr_byte( way_height_clearance );
 		}
 		if(  file->is_version_atleast(120, 2)  ) {
@@ -1167,7 +1179,7 @@ void settings_t::parse_simuconf(tabfile_t& simuconf, sint16& disp_width, sint16&
 	used_vehicle_reduction  = clamp( contents.get_int("used_vehicle_reduction", used_vehicle_reduction ), 0, 1000 );
 
 	// starting money
-	starting_money = contents.get_int64("starting_money", starting_money );
+	starting_money = contents.get_money("starting_money", starting_money );
 	/* up to ten blocks year, money, interpolation={0,1} are possible:
 	 * starting_money[i]=y,m,int
 	 * y .. year
@@ -1193,7 +1205,7 @@ void settings_t::parse_simuconf(tabfile_t& simuconf, sint16& disp_width, sint16&
 				}
 			}
 			startingmoneyperyear[k].year = (sint16)test[1];
-			startingmoneyperyear[k].money = test[2];
+			startingmoneyperyear[k].money = money_t(test[2]);
 			if (test[0]==3) {
 				startingmoneyperyear[k].interpol = test[3]!=0;
 			}
@@ -1209,12 +1221,12 @@ void settings_t::parse_simuconf(tabfile_t& simuconf, sint16& disp_width, sint16&
 		delete [] test;
 	}
 	// at least one found => use this now!
-	if(  j>0  &&  startingmoneyperyear[0].money>0  ) {
-		starting_money = 0;
+	if(  j>0  &&  startingmoneyperyear[0].money > money_t(0,00)  ) {
+		starting_money = money_t(0,00);
 		// fill remaining entries
 		for(  int i=j+1; i<10; i++  ) {
 			startingmoneyperyear[i].year = 0;
-			startingmoneyperyear[i].money = 0;
+			startingmoneyperyear[i].money = money_t(0,00);
 			startingmoneyperyear[i].interpol = 0;
 		}
 	}
@@ -1285,7 +1297,7 @@ void settings_t::parse_simuconf(tabfile_t& simuconf, sint16& disp_width, sint16&
 	}
 	default_ai_construction_speed = env_t::default_ai_construction_speed = contents.get_int("ai_construction_speed", env_t::default_ai_construction_speed );
 
-	maint_building = contents.get_int("maintenance_building", maint_building );
+	maint_building = contents.get_money("maintenance_building", maint_building );
 
 	numbered_stations = contents.get_int("numbered_stations", numbered_stations );
 	station_coverage_size = contents.get_int("station_coverage", station_coverage_size );
@@ -1349,33 +1361,33 @@ void settings_t::parse_simuconf(tabfile_t& simuconf, sint16& disp_width, sint16&
 	way_toll_waycost_percentage = contents.get_int("toll_waycost_percentage", way_toll_waycost_percentage );
 
 	/* now the cost section */
-	cst_multiply_dock = contents.get_int64("cost_multiply_dock", cst_multiply_dock/(-100) ) * -100;
-	cst_multiply_station = contents.get_int64("cost_multiply_station", cst_multiply_station/(-100) ) * -100;
-	cst_multiply_roadstop = contents.get_int64("cost_multiply_roadstop", cst_multiply_roadstop/(-100) ) * -100;
-	cst_multiply_airterminal = contents.get_int64("cost_multiply_airterminal", cst_multiply_airterminal/(-100) ) * -100;
-	cst_multiply_post = contents.get_int64("cost_multiply_post", cst_multiply_post/(-100) ) * -100;
-	cst_multiply_headquarter = contents.get_int64("cost_multiply_headquarter", cst_multiply_headquarter/(-100) ) * -100;
-	cst_depot_air = contents.get_int64("cost_depot_air", cst_depot_air/(-100) ) * -100;
-	cst_depot_rail = contents.get_int64("cost_depot_rail", cst_depot_rail/(-100) ) * -100;
-	cst_depot_road = contents.get_int64("cost_depot_road", cst_depot_road/(-100) ) * -100;
-	cst_depot_ship = contents.get_int64("cost_depot_ship", cst_depot_ship/(-100) ) * -100;
+	cst_multiply_dock = contents.get_money("cost_multiply_dock", cst_multiply_dock/(-100) ) * -100;
+	cst_multiply_station = contents.get_money("cost_multiply_station", cst_multiply_station/(-100) ) * -100;
+	cst_multiply_roadstop = contents.get_money("cost_multiply_roadstop", cst_multiply_roadstop/(-100) ) * -100;
+	cst_multiply_airterminal = contents.get_money("cost_multiply_airterminal", cst_multiply_airterminal/(-100) ) * -100;
+	cst_multiply_post = contents.get_money("cost_multiply_post", cst_multiply_post/(-100) ) * -100;
+	cst_multiply_headquarter = contents.get_money("cost_multiply_headquarter", cst_multiply_headquarter/(-100) ) * -100;
+	cst_depot_air = contents.get_money("cost_depot_air", cst_depot_air/(-100) ) * -100;
+	cst_depot_rail = contents.get_money("cost_depot_rail", cst_depot_rail/(-100) ) * -100;
+	cst_depot_road = contents.get_money("cost_depot_road", cst_depot_road/(-100) ) * -100;
+	cst_depot_ship = contents.get_money("cost_depot_ship", cst_depot_ship/(-100) ) * -100;
 
 	allow_merge_distant_halt = contents.get_int("allow_merge_distant_halt", allow_merge_distant_halt);
-	cst_multiply_merge_halt = contents.get_int64("cost_multiply_merge_halt", cst_multiply_merge_halt/(-100) ) * -100;
+	cst_multiply_merge_halt = contents.get_money("cost_multiply_merge_halt", cst_multiply_merge_halt/(-100) ) * -100;
 
 	// alter landscape
-	cst_buy_land = contents.get_int64("cost_buy_land", cst_buy_land/(-100) ) * -100;
-	cst_alter_land = contents.get_int64("cost_alter_land", cst_alter_land/(-100) ) * -100;
-	cst_set_slope = contents.get_int64("cost_set_slope", cst_set_slope/(-100) ) * -100;
-	cst_alter_climate = contents.get_int64("cost_alter_climate", cst_alter_climate/(-100) ) * -100;
-	cst_found_city = contents.get_int64("cost_found_city", cst_found_city/(-100) ) * -100;
-	cst_multiply_found_industry = contents.get_int64("cost_multiply_found_industry", cst_multiply_found_industry/(-100) ) * -100;
-	cst_remove_tree = contents.get_int64("cost_remove_tree", cst_remove_tree/(-100) ) * -100;
-	cst_multiply_remove_haus = contents.get_int64("cost_multiply_remove_haus", cst_multiply_remove_haus/(-100) ) * -100;
-	cst_multiply_remove_field = contents.get_int64("cost_multiply_remove_field", cst_multiply_remove_field/(-100) ) * -100;
+	cst_buy_land = contents.get_money("cost_buy_land", cst_buy_land/(-100) ) * -100;
+	cst_alter_land = contents.get_money("cost_alter_land", cst_alter_land/(-100) ) * -100;
+	cst_set_slope = contents.get_money("cost_set_slope", cst_set_slope/(-100) ) * -100;
+	cst_alter_climate = contents.get_money("cost_alter_climate", cst_alter_climate/(-100) ) * -100;
+	cst_found_city = contents.get_money("cost_found_city", cst_found_city/(-100) ) * -100;
+	cst_multiply_found_industry = contents.get_money("cost_multiply_found_industry", cst_multiply_found_industry/(-100) ) * -100;
+	cst_remove_tree = contents.get_money("cost_remove_tree", cst_remove_tree/(-100) ) * -100;
+	cst_multiply_remove_haus = contents.get_money("cost_multiply_remove_haus", cst_multiply_remove_haus/(-100) ) * -100;
+	cst_multiply_remove_field = contents.get_money("cost_multiply_remove_field", cst_multiply_remove_field/(-100) ) * -100;
 	// powerlines
-	cst_transformer = contents.get_int64("cost_transformer", cst_transformer/(-100) ) * -100;
-	cst_maintain_transformer = contents.get_int64("cost_maintain_transformer", cst_maintain_transformer/(-100) ) * -100;
+	cst_transformer = contents.get_money("cost_transformer", cst_transformer/(-100) ) * -100;
+	cst_maintain_transformer = contents.get_money("cost_maintain_transformer", cst_maintain_transformer/(-100) ) * -100;
 
 	cst_make_public_months = contents.get_int64("cost_make_public_months", cst_make_public_months);
 
@@ -1509,9 +1521,9 @@ int settings_t::get_name_language_id() const
 }
 
 
-sint64 settings_t::get_starting_money(sint16 const year) const
+money_t settings_t::get_starting_money(sint16 const year) const
 {
-	if(  starting_money>0  ) {
+	if(  starting_money > money_t(0,00)  ) {
 		return starting_money;
 	}
 

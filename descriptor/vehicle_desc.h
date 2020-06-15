@@ -66,7 +66,7 @@ private:
 	uint16  loading_time; // time per full loading/unloading
 	uint32  weight;
 	uint32  power;
-	uint16  running_cost;
+	money_t running_cost;
 
 	uint16  gear;       // engine gear (power multiplier), 64=100
 
@@ -90,7 +90,8 @@ public:
 	// default vehicle (used for way search and similar tasks)
 	// since it has no images and not even a name node any calls to this will case a crash
 	vehicle_desc_t(uint8 wtype, uint16 speed, engine_t engine) {
-		maintenance = freight_image_type = price = capacity = axle_load = running_cost = intro_date = leader_count = trailer_count = 0;
+		freight_image_type = capacity = axle_load = intro_date = leader_count = trailer_count = 0;
+		price = running_cost = maintenance = money_t(0, 00);
 		power = weight = 1;
 		loading_time = 1000;
 		gear = 64;
@@ -246,8 +247,8 @@ public:
 	uint16 get_loading_time() const { return loading_time; } // ms per full loading/unloading
 	uint32 get_weight() const { return weight; }
 	uint32 get_power() const { return power; }
-	uint32 get_running_cost() const { return running_cost; }
-	sint32 get_fixed_cost() const { return get_maintenance(); }
+	money_t get_running_cost() const { return running_cost; }
+	money_t get_fixed_cost() const { return get_maintenance(); }
 	sint8 get_sound() const { return sound; }
 
 	/**

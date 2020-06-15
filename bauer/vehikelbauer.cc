@@ -206,7 +206,7 @@ vehicle_t* vehicle_builder_t::build(koord3d k, player_t* player, convoi_t* cnv, 
 			dbg->fatal("vehicle_builder_t::build()", "cannot built a vehicle with waytype %i", vb->get_waytype());
 	}
 
-	player->book_new_vehicle(-(sint64)vb->get_price(), k.get_2d(), vb->get_waytype() );
+	player->book_new_vehicle(-vb->get_price(), k.get_2d(), vb->get_waytype() );
 
 	return v;
 }
@@ -253,15 +253,14 @@ static int compare_capacity(const vehicle_desc_t* a, const vehicle_desc_t* b) { 
 static int compare_engine(const vehicle_desc_t* a, const vehicle_desc_t* b) {
 	return (a->get_capacity() + a->get_power() == 0 ? (uint8)vehicle_desc_t::steam : a->get_engine_type()) - (b->get_capacity() + b->get_power() == 0 ? (uint8)vehicle_desc_t::steam : b->get_engine_type());
 }
-static int compare_price(const vehicle_desc_t* a, const vehicle_desc_t* b) { return a->get_price() - b->get_price(); }
-static int compare_cost(const vehicle_desc_t* a, const vehicle_desc_t* b) { return a->get_running_cost() - b->get_running_cost(); }
-static int compare_cost_per_unit(const vehicle_desc_t* a, const vehicle_desc_t* b) { return a->get_running_cost()*b->get_capacity() - b->get_running_cost()*a->get_capacity(); }
-static int compare_topspeed(const vehicle_desc_t* a, const vehicle_desc_t* b) {return a->get_topspeed() - b->get_topspeed();}
-static int compare_power(const vehicle_desc_t* a, const vehicle_desc_t* b) {return (a->get_power() == 0 ? 0x7FFFFFF : a->get_power()) - (b->get_power() == 0 ? 0x7FFFFFF : b->get_power());}
-static int compare_weight(const vehicle_desc_t* a, const vehicle_desc_t* b) {return a->get_weight() - b->get_weight();}
-static int compare_intro_year_month(const vehicle_desc_t* a, const vehicle_desc_t* b) {return a->get_intro_year_month() - b->get_intro_year_month();}
+static int compare_price(const vehicle_desc_t* a, const vehicle_desc_t* b)             {return sgn(a->get_price() - b->get_price()); }
+static int compare_cost(const vehicle_desc_t* a, const vehicle_desc_t* b)              {return sgn(a->get_running_cost() - b->get_running_cost()); }
+static int compare_cost_per_unit(const vehicle_desc_t* a, const vehicle_desc_t* b)     {return sgn(a->get_running_cost()*b->get_capacity() - b->get_running_cost()*a->get_capacity()); }
+static int compare_topspeed(const vehicle_desc_t* a, const vehicle_desc_t* b)          {return a->get_topspeed() - b->get_topspeed();}
+static int compare_power(const vehicle_desc_t* a, const vehicle_desc_t* b)             {return (a->get_power() == 0 ? 0x7FFFFFF : a->get_power()) - (b->get_power() == 0 ? 0x7FFFFFF : b->get_power());}
+static int compare_weight(const vehicle_desc_t* a, const vehicle_desc_t* b)            {return a->get_weight() - b->get_weight();}
+static int compare_intro_year_month(const vehicle_desc_t* a, const vehicle_desc_t* b)  {return a->get_intro_year_month() - b->get_intro_year_month();}
 static int compare_retire_year_month(const vehicle_desc_t* a, const vehicle_desc_t* b) {return a->get_retire_year_month() - b->get_retire_year_month();}
-
 
 
 // default compare function with mode parameter
@@ -440,7 +439,7 @@ const vehicle_desc_t *vehicle_builder_t::vehikel_search( waytype_t wt, const uin
 			// assign this vehicle if we have not found one yet, or we only found one too weak
 			if(  desc!=NULL  ) {
 				// is it cheaper to run? (this is most important)
-				difference += (desc->get_capacity()*1000)/(1+desc->get_running_cost()) < (test_desc->get_capacity()*1000)/(1+test_desc->get_running_cost()) ? -20 : 20;
+				difference += (desc->get_capacity()*1000)/(1+desc->get_running_cost().get_value()) < (test_desc->get_capacity()*1000)/(1+test_desc->get_running_cost().get_value()) ? -20 : 20;
 				if(  target_weight>0  ) {
 					// is it stronger?
 					difference += (desc->get_power()*desc->get_gear())/64 < power ? -10 : 10;
@@ -472,7 +471,7 @@ const vehicle_desc_t *vehicle_builder_t::vehikel_search( waytype_t wt, const uin
 			uint32 max_weight = power/( (speed*speed)/2500 + 1 );
 
 			// we found a useful engine
-			sint32 current_index = (power * 100) / (1 + test_desc->get_running_cost()) + test_desc->get_topspeed() - test_desc->get_weight() / 1000 - (sint32)(test_desc->get_price() / 25000);
+			sint32 current_index = (power * 100) / (1 + test_desc->get_running_cost().get_value()) + test_desc->get_topspeed() - test_desc->get_weight() / 1000 - (sint32)(test_desc->get_price().get_credits() / 250);
 			// too slow?
 			if(speed < target_speed) {
 				current_index -= 250;
@@ -562,7 +561,7 @@ const vehicle_desc_t *vehicle_builder_t::get_best_matching( waytype_t wt, const 
 			// assign this vehicle if we have not found one yet, or we only found one too weak
 			if(  desc!=NULL  ) {
 				// is it cheaper to run? (this is most important)
-				difference += (desc->get_capacity()*1000)/(1+desc->get_running_cost()) < (test_desc->get_capacity()*1000)/(1+test_desc->get_running_cost()) ? -20 : 20;
+				difference += (desc->get_capacity()*1000)/(1+desc->get_running_cost().get_value()) < (test_desc->get_capacity()*1000)/(1+test_desc->get_running_cost().get_value()) ? -20 : 20;
 				if(  target_weight>0  ) {
 					// is it stronger?
 					difference += (desc->get_power()*desc->get_gear())/64 < power ? -10 : 10;
@@ -589,7 +588,7 @@ const vehicle_desc_t *vehicle_builder_t::get_best_matching( waytype_t wt, const 
 			uint32 max_weight = power/( (speed*speed)/2500 + 1 );
 
 			// we found a useful engine
-			sint32 current_index = (power * 100) / (1 + test_desc->get_running_cost()) + test_desc->get_topspeed() - (sint16)test_desc->get_weight() / 1000 - (sint32)(test_desc->get_price() / 25000);
+			sint32 current_index = (power * 100) / (1 + test_desc->get_running_cost().get_value()) + test_desc->get_topspeed() - (sint16)test_desc->get_weight() / 1000 - (sint32)(test_desc->get_price().get_credits() / 250);
 			// too slow?
 			if(speed < target_speed) {
 				current_index -= 250;

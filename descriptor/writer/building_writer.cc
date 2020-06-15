@@ -20,8 +20,7 @@ using std::string;
 
 void tile_writer_t::write_obj(FILE* fp, obj_node_t& parent, int index, int seasons,
 	slist_tpl<slist_tpl<slist_tpl<string> > >& backkeys,
-	slist_tpl<slist_tpl<slist_tpl<string> > >& frontkeys
-)
+	slist_tpl<slist_tpl<slist_tpl<string> > >& frontkeys)
 {
 	obj_node_t node(this, 7, &parent);
 
@@ -255,14 +254,14 @@ void building_writer_t::write_obj(FILE* fp, obj_node_t& parent, tabfileobj_t& ob
 		capacity = obj.get_int("station_capacity", level * 32);
 	}
 
-	sint32 maintenance = obj.get_int("maintenance", PRICE_MAGIC);
+	money_t maintenance = obj.get_money("maintenance", PRICE_MAGIC);
 	if(  maintenance == PRICE_MAGIC  ) {
-		maintenance = obj.get_int("station_maintenance", PRICE_MAGIC);
+		maintenance = obj.get_money("station_maintenance", PRICE_MAGIC);
 	}
 
-	sint32 price = obj.get_int("cost", PRICE_MAGIC);
+	money_t price = obj.get_money("cost", PRICE_MAGIC);
 	if(  price == PRICE_MAGIC  ) {
-		price = obj.get_int("station_price", PRICE_MAGIC);
+		price = obj.get_money("station_price", PRICE_MAGIC);
 	}
 
 	uint8 allow_underground = obj.get_int("allow_underground", 2);
@@ -357,25 +356,25 @@ void building_writer_t::write_obj(FILE* fp, obj_node_t& parent, tabfileobj_t& ob
 	node.write_uint16(fp, 0x800A,            0);
 
 	// write desc data
-	node.write_uint8 (fp, 0,                 2); // was gtyp
-	node.write_uint8 (fp, type,              3);
-	node.write_uint16(fp, level,             4);
-	node.write_uint32(fp, extra_data,        6);
-	node.write_uint16(fp, size.x,           10);
-	node.write_uint16(fp, size.y,           12);
-	node.write_uint8 (fp, layouts,          14);
-	node.write_uint16(fp, allowed_climates, 15);
-	node.write_uint8 (fp, enables,          17);
-	node.write_uint8 (fp, flags,            18);
-	node.write_uint8 (fp, chance,           19);
-	node.write_uint16(fp, intro_date,       20);
-	node.write_uint16(fp, retire_date,    22);
-	node.write_uint16(fp, animation_time,   24);
-	node.write_uint16(fp, capacity,         26);
-	node.write_sint32(fp, maintenance,      28);
-	node.write_sint32(fp, price,            32);
-	node.write_uint8 (fp, allow_underground,36);
-	node.write_uint16(fp, preservation_date,37);
+	node.write_uint8 (fp, 0,                                2); // was gtyp
+	node.write_uint8 (fp, type,                             3);
+	node.write_uint16(fp, level,                            4);
+	node.write_uint32(fp, extra_data,                       6);
+	node.write_uint16(fp, size.x,                          10);
+	node.write_uint16(fp, size.y,                          12);
+	node.write_uint8 (fp, layouts,                         14);
+	node.write_uint16(fp, allowed_climates,                15);
+	node.write_uint8 (fp, enables,                         17);
+	node.write_uint8 (fp, flags,                           18);
+	node.write_uint8 (fp, chance,                          19);
+	node.write_uint16(fp, intro_date,                      20);
+	node.write_uint16(fp, retire_date,                     22);
+	node.write_uint16(fp, animation_time,                  24);
+	node.write_uint16(fp, capacity,                        26);
+	node.write_sint32(fp, (sint32)maintenance.get_value(), 28);
+	node.write_sint32(fp, (sint32)price.get_value(),       32);
+	node.write_uint8 (fp, allow_underground,               36);
+	node.write_uint16(fp, preservation_date,               37);
 
 	// probably add some icons, if defined
 	slist_tpl<string> cursorkeys;

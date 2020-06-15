@@ -107,7 +107,9 @@ void convoi_t::init(player_t *player)
 
 	is_electric = false;
 	sum_gesamtweight = sum_weight = 0;
-	sum_running_costs = sum_fixed_costs = sum_gear_and_power = previous_delta_v = 0;
+	sum_running_costs = money_t(0,00);
+	sum_fixed_costs = money_t(0,00);
+	sum_gear_and_power = previous_delta_v = 0;
 	sum_power = 0;
 	min_top_speed = SPEED_UNLIMITED;
 	speedbonus_kmh = SPEED_UNLIMITED; // speed_to_kmh() not needed
@@ -124,7 +126,7 @@ void convoi_t::init(player_t *player)
 	wait_lock = 0;
 	arrived_time = 0;
 
-	jahresgewinn = 0;
+	jahresgewinn = money_t(0,00);
 	total_distance_traveled = 0;
 
 	distance_since_last_stop = 0;
@@ -637,7 +639,7 @@ void convoi_t::add_running_cost( const weg_t *weg )
 
 	if(  weg  &&  weg->get_owner()!=get_owner()  &&  weg->get_owner()!=NULL  ) {
 		// running on non-public way costs toll (since running costs are positive => invert)
-		sint32 toll = -(sum_running_costs*welt->get_settings().get_way_toll_runningcost_percentage())/100l;
+		money_t toll = -(sum_running_costs*welt->get_settings().get_way_toll_runningcost_percentage())/100;
 		if(  welt->get_settings().get_way_toll_waycost_percentage()  ) {
 			if(  weg->is_electrified()  &&  needs_electrification()  ) {
 				// toll for using electricity
@@ -646,25 +648,25 @@ void convoi_t::add_running_cost( const weg_t *weg )
 					obj_t *d=gr->obj_bei(i);
 					if(  wayobj_t const* const wo = obj_cast<wayobj_t>(d)  )  {
 						if(  wo->get_waytype()==weg->get_waytype()  ) {
-							toll += (wo->get_desc()->get_maintenance()*welt->get_settings().get_way_toll_waycost_percentage())/100l;
+							toll += (wo->get_desc()->get_maintenance()*welt->get_settings().get_way_toll_waycost_percentage())/100;
 							break;
 						}
 					}
 				}
 			}
 			// now add normal way toll be maintenance
-			toll += (weg->get_desc()->get_maintenance()*welt->get_settings().get_way_toll_waycost_percentage())/100l;
+			toll += (weg->get_desc()->get_maintenance()*welt->get_settings().get_way_toll_waycost_percentage())/100;
 		}
 		weg->get_owner()->book_toll_received( toll, get_schedule()->get_waytype() );
 		get_owner()->book_toll_paid(         -toll, get_schedule()->get_waytype() );
-		book( -toll, CONVOI_WAYTOLL);
-		book( -toll, CONVOI_PROFIT);
+		book( -toll.get_value(), CONVOI_WAYTOLL);
+		book( -toll.get_value(), CONVOI_PROFIT);
 
 	}
 	get_owner()->book_running_costs( sum_running_costs, get_schedule()->get_waytype());
 
-	book( sum_running_costs, CONVOI_OPERATIONS );
-	book( sum_running_costs, CONVOI_PROFIT );
+	book( sum_running_costs.get_value(), CONVOI_OPERATIONS );
+	book( sum_running_costs.get_value(), CONVOI_PROFIT );
 
 	total_distance_traveled ++;
 	distance_since_last_stop++;
@@ -1375,7 +1377,7 @@ void convoi_t::step()
 
 void convoi_t::new_year()
 {
-	jahresgewinn = 0;
+	jahresgewinn = money_t(0,00);
 }
 
 
@@ -1456,8 +1458,8 @@ void convoi_t::new_month()
 		}
 	}
 	// book fixed cost as running cost
-	book( sum_fixed_costs, CONVOI_OPERATIONS );
-	book( sum_fixed_costs, CONVOI_PROFIT );
+	book( sum_fixed_costs.get_value(), CONVOI_OPERATIONS );
+	book( sum_fixed_costs.get_value(), CONVOI_PROFIT );
 	// since convois can be in the depot, the waytypewithout schedule is determined from the vechile (if there)
 	// one can argue that convois in depots should not cost money ...
 	waytype_t wtyp = ignore_wt;
@@ -1527,7 +1529,7 @@ void convoi_t::start()
 
 		// recalc weight and image
 		// also for any vehicle entered a depot, set_letztes is true! => reset it correctly
-		sint64 restwert_delta = 0;
+		money_t restwert_delta;
 		for(unsigned i=0; i<anz_vehikel; i++) {
 			fahr[i]->set_leading( false );
 			fahr[i]->set_last( false );
@@ -2475,9 +2477,9 @@ void convoi_t::rdwr(loadsave_t *file)
 	// since it was saved as an signed int
 	// we recalc it anyhow
 	if(file->is_loading()) {
-		jahresgewinn = 0;
+		jahresgewinn = money_t(0,00);
 		for(int i=welt->get_last_month()%12;  i>=0;  i--  ) {
-			jahresgewinn += financial_history[i][CONVOI_PROFIT];
+			jahresgewinn += money_t(financial_history[i][CONVOI_PROFIT]);
 		}
 	}
 
@@ -2615,11 +2617,11 @@ void convoi_t::info(cbuffer_t & buf) const
 	if (v != NULL) {
 		char tmp[128];
 
-		buf.printf("\n %d/%dkm/h (%1.2f$/km)\n", speed_to_kmh(min_top_speed), v->get_desc()->get_topspeed(), get_running_cost() / 100.0);
+		buf.printf("\n %d/%dkm/h (%1.2f$/km)\n", speed_to_kmh(min_top_speed), v->get_desc()->get_topspeed(), get_running_cost().as_double());
 		buf.printf(" %s: %ikW\n", translator::translate("Leistung"), sum_power);
 		buf.printf(" %s: %i (%i) t\n", translator::translate("Gewicht"), sum_weight, sum_gesamtweight - sum_weight);
 		buf.printf(" %s: ", translator::translate("Gewinn"));
-		money_to_string(tmp, (double)jahresgewinn);
+		money_to_string(tmp, jahresgewinn);
 		buf.append(tmp);
 		buf.append("\n");
 	}
@@ -2794,12 +2796,12 @@ void convoi_t::laden()
  */
 void convoi_t::calc_gewinn()
 {
-	sint64 gewinn = 0;
+	money_t gewinn;
 
 	for(unsigned i=0; i<anz_vehikel; i++) {
 		vehicle_t* v = fahr[i];
-		sint64 tmp;
-		gewinn += tmp = v->calc_revenue(v->last_stop_pos, v->get_pos() );
+		money_t tmp = v->calc_revenue(v->last_stop_pos, v->get_pos() );
+		gewinn += tmp;
 		// get_schedule is needed as v->get_waytype() returns track_wt for trams (instead of tram_wt
 		owner->book_revenue(tmp, fahr[0]->get_pos().get_2d(), get_schedule()->get_waytype(), v->get_cargo_type()->get_index() );
 		v->last_stop_pos = v->get_pos();
@@ -2815,11 +2817,11 @@ void convoi_t::calc_gewinn()
 	distance_since_last_stop = 0;
 	sum_speed_limit = 0;
 
-	if(gewinn) {
+	if(  gewinn != money_t(0,00)  ) {
 		jahresgewinn += gewinn;
 
-		book(gewinn, CONVOI_PROFIT);
-		book(gewinn, CONVOI_REVENUE);
+		book(gewinn.get_value(), CONVOI_PROFIT);
+		book(gewinn.get_value(), CONVOI_REVENUE);
 	}
 }
 
@@ -2916,7 +2918,7 @@ station_tile_search_ready: ;
 	// don't load when vehicle is being withdrawn
 	bool changed_loading_level = false;
 	uint32 time = WTT_LOADING; // min time for loading/unloading
-	sint64 gewinn = 0;
+	money_t gewinn;
 
 	// cargo type of previous vehicle that could not be filled
 	const goods_desc_t* cargo_type_prev = NULL;
@@ -2926,9 +2928,9 @@ station_tile_search_ready: ;
 
 		// we need not to call this on the same position
 		if(  v->last_stop_pos != v->get_pos()  ) {
-			sint64 tmp;
 			// calc_revenue
-			gewinn += tmp = v->calc_revenue(v->last_stop_pos, v->get_pos() );
+			const money_t tmp = v->calc_revenue(v->last_stop_pos, v->get_pos() );
+			gewinn += tmp;
 			owner->book_revenue(tmp, fahr[0]->get_pos().get_2d(), get_schedule()->get_waytype(), v->get_cargo_type()->get_index());
 			v->last_stop_pos = v->get_pos();
 		}
@@ -2975,11 +2977,11 @@ station_tile_search_ready: ;
 	distance_since_last_stop = 0;
 	sum_speed_limit = 0;
 
-	if(gewinn) {
+	if(  gewinn != money_t(0,00)  ) {
 		jahresgewinn += gewinn;
 
-		book(gewinn, CONVOI_PROFIT);
-		book(gewinn, CONVOI_REVENUE);
+		book(gewinn.get_value(), CONVOI_PROFIT);
+		book(gewinn.get_value(), CONVOI_REVENUE);
 	}
 
 	// loading is finished => maybe drive on
@@ -3012,9 +3014,9 @@ station_tile_search_ready: ;
 }
 
 
-sint64 convoi_t::calc_restwert() const
+money_t convoi_t::calc_restwert() const
 {
-	sint64 result = 0;
+	money_t result;
 
 	for(uint i=0; i<anz_vehikel; i++) {
 		result += fahr[i]->calc_sale_value();
@@ -3206,7 +3208,7 @@ void convoi_t::dump() const
 		(int)state,
 		(const char *)(state_names[state]),
 		(int)alte_richtung,
-		(long)(jahresgewinn/100),
+		(long)(jahresgewinn.get_credits()),
 		(const char *)name_and_id,
 		line.is_bound() ? line.get_id() : 0,
 		(const void *)schedule );
@@ -3234,9 +3236,9 @@ void convoi_t::init_financial_history()
 }
 
 
-sint64 convoi_t::get_purchase_cost() const
+money_t convoi_t::get_purchase_cost() const
 {
-	sint64 purchase_cost = 0;
+	money_t purchase_cost;
 	for(  unsigned i = 0;  i < get_vehicle_count();  i++  ) {
 		purchase_cost += fahr[i]->get_desc()->get_price();
 	}

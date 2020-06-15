@@ -159,11 +159,11 @@ size_t strncopy_to_break( char *dest, const char *src, size_t n )
 /**
  * Creates a tooltip from tip text and money value
  */
-char *tooltip_with_price(const char * tip, sint64 price)
+char *tooltip_with_price(const char * tip, money_t price)
 {
 	int n = strncopy_to_break( tool_t::toolstr, translator::translate( tip ), 256 );
 	memcpy( tool_t::toolstr + n, ", ", 2 );
-	money_to_string(tool_t::toolstr+n+2, (double)price/-100.0);
+	money_to_string(tool_t::toolstr+n+2, -price);
 	return tool_t::toolstr;
 }
 
@@ -171,13 +171,13 @@ char *tooltip_with_price(const char * tip, sint64 price)
 /**
  * Creates a tooltip from tip text, money value and way/object length
  */
-char *tooltip_with_price_length(const char *tip, sint64 price, sint64 length)
+char *tooltip_with_price_length(const char *tip, money_t price, sint64 length)
 {
 	int n = sprintf(tool_t::toolstr, translator::translate("length: %d"), (int)length);
 	n += sprintf(tool_t::toolstr+n, ", ");
 	n += strncopy_to_break( tool_t::toolstr+n, translator::translate( tip ), 256 );
 	n += sprintf(tool_t::toolstr+n, ": ");
-	money_to_string(tool_t::toolstr+n, (double)price/-100.0);
+	money_to_string(tool_t::toolstr+n, -price);
 	return tool_t::toolstr;
 }
 
@@ -185,15 +185,15 @@ char *tooltip_with_price_length(const char *tip, sint64 price, sint64 length)
 /**
  * Creates a tooltip from tip text and money value
  */
-char *tooltip_with_price_maintenance(karte_t *welt, const char *tip, sint64 price, sint64 maintenance)
+char *tooltip_with_price_maintenance(karte_t *welt, const char *tip, money_t price, money_t maintenance)
 {
 	int n = strncopy_to_break( tool_t::toolstr, translator::translate( tip ), 256 );
 	memcpy( tool_t::toolstr+n, ", ", 2 );
-	money_to_string(tool_t::toolstr+n+2, (double)price/-100.0);
+	money_to_string(tool_t::toolstr+n+2, -price);
 	n += strlen(tool_t::toolstr+n);
 	strcpy( tool_t::toolstr+n, " (" );
 
-	money_to_string(tool_t::toolstr+n+2, (double)(welt->scale_with_month_length(maintenance) ) / 100.0);
+	money_to_string(tool_t::toolstr+n+2, welt->scale_with_month_length(maintenance));
 	strcat( tool_t::toolstr, ")" );
 	return tool_t::toolstr;
 }
@@ -203,15 +203,15 @@ char *tooltip_with_price_maintenance(karte_t *welt, const char *tip, sint64 pric
 /**
  * Creates a tooltip from tip text and money value
  */
-static char const* tooltip_with_price_maintenance_capacity(karte_t* const welt, char const* const tip, sint64 const price, sint64 const maintenance, uint32 const capacity, uint8 const enables)
+static char const* tooltip_with_price_maintenance_capacity(karte_t* const welt, char const* const tip, const money_t price, const money_t maintenance, uint32 const capacity, uint8 const enables)
 {
 	int n = strncopy_to_break( tool_t::toolstr, translator::translate( tip ), 256 );
 	memcpy( tool_t::toolstr+n, ", ", 2 );
-	money_to_string(tool_t::toolstr+n+2, (double)price/-100.0);
+	money_to_string(tool_t::toolstr+n+2, -price);
 	strcat( tool_t::toolstr, " (" );
 	n = strlen(tool_t::toolstr);
 
-	money_to_string(tool_t::toolstr+n, (double)(welt->scale_with_month_length(maintenance) ) / 100.0);
+	money_to_string(tool_t::toolstr+n, welt->scale_with_month_length(maintenance));
 	strcat( tool_t::toolstr, ")" );
 	n = strlen(tool_t::toolstr);
 
@@ -735,7 +735,7 @@ DBG_MESSAGE("tool_remover()", "removing way");
 			}
 		}
 		wt = w->get_desc()->get_finance_waytype();
-		sint32 cost_sum = gr->weg_entfernen(w->get_waytype(), true);
+		money_t cost_sum = gr->weg_entfernen(w->get_waytype(), true);
 		player_t::book_construction_costs(player, -cost_sum, k, wt);
 	}
 	else {
@@ -1305,7 +1305,7 @@ const char *tool_setslope_t::tool_set_slope_work( player_t *player, koord3d pos,
 
 			// check funds
 			settings_t const& s = welt->get_settings();
-			sint64 const cost = new_slope == RESTORE_SLOPE ? s.cst_alter_land : s.cst_set_slope;
+			const money_t cost = new_slope == RESTORE_SLOPE ? s.cst_alter_land : s.cst_set_slope;
 			if(  !player->can_afford(cost)  ) {
 				return NOTICE_INSUFFICIENT_FUNDS;
 			}
@@ -1521,7 +1521,7 @@ const char *tool_clear_reservation_t::work( player_t *, koord3d pos )
 const char* tool_transformer_t::get_tooltip(const player_t *) const
 {
 	settings_t const& s = welt->get_settings();
-	sprintf(toolstr, "%s, %ld$ (%ld$)", translator::translate("Build drain"), (long)(s.cst_transformer / -100), (long)(welt->scale_with_month_length(s.cst_maintain_transformer)) / -100);
+	sprintf(toolstr, "%s, %ld$ (%ld$)", translator::translate("Build drain"), (long)(-s.cst_transformer.get_credits()), (long)(-welt->scale_with_month_length(s.cst_maintain_transformer).get_credits()));
 	return toolstr;
 }
 
@@ -1649,7 +1649,7 @@ const char *tool_transformer_t::work( player_t *player, koord3d pos )
 const char *tool_add_city_t::work( player_t *player, koord3d pos )
 {
 	// check funds
-	const sint64 cost = welt->get_settings().cst_found_city;
+	const money_t cost = welt->get_settings().cst_found_city;
 	if(  !player->can_afford(cost)  ) {
 		return NOTICE_INSUFFICIENT_FUNDS;
 	}
@@ -1735,9 +1735,9 @@ const char *tool_buy_house_t::work( player_t *player, koord3d pos)
 				gebaeude_t *gb_part = gr->find<gebaeude_t>();
 				// there may be buildings with holes
 				if(  gb_part  &&  gb_part->get_tile()->get_desc()==bdsc  &&  player_t::check_owner(gb_part->get_owner(),player)  ) {
-					sint32 const maint = welt->get_settings().maint_building * bdsc->get_level();
+					const money_t maint = welt->get_settings().maint_building * bdsc->get_level();
 					player_t::add_maintenance(old_owner, -maint, gb->get_waytype());
-					player_t::add_maintenance(player,        +maint, gb->get_waytype());
+					player_t::add_maintenance(player,    +maint, gb->get_waytype());
 					gb->set_owner(player);
 					player_t::book_construction_costs(player, -maint, k + pos.get_2d(), gb->get_waytype());
 				}
@@ -2134,7 +2134,7 @@ const char *tool_plant_tree_t::work( player_t *player, koord3d pos )
 		}
 
 		// check funds
-		sint64 const cost = welt->get_settings().cst_remove_tree;
+		const money_t cost = welt->get_settings().cst_remove_tree;
 		if(  !player->can_afford(cost)  ) {
 			return NOTICE_INSUFFICIENT_FUNDS;
 		}
@@ -2157,6 +2157,7 @@ const char *tool_plant_tree_t::work( player_t *player, koord3d pos )
 		}
 		return "";
 	}
+
 	return NULL;
 }
 
@@ -2618,7 +2619,7 @@ void tool_build_bridge_t::mark_tiles(  player_t *player, const koord3d &start, c
 	koord3d end2 = bridge_builder_t::find_end_pos(player, start, zv, desc, error, bridge_height, false, koord_distance(start, end), is_ctrl_pressed());
 	assert(end2 == end); (void)end2;
 
-	sint64 costs = 0;
+	money_t costs;
 	// start
 	grund_t *gr = welt->lookup(start);
 
@@ -3410,7 +3411,7 @@ void tool_build_wayobj_t::mark_tiles( player_t* player, const koord3d &start, co
 	route_t verbindung;
 	bool can_built = calc_route( verbindung, player, start, end );
 	if( can_built ) {
-		sint32 cost_estimate = 0;
+		money_t cost_estimate;
 
 		bool keep_existing_faster_ways = !is_ctrl_pressed();
 
@@ -3732,8 +3733,8 @@ DBG_MESSAGE("tool_station_building_aux()", "building mail office/station buildin
 
 	hausbauer_t::build(halt->get_owner(), pos-offsets, rotation, desc, &halt);
 
-	sint32     const  factor = desc->get_x() * desc->get_y();
-	sint64     cost = -desc->get_price(welt) * factor;
+	const sint32 factor = desc->get_x() * desc->get_y();
+	money_t cost        = -desc->get_price(welt) * factor;
 
 	if(  player!=halt->get_owner()  &&  halt->get_owner()==welt->get_public_player()  ) {
 		// public stops are expensive!
@@ -3911,7 +3912,7 @@ const char *tool_build_station_t::tool_station_dock_aux(player_t *player, koord3
 		halt = haltestelle_t::create(k, player);
 	}
 	hausbauer_t::build(halt->get_owner(), bau_pos, layout, desc, &halt);
-	sint64 costs = -desc->get_price(welt);
+	money_t costs = -desc->get_price(welt);
 	if(  player!=halt->get_owner() && player != welt->get_public_player()  ) {
 		// public stops are expensive!
 		// (Except for the public player itself)
@@ -4134,7 +4135,7 @@ const char *tool_build_station_t::tool_station_flat_dock_aux(player_t *player, k
 	}
 
 	hausbauer_t::build(halt->get_owner(), bau_pos, layout, desc, &halt);
-	sint64 costs = -desc->get_price(welt);
+	money_t costs = -desc->get_price(welt);
 	if(  player!=halt->get_owner() && player != welt->get_public_player()  ) {
 		// public stops are expensive!
 		// (Except for the public player itself)
@@ -4312,7 +4313,7 @@ DBG_MESSAGE("tool_station_aux()", "building %s on square %d,%d for waytype %x", 
 	}
 
 	halthandle_t old_halt = bd->get_halt();
-	sint64 old_cost = 0;
+	money_t old_cost;
 	bool recalc_schedule = false;
 
 	halthandle_t halt;
@@ -4361,9 +4362,10 @@ DBG_MESSAGE("tool_station_aux()", "building %s on square %d,%d for waytype %x", 
 	}
 
 	// cost to build new station
-	sint64 cost = -desc->get_price(welt)*desc->get_x()*desc->get_y();
+	money_t cost = -desc->get_price(welt)*desc->get_x()*desc->get_y();
 	// discount for existing station
 	cost += old_cost/2;
+
 	if(  player!=halt->get_owner() && player != welt->get_public_player()  ) {
 		// public stops are expensive!
 		// (Except for the public player itself)
@@ -4484,11 +4486,10 @@ const char* tool_build_station_t::get_tooltip(const player_t *) const
 		return "";
 	}
 
-	sint64 price = 0;
-	sint64 maint = 0;
+	money_t price;
 	uint32 cap = desc->get_capacity(); // This is always correct in the desc object.
 
-	maint = desc->get_maintenance(welt);
+	money_t maint = desc->get_maintenance(welt);
 
 	if(  desc->get_type()==building_desc_t::generic_stop || desc->get_type()==building_desc_t::generic_extension || desc->get_type()==building_desc_t::dock || desc->get_type()==building_desc_t::flat_dock  ) {
 		price = -desc->get_price(welt);
@@ -4506,6 +4507,7 @@ const char* tool_build_station_t::get_tooltip(const player_t *) const
 
 	return tooltip_with_price_maintenance_capacity(welt, desc->get_name(), price, maint, cap, desc->get_enabled());
 }
+
 
 waytype_t tool_build_station_t::get_waytype() const
 {
@@ -4917,7 +4919,8 @@ void tool_build_roadsign_t::mark_tiles( player_t *player, const koord3d &start, 
 	signal_info const& s              = current;
 	uint8       const  signal_density = 2 * s.spacing;      // measured in half tiles (straight track count as 2, diagonal as 1, since sqrt(1/2) = 1/2 ;)
 	uint8              next_signal    = signal_density + 1; // to place a sign asap
-	sint32             cost           = 0;
+	money_t            cost;
+
 	directions.clear();
 	// dummy roadsign to get images for preview
 	roadsign_t *dummy_rs;
@@ -4973,7 +4976,7 @@ void tool_build_roadsign_t::mark_tiles( player_t *player, const koord3d &start, 
 				dummy_rs->set_dir(ribi); // calls calc_image()
 				zeiger->set_foreground_image(dummy_rs->get_front_image());
 				zeiger->set_image(dummy_rs->get_image());
-				cost += rs ? (rs->get_desc()==desc ? 0  : desc->get_price()+rs->get_desc()->get_price()) : desc->get_price();
+				cost += rs ? (rs->get_desc()==desc ? money_t(0,00)  : desc->get_price()+rs->get_desc()->get_price()) : desc->get_price();
 			}
 		}
 		else if (s.remove_intermediate && rs && !rs->is_deletable(player)) {
@@ -5784,7 +5787,7 @@ DBG_MESSAGE("tool_headquarter()", "building headquarters at (%d,%d)", pos.x, pos
 
 	// check funds
 	koord size = desc->get_size();
-	sint64 const cost = -desc->get_price(welt) * size.x * size.y;
+	const money_t cost = -desc->get_price(welt) * size.x * size.y;
 	if(  !player->can_afford(cost)  ) {
 		return NOTICE_INSUFFICIENT_FUNDS;
 	}
@@ -6276,7 +6279,7 @@ const char *tool_make_stop_public_t::work( player_t *player, koord3d p )
 	}
 
 	// check funds
-	sint64 workcost = -welt->scale_with_month_length(halt->calc_maintenance() * welt->get_settings().cst_make_public_months);
+	money_t workcost = -welt->scale_with_month_length(halt->calc_maintenance() * welt->get_settings().cst_make_public_months);
 
 	// check waycost and some forbidden cases too
 	FOR(slist_tpl<haltestelle_t::tile_t>, const& i, halt->get_tiles()) {
@@ -6293,7 +6296,7 @@ const char *tool_make_stop_public_t::work( player_t *player, koord3d p )
 						return NOTICE_UNSUITABLE_GROUND;
 					}
 					// compute maintainance cost
-					sint32 cost = w->get_desc()->get_maintenance();
+					money_t cost = w->get_desc()->get_maintenance();
 					// tunnel cost overwrites way cost
 					if(  tunnel_t *t = i.grund->find<tunnel_t>()  ) {
 						cost = t->get_desc()->get_maintenance();
@@ -6373,7 +6376,7 @@ void tool_merge_stop_t::mark_tiles(  player_t *player, const koord3d &start, con
 {
 	halt_be_merged_from = haltestelle_t::get_halt(start,player);
 	halt_be_merged_to = haltestelle_t::get_halt(end,player);
-	sint64 workcost = 0;
+
 	uint32 distance = 0x7FFFFFFFu;
 
 	FOR(slist_tpl<haltestelle_t::tile_t>, const& i, halt_be_merged_from->get_tiles()) {
@@ -6392,8 +6395,8 @@ void tool_merge_stop_t::mark_tiles(  player_t *player, const koord3d &start, con
 	}
 
 	if(  distance  < welt->get_settings().allow_merge_distant_halt  ) {
-		distance = clamp(distance,2,33)-2;
-		workcost = welt->scale_with_month_length( (1<<distance) * welt->get_settings().cst_multiply_merge_halt );
+		distance = clamp(distance, 2, 33) - 2;
+		const money_t workcost = welt->scale_with_month_length( welt->get_settings().cst_multiply_merge_halt * (1<<distance) );
 		win_set_static_tooltip( tooltip_with_price("Building costs estimates", workcost) );
 	}
 	else {
@@ -6405,7 +6408,8 @@ const char *tool_merge_stop_t::do_work( player_t *player, const koord3d &last_po
 {
 	halt_be_merged_from = haltestelle_t::get_halt(pos,player);
 	halt_be_merged_to = haltestelle_t::get_halt(last_pos,player);
-	sint64 workcost = 0;
+
+	money_t workcost;
 	uint32 distance = 0x7FFFFFFFu;
 
 	FOR(slist_tpl<haltestelle_t::tile_t>, const& i, halt_be_merged_from->get_tiles()) {
@@ -7444,7 +7448,7 @@ bool tool_change_player_t::init( player_t *player_in)
 			if(  player  &&  player_in==welt->get_public_player() ) {
 				int delta;
 				if (sscanf(p, "%c,%i,%i", &tool, &id, &delta) == 3) {
-					player->get_finance()->book_account(delta);
+					player->get_finance()->book_account(money_t(delta));
 				}
 			}
 			break;

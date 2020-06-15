@@ -189,12 +189,9 @@ private:
 	 * PRICE_MAGIC then calculated from the "level" in the old way.
 	 */
 
-	sint32 price;
-	sint32 maintenance;
+	money_t price;
+	money_t maintenance;
 	uint16 capacity;
-
-#define PRICE_MAGIC (2147483647)
-
 
 	climate_bits allowed_climates;
 
@@ -332,8 +329,8 @@ public:
 	/**
 	* @see above for maintenance/price/capacity variable information
 	*/
-	sint32 get_maintenance(karte_t *world) const;
-	sint32 get_price(karte_t *world) const;
+	money_t get_maintenance(karte_t *world) const;
+	money_t get_price(karte_t *world) const;
 	uint16 get_capacity() const { return capacity; }
 
 

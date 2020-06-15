@@ -55,7 +55,7 @@ class settings_t;
 #define INIT_COST(t,a,b,c,d,e) \
 {\
 	gui_numberinput_t *ni = new_component<gui_numberinput_t>();\
-	ni->init( (sint32)( (a)/(sint64)100 ), (b), (c), (d), (e) );\
+	ni->init( (sint32)( (a).get_credits() ), (b), (c), (d), (e) );\
 	numinp.append( ni );\
 	gui_label_t *lb = new_component<gui_label_t>();\
 	lb->set_text_pointer(t);\
@@ -95,7 +95,7 @@ class settings_t;
 #define READ_COST(t)           (t)((sint64)((*numiter++)->get_value()) * 100)
 #define READ_NUM_VALUE(t)      (t) = (*numiter++)->get_value()
 #define READ_NUM_VALUE_NEW(t)  if(new_world) { READ_NUM_VALUE(t); }
-#define READ_COST_VALUE(t)     (t) = (sint64)((*numiter++)->get_value()) * 100
+#define READ_COST_VALUE(t)     (t) = money_t((*numiter++)->get_value(), 00)
 #define READ_COST_VALUE_NEW(t) if(new_world) { READ_COST_VALUE(t); }
 #define READ_BOOL(t)           (t)((*booliter++)->pressed)
 #define READ_BOOL_NEW(t)       if(new_world) { READ_BOOL(t); }

@@ -402,7 +402,7 @@ public:
 	player_t *get_owner() const {return owner;}
 
 	// just for info so far
-	sint64 calc_maintenance() const;
+	money_t calc_maintenance() const;
 
 	void merge_halt( halthandle_t halt_to_join );
 

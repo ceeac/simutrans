@@ -140,7 +140,7 @@ const char* gui_convoiinfo_t::get_text() const
 
 void gui_convoiinfo_t::update_label()
 {
-	label_profit.buf().append_money(cnv->get_jahresgewinn() / 100.0);
+	label_profit.buf().append_money(cnv->get_jahresgewinn());
 	label_profit.update();
 	label_line.buf().clear();
 

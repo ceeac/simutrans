@@ -142,7 +142,7 @@ public:
 	/**
 	 * appends money string to write buf, sets color
 	 */
-	void append_money(double money);
+	void append_money(money_t money);
 
 	void draw(scr_coord offset) OVERRIDE;
 

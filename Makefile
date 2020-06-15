@@ -258,6 +258,7 @@ SOURCES += dataobj/koord.cc
 SOURCES += dataobj/koord3d.cc
 SOURCES += dataobj/loadsave.cc
 SOURCES += dataobj/marker.cc
+SOURCES += dataobj/money.cc
 SOURCES += dataobj/objlist.cc
 SOURCES += dataobj/powernet.cc
 SOURCES += dataobj/records.cc

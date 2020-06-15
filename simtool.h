@@ -36,8 +36,8 @@ class way_obj_desc_t;
 
 /****************************** helper functions: *****************************/
 
-char *tooltip_with_price(const char * tip, sint64 price);
-char *tooltip_with_price_length(const char * tip, sint64 price, sint64 length);
+char *tooltip_with_price(const char * tip, money_t price);
+char *tooltip_with_price_length(const char * tip, money_t price, sint64 length);
 
 void open_error_msg_win(const char* error);
 

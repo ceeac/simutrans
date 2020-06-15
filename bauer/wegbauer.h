@@ -10,6 +10,7 @@
 #include "../simtypes.h"
 #include "../dataobj/koord3d.h"
 #include "../tpl/vector_tpl.h"
+#include "../dataobj/money.h"
 
 
 class way_desc_t;
@@ -206,7 +207,7 @@ public:
 
 	/* returns the amount needed to built this way
 	*/
-	sint64 calc_costs();
+	money_t calc_costs();
 
 	bool check_crossing(const koord zv, const grund_t *bd,waytype_t wtyp, const player_t *player) const;
 	bool check_powerline(const koord zv, const grund_t *bd) const;

@@ -20,19 +20,20 @@ class checksum_t;
  *  1   Copyright
  *  2   Text: Name of measurement unit
  */
-class goods_desc_t : public obj_named_desc_t {
+class goods_desc_t : public obj_named_desc_t
+{
 	friend class goods_reader_t;
 	friend class goods_manager_t;
 
 
 	/// base value
-	uint16 base_value;
+	money_t base_value;
 
 	/**
 	 * Value used in revenue calculation.
 	 * Will be set by goods_manager_t.
 	 */
-	uint16 value;
+	money_t value;
 
 	/**
 	* Category of the good
@@ -71,7 +72,7 @@ public:
 		return get_child<text_desc_t>(2)->get_text();
 	}
 
-	uint16 get_value() const { return value; }
+	money_t get_value() const { return value; }
 
 	/**
 	* @return speed bonus value of the good

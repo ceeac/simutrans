@@ -140,8 +140,8 @@ void gui_label_buf_t::draw(scr_coord offset)
 }
 
 
-void gui_label_buf_t::append_money(double money)
+void gui_label_buf_t::append_money(money_t money)
 {
 	buffer_write.append_money(money);
-	set_color(money >= 0 ? MONEY_PLUS : MONEY_MINUS);
+	set_color(money >= money_t(0,00) ? MONEY_PLUS : MONEY_MINUS);
 }

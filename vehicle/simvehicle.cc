@@ -1231,21 +1231,21 @@ void vehicle_t::make_smoke() const
  * every stop.
  * @return income total for last hop
  */
-sint64 vehicle_t::calc_revenue(const koord3d& start, const koord3d& end) const
+money_t vehicle_t::calc_revenue(const koord3d& start, const koord3d& end) const
 {
 	// may happen when waiting in station
 	if (start == end || fracht.empty()) {
-		return 0;
+		return money_t(0,00);
 	}
 
 	// cnv_kmh = lesser of min_top_speed, power limited top speed, and average way speed limits on trip, except aircraft which are not power limited and don't have speed limits
 	sint32 cnv_kmh = cnv->get_speedbonus_kmh();
 
-	sint64 value = 0;
+	money_t value;
 
 	// cache speedbonus price
 	const goods_desc_t* last_freight = NULL;
-	sint64 freight_revenue = 0;
+	money_t freight_revenue;
 
 	sint32 dist = 0;
 	if(  welt->get_settings().get_pay_for_total_distance_mode() == settings_t::TO_PREVIOUS  ) {
@@ -1290,14 +1290,15 @@ sint64 vehicle_t::calc_revenue(const koord3d& start, const koord3d& end) const
 			freight_revenue = ware_t::calc_revenue(ware.get_desc(), get_desc()->get_waytype(), cnv_kmh);
 			last_freight = ware.get_desc();
 		}
-		const sint64 price = freight_revenue * (sint64)dist * (sint64)ware.menge;
+
+		const money_t price = freight_revenue * (sint64)dist * (sint64)ware.menge;
 
 		// sum up new price
 		value += price;
 	}
 
 	// Rounded value, in cents
-	return (value+1500ll)/3000ll;
+	return money_t((value.get_value()+1500ll)/3000ll);
 }
 
 
@@ -1636,15 +1637,16 @@ DBG_MESSAGE("vehicle_t::rdwr_from_convoi()","bought at %i/%i.",(purchase_time%12
 }
 
 
-uint32 vehicle_t::calc_sale_value() const
+money_t vehicle_t::calc_sale_value() const
 {
 	// if already used, there is a general price reduction
-	double value = (double)desc->get_price();
+	double value = (double)desc->get_price().get_value();
 	if(  has_driven  ) {
 		value *= (1000 - welt->get_settings().get_used_vehicle_reduction()) / 1000.0;
 	}
-	// after 20 year, it has only half value
-	return (uint32)( value * pow(0.997, (int)(welt->get_current_month() - get_purchase_time())));
+
+	// after 20 years, it has only half value
+	return money_t( value * pow(0.997, (int)(welt->get_current_month() - get_purchase_time())));
 }
 
 

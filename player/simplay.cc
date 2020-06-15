@@ -93,7 +93,7 @@ player_t::~player_t()
 }
 
 
-void player_t::book_construction_costs(player_t * const player, const sint64 amount, const koord k, const waytype_t wt)
+void player_t::book_construction_costs(player_t * const player, const money_t amount, const koord k, const waytype_t wt)
 {
 	if(player!=NULL) {
 		player->finance->book_construction_costs(amount, wt);
@@ -104,13 +104,12 @@ void player_t::book_construction_costs(player_t * const player, const sint64 amo
 }
 
 
-sint64 player_t::add_maintenance(sint64 change, waytype_t const wt)
+money_t player_t::add_maintenance(money_t change, waytype_t const wt)
 {
-	int tmp = 0;
 #ifdef MULTI_THREAD
 		pthread_mutex_lock( &load_mutex  );
 #endif
-	tmp = finance->book_maintenance(change, wt);
+	const money_t tmp = finance->book_maintenance(change, wt);
 #ifdef MULTI_THREAD
 		pthread_mutex_unlock( &load_mutex  );
 #endif
@@ -118,15 +117,15 @@ sint64 player_t::add_maintenance(sint64 change, waytype_t const wt)
 }
 
 
-void player_t::add_money_message(const sint64 amount, const koord pos)
+void player_t::add_money_message(const money_t amount, const koord pos)
 {
-	if(amount != 0  &&  player_nr != 1) {
+	if(amount != money_t(0,00)  &&  player_nr != 1) {
 		if(  koord_distance(welt->get_viewport()->get_world_position(),pos)<2*(uint32)(display_get_width()/get_tile_raster_width())+3  ) {
 			// only display, if near the screen ...
 			add_message(amount, pos);
 
 			// and same for sound too ...
-			if(  amount>=10000  &&  !welt->is_fast_forward()  ) {
+			if(  amount>=money_t(100,00)  &&  !welt->is_fast_forward()  ) {
 				welt->play_sound_area_clipped(pos, SFX_CASH, CASH_SOUND );
 			}
 		}
@@ -134,33 +133,33 @@ void player_t::add_money_message(const sint64 amount, const koord pos)
 }
 
 
-void player_t::book_new_vehicle(const sint64 amount, const koord k, const waytype_t wt)
+void player_t::book_new_vehicle(const money_t amount, const koord k, const waytype_t wt)
 {
 	finance->book_new_vehicle(amount, wt);
 	add_money_message(amount, k);
 }
 
 
-void player_t::book_revenue(const sint64 amount, const koord k, const waytype_t wt, sint32 index)
+void player_t::book_revenue(const money_t amount, const koord k, const waytype_t wt, sint32 index)
 {
 	finance->book_revenue(amount, wt, index);
 	add_money_message(amount, k);
 }
 
 
-void player_t::book_running_costs(const sint64 amount, const waytype_t wt)
+void player_t::book_running_costs(const money_t amount, const waytype_t wt)
 {
 	finance->book_running_costs(amount, wt);
 }
 
 
-void player_t::book_toll_paid(const sint64 amount, const waytype_t wt)
+void player_t::book_toll_paid(const money_t amount, const waytype_t wt)
 {
 	finance->book_toll_paid(amount, wt);
 }
 
 
-void player_t::book_toll_received(const sint64 amount, const waytype_t wt)
+void player_t::book_toll_received(const money_t amount, const waytype_t wt)
 {
 	finance->book_toll_received(amount, wt);
 }
@@ -194,9 +193,9 @@ void player_t::set_name(const char *new_name)
 }
 
 
-player_t::income_message_t::income_message_t( sint64 betrag, koord p )
+player_t::income_message_t::income_message_t( money_t betrag, koord p )
 {
-	money_to_string(str, betrag/100.0);
+	money_to_string(str, betrag);
 	alter = 127;
 	pos = p;
 	amount = betrag;
@@ -249,12 +248,12 @@ void player_t::age_messages(uint32 /*delta_t*/)
 }
 
 
-void player_t::add_message(sint64 betrag, koord k)
+void player_t::add_message(money_t betrag, koord k)
 {
 	if(  !messages.empty()  &&  messages.back()->pos==k  &&  messages.back()->alter==127  ) {
 		// last message exactly at same place, not aged
 		messages.back()->amount += betrag;
-		money_to_string(messages.back()->str, messages.back()->amount/100.0);
+		money_to_string(messages.back()->str, messages.back()->amount);
 	}
 	else {
 		// otherwise new message
@@ -290,11 +289,11 @@ bool player_t::new_month()
 	finance->calc_finance_history();
 
 	// Bankrupt ?
-	if(  finance->get_account_balance() < 0  ) {
+	if(  finance->get_account_balance() < money_t(0,00)  ) {
 		finance->increase_account_overdrawn();
 		if(  !welt->get_settings().is_freeplay()  &&  player_nr != 1  ) {
 			if(  welt->get_active_player_nr()==player_nr  &&  !env_t::networkmode  ) {
-				if(  finance->get_netwealth() < 0 ) {
+				if(  finance->get_netwealth() < money_t(0,00) ) {
 					destroy_all_win(true);
 					create_win( display_get_width()/2-128, 40, new news_img("Bankrott:\n\nDu bist bankrott.\n"), w_info, magic_none);
 					ticker::add_msg( translator::translate("Bankrott:\n\nDu bist bankrott.\n"), koord::invalid, PLAYER_FLAG + player_color_1 + 1 );
@@ -312,10 +311,10 @@ bool player_t::new_month()
 				}
 			}
 			// no assets => nothing to go bankrupt about again
-			else if(  finance->get_maintenance(TT_ALL) != 0  ||  finance->has_convoi()  ) {
+			else if(  finance->get_maintenance(TT_ALL) != money_t(0,00)  ||  finance->has_convoi()  ) {
 
 				// for AI, we only declare bankrupt, if total assets are below zero
-				if(  finance->get_netwealth() < 0  ) {
+				if(  finance->get_netwealth() < money_t(0,00)  ) {
 					return false;
 				}
 				// tell the current player (even during networkgames)
@@ -403,9 +402,9 @@ void player_t::calc_assets()
 	// all convois
 	FOR(vector_tpl<convoihandle_t>, const cnv, welt->convoys()) {
 		if(  cnv->get_owner() == this  ) {
-			sint64 restwert = cnv->calc_restwert();
-			assets[TT_ALL] += restwert;
-			assets[finance->translate_waytype_to_tt(cnv->front()->get_desc()->get_waytype())] += restwert;
+			const money_t restwert = cnv->calc_restwert();
+			assets[TT_ALL] += restwert.get_value();
+			assets[finance->translate_waytype_to_tt(cnv->front()->get_desc()->get_waytype())] += restwert.get_value();
 		}
 	}
 
@@ -413,9 +412,9 @@ void player_t::calc_assets()
 	FOR(slist_tpl<depot_t*>, const depot, depot_t::get_depot_list()) {
 		if(  depot->get_player_nr() == player_nr  ) {
 			FOR(slist_tpl<vehicle_t*>, const veh, depot->get_vehicle_list()) {
-				sint64 restwert = veh->calc_sale_value();
-				assets[TT_ALL] += restwert;
-				assets[finance->translate_waytype_to_tt(veh->get_desc()->get_waytype())] += restwert;
+				const money_t restwert = veh->calc_sale_value();
+				assets[TT_ALL] += restwert.get_value();
+				assets[finance->translate_waytype_to_tt(veh->get_desc()->get_waytype())] += restwert.get_value();
 			}
 		}
 	}
@@ -424,7 +423,7 @@ void player_t::calc_assets()
 }
 
 
-void player_t::update_assets(sint64 const delta, const waytype_t wt)
+void player_t::update_assets(money_t const delta, const waytype_t wt)
 {
 	finance->update_assets(delta, wt);
 }
@@ -503,7 +502,7 @@ void player_t::ai_bankrupt()
 					if(  w  &&  w->get_owner()==this  ) {
 						// tunnels and bridges are handled later? (logic needs to be checked for correct maintenance costs)
 						if (!gr->ist_bruecke()  &&  !gr->ist_tunnel()) {
-							sint32 const costs = w->get_desc()->get_maintenance();
+							const money_t costs = w->get_desc()->get_maintenance();
 							waytype_t const wt = w->get_desc()->get_finance_waytype();
 							player_t::add_maintenance(this, -costs, wt);
 							player_t::add_maintenance(psplayer, costs, wt);
@@ -545,7 +544,7 @@ void player_t::ai_bankrupt()
 				for (uint8 i = gr->get_top(); i-- != 0;) {
 					obj_t *obj = gr->obj_bei(i);
 					if(obj->get_owner()==this) {
-						sint32 costs = 0;
+						money_t costs;
 						waytype_t wt = ignore_wt;
 						switch(obj->get_typ()) {
 							case obj_t::roadsign:
@@ -629,8 +628,8 @@ void player_t::ai_bankrupt()
 
 	active = false;
 	// make account negative
-	if (finance->get_account_balance() > 0) {
-		finance->book_account( -finance->get_account_balance() -1 );
+	if (finance->get_account_balance() > money_t(0,00)) {
+		finance->book_account( -finance->get_account_balance() -money_t(0,01) );
 	}
 
 	cbuffer_t buf;
@@ -644,8 +643,8 @@ void player_t::rdwr(loadsave_t *file)
 	xml_tag_t sss( file, "spieler_t" );
 
 	if(file->is_version_less(112, 5)) {
-		sint64 konto = finance->get_account_balance();
-		file->rdwr_longlong(konto);
+		money_t konto = finance->get_account_balance();
+		konto.rdwr(file);
 		finance->set_account_balance(konto);
 
 		sint32 account_overdrawn = finance->get_account_overdrawn();
@@ -831,7 +830,7 @@ void player_t::add_undo(koord3d k)
 }
 
 
-sint64 player_t::undo()
+bool player_t::undo()
 {
 	if (last_built.empty()) {
 		// nothing to UNDO
@@ -884,7 +883,7 @@ sint64 player_t::undo()
 	}
 
 	// ok, now remove everything last built
-	sint64 cost=0;
+	money_t cost;
 	FOR(vector_tpl<koord3d>, const& i, last_built) {
 		grund_t* const gr = welt->lookup(i);
 		if(  undo_type != powerline_wt  ) {
@@ -899,7 +898,7 @@ sint64 player_t::undo()
 		}
 	}
 	last_built.clear();
-	return cost;
+	return cost != money_t(0,00);
 }
 
 
@@ -933,9 +932,9 @@ void player_t::book_convoi_number(int count)
 }
 
 
-double player_t::get_account_balance_as_double() const
+money_t player_t::get_account_balance() const
 {
-	return finance->get_account_balance() / 100.0;
+	return finance->get_account_balance();
 }
 
 
@@ -950,7 +949,7 @@ bool player_t::has_money_or_assets() const
 	return finance->has_money_or_assets();
 }
 
-bool player_t::can_afford(sint64 cost) const
+bool player_t::can_afford(money_t cost) const
 {
 	return welt->get_settings().is_freeplay() ||
 		is_public_service() ||

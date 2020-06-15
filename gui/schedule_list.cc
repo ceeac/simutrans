@@ -506,7 +506,7 @@ void schedule_list_gui_t::display(scr_coord pos)
 
 	capacity = load = loadfactor = 0; // total capacity and load of line (=sum of all conv's cap/load)
 
-	sint64 profit = line->get_finance_history(0,LINE_PROFIT);
+	money_t profit(line->get_finance_history(0,LINE_PROFIT));
 
 	for(  uint32 i=0;  i<icnv;  i++  ) {
 		convoihandle_t const cnv = line->get_convoy(i);
@@ -546,9 +546,9 @@ void schedule_list_gui_t::display(scr_coord pos)
 
 	int len2 = display_proportional_clip_rgb(pos.x+RIGHT_COLUMN_OFFSET,
 		pos.y+text_y+LINESPACE, translator::translate("Gewinn"), ALIGN_LEFT, SYSCOL_TEXT, true );
-	money_to_string(ctmp, profit/100.0);
+	money_to_string(ctmp, profit);
 	len2 += display_proportional_clip_rgb(pos.x+RIGHT_COLUMN_OFFSET+len2,
-		pos.y+text_y+LINESPACE, ctmp, ALIGN_LEFT, profit>=0?MONEY_PLUS:MONEY_MINUS, true );
+		pos.y+text_y+LINESPACE, ctmp, ALIGN_LEFT, (profit>=money_t(0,00)) ? MONEY_PLUS : MONEY_MINUS, true );
 
 	if(  capacity>0  ) {
 		int rest_width = max( (get_windowsize().w-RIGHT_COLUMN_OFFSET)/2, max(len2,len) );
