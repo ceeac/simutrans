@@ -12,7 +12,7 @@
 #include <windows.h>
 #endif
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #include <GL/glew.h>
 #include <GL/gl.h>

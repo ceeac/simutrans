@@ -1,0 +1,22 @@
+
+parameters:
+- name: depsVersion
+  type: string
+- name: depsTriplet
+  type: string
+
+steps:
+- bash: |
+    set -ex
+    mkdir -p build
+    curl -o build/vs_deps.zip -v -L "https://github.com/ceeac/simutrans-dependencies/releases/download/v${{ parameters.depsVersion }}/simutrans-libs-v${{ parameters.depsVersion }}-${{ parameters.depsTriplet }}.zip"
+  displayName: 'Download Windows dependencies'
+- task: ExtractFiles@1
+  inputs:
+    archiveFilePatterns: "build/vs_deps.zip"
+    ${{ if startsWith(parameters.depsTriplet, 'x86-') }}:
+      destinationFolder: "deps/Win32"
+    ${{ if startsWith(parameters.depsTriplet, 'x64-') }}:
+      destinationFolder: "deps/x64"
+    cleanDestinationFolder: false
+  displayName: 'Extract Windows dependencies'

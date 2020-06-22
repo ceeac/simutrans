@@ -5,7 +5,7 @@
 
 // Sound with SDL_mixer.dll (not changing the volume of other programs)
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <SDL_mixer.h>
 #include <string.h>
 #include "sound.h"

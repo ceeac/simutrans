@@ -1,0 +1,27 @@
+
+trigger:
+- master
+- extended-azure-ci
+
+
+jobs:
+- template: azure-templates/build-windows.yml
+  parameters:
+    images: [ 'windows-2019' ]
+    archs:  [ 'x64' ]
+    buildConfigs: [
+        'Debug (headless server)',
+        'Debug (no randomness)',
+        'Debug (OpenGL)',
+        'Debug (Optimised)',
+        'Debug (SDL)',
+        'Debug (SDL2)',
+        'Debug (single threaded)',
+        'Debug',
+        'Dr. Memory',
+        'Release (headless server)',
+        'Release (OpenGL)',
+        'Release (SDL)',
+        'Release (single threaded)',
+        'Release'
+      ]

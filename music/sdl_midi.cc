@@ -3,7 +3,7 @@
  * (see LICENSE.txt)
  */
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <SDL_mixer.h>
 
 #include "../simdebug.h"

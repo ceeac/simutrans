@@ -3,7 +3,7 @@
  * (see LICENSE.txt)
  */
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 #ifdef _WIN32
 #include <windows.h>
