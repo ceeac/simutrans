@@ -8,7 +8,7 @@ jobs:
 - template: azure-templates/build-windows.yml
   parameters:
     images: [ 'windows-2019' ]
-    archs:  [ 'x64' ]
+    archs:  [ 'x86', 'x64' ]
     buildConfigs: [
         'Debug (headless server)',
         'Debug (no randomness)',

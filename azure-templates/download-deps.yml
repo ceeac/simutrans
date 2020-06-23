@@ -15,7 +15,7 @@ steps:
   inputs:
     archiveFilePatterns: "build/vs_deps.zip"
     ${{ if startsWith(parameters.depsTriplet, 'x86-') }}:
-      destinationFolder: "deps/Win32"
+      destinationFolder: "deps/x86"
     ${{ if startsWith(parameters.depsTriplet, 'x64-') }}:
       destinationFolder: "deps/x64"
     cleanDestinationFolder: false

@@ -10,16 +10,13 @@ jobs:
           steps:
             - template: download-deps.yml
               parameters:
-                depsVersion: '4'
+                depsVersion: '5'
                 depsTriplet: ${{ format('{0}-windows-static', arch) }}
             - task: VSBuild@1
               displayName: 'Build'
               inputs:
                 solution: 'Simutrans-Extended.sln'
-                ${{ if eq(arch, 'x86') }}:
-                  platform: "Win32"
-                ${{ if ne(arch, 'x86') }}:
-                  platform: ${{ arch }}
+                platform: ${{ arch }}
                 configuration: ${{ buildConfig }}
                 msbuildArgs: '/t:"Simutrans-Extended"'
                 maximumCpuCount: true
