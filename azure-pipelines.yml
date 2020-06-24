@@ -7,7 +7,7 @@ trigger:
 jobs:
 - template: azure-templates/build-windows.yml
   parameters:
-    projects: [ Simutrans-Extended ]
+    projects: [ 'Simutrans-Extended' ]
     images: [ 'windows-2019' ]
     archs:  [ 'x86', 'x64' ]
     buildConfigs: [
@@ -28,7 +28,7 @@ jobs:
       ]
 - template: azure-templates/build-windows.yml
   parameters:
-    projects: [ 'Makeobj-Extended' ]
+    projects: [ 'Makeobj-Extended', 'Nettool-Extended' ]
     images: [ 'windows-2019' ]
     archs:  [ 'x86', 'x64' ]
     buildConfigs: [
