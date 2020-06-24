@@ -211,7 +211,7 @@ void display_rezoomed_img_alpha(const image_id, const image_id, const unsigned, 
 {
 }
 
-void display_color_img_with_tooltip(const image_id n, KOORD_VAL xp, KOORD_VAL yp, const signed char player_nr, const int daynight, const int dirty, const char *text  CLIP_NUM_DEF CLIP_NUM_DEFAULT_ZERO)
+void display_color_img_with_tooltip(const image_id n, KOORD_VAL xp, KOORD_VAL yp, const signed char player_nr, const int daynight, const int dirty, const char *text  CLIP_NUM_DEF_NOUSE)
 {
 }
 
@@ -236,10 +236,6 @@ void display_blend_wh_rgb(KOORD_VAL, KOORD_VAL, KOORD_VAL, KOORD_VAL, PIXVAL, in
 }
 
 void display_vlinear_gradient_wh_rgb(KOORD_VAL, KOORD_VAL, KOORD_VAL, KOORD_VAL, PIXVAL, int, int)
-{
-}
-
-void display_color_img_with_tooltip(const image_id, KOORD_VAL, KOORD_VAL, sint8, const int, const int, const char* CLIP_NUM_DEF_NOUSE)
 {
 }
 
