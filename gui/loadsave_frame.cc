@@ -225,14 +225,10 @@ gui_loadsave_table_row_t::gui_loadsave_table_row_t(const char *pathname, const c
 		else {
 			// read pak_extension from file
 			loadsave_t test;
-			try {
-				test.rd_open(pathname);
-				test.close();
-			}
-			catch (char *e) {
-				error = e;
-			}
-			catch (...) {
+			const bool ok = test.rd_open(pathname);
+			test.close();
+
+			if (!ok) {
 				error = "failed reading header";
 			}
 
