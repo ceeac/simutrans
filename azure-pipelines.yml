@@ -5,27 +5,27 @@ trigger:
 
 
 jobs:
-#- template: azure-templates/build-windows.yml
-  #parameters:
-    #projects: [ Simutrans-Extended ]
-    #images: [ 'windows-2019' ]
-    #archs:  [ 'x86', 'x64' ]
-    #buildConfigs: [
-        #'Debug (headless server)',
-        #'Debug (no randomness)',
-        #'Debug (OpenGL)',
-        #'Debug (Optimised)',
-        #'Debug (SDL)',
-        #'Debug (SDL2)',
-        #'Debug (single threaded)',
-        #'Debug',
-        #'Dr. Memory',
-        #'Release (headless server)',
-        #'Release (OpenGL)',
-        #'Release (SDL)',
-        #'Release (single threaded)',
-        #'Release'
-      #]
+- template: azure-templates/build-windows.yml
+  parameters:
+    projects: [ Simutrans-Extended ]
+    images: [ 'windows-2019' ]
+    archs:  [ 'x86', 'x64' ]
+    buildConfigs: [
+        'Debug (headless server)',
+        'Debug (no randomness)',
+        'Debug (OpenGL)',
+        'Debug (Optimised)',
+        'Debug (SDL)',
+        'Debug (SDL2)',
+        'Debug (single threaded)',
+        'Debug',
+        'Dr. Memory',
+        'Release (headless server)',
+        'Release (OpenGL)',
+        'Release (SDL)',
+        'Release (single threaded)',
+        'Release'
+      ]
 - template: azure-templates/build-windows.yml
   parameters:
     projects: [ 'Makeobj-Extended' ]
