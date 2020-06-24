@@ -29,17 +29,9 @@ simutrans/
 *.iobj
 *.ipdb
 *.TMP
-settings-experimental-debug.xml
-settings-extended-debug.xml
-ipch
-/Debug
-/Debug (SDL)
-/Debug-nettool
-/Release
-/Release (SDL)
 /build
 /config.*
-/intermediates
+/deps
 /makeobj/makeobj
 *.exe.*
 /binaries
@@ -53,7 +45,6 @@ PAK*
 settings.xml
 /simutrans-experimental
 /simutrans-extended
-/Debug-makeobj
 simutrans-experimental*
 simexstrip
 _UpgradeReport_Files*
