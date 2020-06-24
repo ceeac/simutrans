@@ -606,9 +606,9 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib;pthreadVCE3.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;gdi32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -648,9 +648,9 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib;pthreadVCE3.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib;pthreadVCE3d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -695,9 +695,9 @@
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;SDL.lib;gdi32.lib;OpenGL32.lib;glew32.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;SDL.lib;gdi32.lib;OpenGL32.lib;glew32d.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -790,9 +790,9 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib;pthreadVCE3.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib;pthreadVCE3d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -832,9 +832,9 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -856,7 +856,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;USE_C;WIN32;DEBUG=3;%(PreprocessorDefinitions);COLOUR_DEPTH=16;DEBUG_FREELIST;MULTI_THREAD;REVISION_FROM_FILE;GDI_SOUND</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -871,9 +871,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;gdi32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -889,7 +889,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;USE_C;WIN32;DEBUG=3;%(PreprocessorDefinitions);COLOUR_DEPTH=16;DEBUG_FREELIST;MULTI_THREAD;REVISION_FROM_FILE;GDI_SOUND</PreprocessorDefinitions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -911,9 +911,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib;pthreadVCE3.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib;pthreadVCE3d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug-optimised.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -930,7 +930,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;USE_C;WIN32;DEBUG=3;%(PreprocessorDefinitions);COLOUR_DEPTH=16;DEBUG_FREELIST;MULTI_THREAD;REVISION_FROM_FILE</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -948,9 +948,9 @@
       <ExceptionHandling>false</ExceptionHandling>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;SDL.lib;gdi32.lib;OpenGL32.lib;glew32.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;SDL.lib;gdi32.lib;OpenGL32.lib;glew32d.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -967,7 +967,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;DEBUG=3;%(PreprocessorDefinitions);COLOUR_DEPTH=16;MULTI_THREAD;DEBUG_FREELIST</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1000,7 +1000,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;DEBUG=3;%(PreprocessorDefinitions);COLOUR_DEPTH=16;MULTI_THREAD;DEBUG_FREELIST</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1015,9 +1015,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib;pthreadVCE3.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib;pthreadVCE3d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1033,7 +1033,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;DEBUG=3;COLOUR_DEPTH=16;DEBUG_FREELIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1048,9 +1048,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1082,7 +1082,7 @@
       <AdditionalOptions>/F 4194304 %(AdditionalOptions)/Zc:sizedDealloc-</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Advapi32.lib;Shell32.lib;User32.lib;Winmm.lib;Ws2_32.lib;zlib.lib;bz2.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -1092,7 +1092,7 @@
       <DataExecutionPrevention>
       </DataExecutionPrevention>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AdditionalOptions>/LARGEADDRESSAWARE %(AdditionalOptions)</AdditionalOptions>
     </Link>
@@ -1103,7 +1103,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;DEBUG=5;COLOUR_DEPTH=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>StackFrameRuntimeCheck</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -1119,7 +1119,7 @@
       <AdditionalOptions>/F 4194304 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>Advapi32.lib;Shell32.lib;User32.lib;Winmm.lib;Ws2_32.lib;zlib.lib;bz2.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug.exe</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -1128,7 +1128,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention>
       </DataExecutionPrevention>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -1183,7 +1183,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;NDEBUG;%(PreprocessorDefinitions);COLOUR_DEPTH=16;MULTI_THREAD</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -1263,7 +1263,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;USE_C;WIN32;NDEBUG;COLOUR_DEPTH=16;REVISION_FROM_FILE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -1320,8 +1320,8 @@
       <AdditionalOptions>/Zc:sizedDealloc-</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -1342,7 +1342,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <OmitFramePointers>false</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;%(PreprocessorDefinitions);COLOUR_DEPTH=16</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -1360,8 +1360,8 @@
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;gdi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -1420,7 +1420,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;NDEBUG;%(PreprocessorDefinitions);COLOUR_DEPTH=0;MULTI_THREAD</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -1496,7 +1496,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;IN32;NDEBUG;SDL;%(PreprocessorDefinitions);COLOUR_DEPTH=16</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
@@ -1545,9 +1545,9 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>SDL.lib SDLmain.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;SDL.lib;gdi32.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;SDL.lib;gdi32.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug-SDL.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1581,9 +1581,9 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;SDL2.lib;ole32.lib;oleaut32.lib;setupapi.lib;version.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;SDL2d.lib;ole32.lib;oleaut32.lib;setupapi.lib;version.lib;gdi32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug-SDL.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1601,7 +1601,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;DEBUG=3;SDL;%(PreprocessorDefinitions);COLOUR_DEPTH=16</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -1616,9 +1616,9 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>SDL.lib SDLmain.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;SDL.lib;gdi32.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;SDL.lib;gdi32.lib;dxguid.lib;dinput8.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug-SDL.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -1634,7 +1634,7 @@
     </PreBuildEvent>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(Platform)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\$(PlatformTarget)\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NOMINMAX=1;LITTLE_ENDIAN;WIN32;DEBUG=3;SDL;%(PreprocessorDefinitions);COLOUR_DEPTH=16</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -1649,9 +1649,9 @@
     </ClCompile>
     <Link>
       <AdditionalOptions>SDL.lib SDLmain.lib %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlib.lib;bz2.lib;pthreadVCE3.lib;SDL2.lib;ole32.lib;oleaut32.lib;setupapi.lib;version.lib;gdi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>advapi32.lib;imm32.lib;shell32.lib;user32.lib;winmm.lib;ws2_32.lib;zlibd.lib;bz2d.lib;pthreadVCE3d.lib;SDL2d.lib;ole32.lib;oleaut32.lib;setupapi.lib;version.lib;gdi32.lib</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName)-debug-SDL.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)deps\$(PlatformTarget)\debug\lib\;$(SolutionDir)deps\$(PlatformTarget)\lib\manual-link\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
