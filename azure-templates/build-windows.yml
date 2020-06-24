@@ -1,10 +1,11 @@
 
 jobs:
+- ${{ each project in parameters.projects }}:
   - ${{ each image in parameters.images }}:
     - ${{ each arch in parameters.archs }}:
       - ${{ each buildConfig in parameters.buildConfigs }}:
         - job:
-          displayName: "${{ format('{0}  {1}  {2}', image, arch, buildConfig) }}"
+          displayName: "${{ format('{0}  {1}  {2}  {3}', project, image, arch, buildConfig) }}"
           pool:
             vmImage: ${{ image }}
           steps:
@@ -18,5 +19,5 @@ jobs:
                 solution: 'Simutrans-Extended.sln'
                 platform: ${{ arch }}
                 configuration: ${{ buildConfig }}
-                msbuildArgs: '/t:"Simutrans-Extended"'
+                msbuildArgs: "${{ format('/t:{0}', project) }}"
                 maximumCpuCount: true
