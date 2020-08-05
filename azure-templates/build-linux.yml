@@ -11,18 +11,6 @@ jobs:
           - script:
               set -ex
 
-              sudo apt-get update && sudo apt-get -y install --no-install-recommends \
-                build-essential \
-                g++-10 \
-                clang++-10 \
-                liballegro4-dev \
-                libsdl1.2-dev \
-                libsdl-mixer1.2-dev \
-                libsdl2-dev \
-                libsdl2-mixer-dev \
-                zlib1g-dev \
-                libbz2-dev \
-                libpng-dev \
-                libglew-dev
+              sudo apt-get update && sudo apt-get -y install --no-install-recommends build-essential g++-10 clang++-10 liballegro4-dev libsdl1.2-dev libsdl-mixer1.2-dev libsdl2-dev libsdl2-mixer-dev zlib1g-dev libbz2-dev libpng-dev libglew-dev
 
               ${{ compiler }} BACKEND=${{ backend }} COLOUR_DEPTH=16 OSTYPE=linux make -j$(nproc) ${{ target }}
