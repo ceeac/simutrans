@@ -14,6 +14,15 @@ jobs:
     ]
     backends: [ 'allegro', 'opengl', 'sdl', 'sdl2', 'mixer_sdl', 'mixer_sdl2', 'posix' ]
 
+- template: azure-templates/build-linux.yml
+  parameters:
+    targets: [ 'makeobj', 'nettool' ]
+    compilers: [
+        'CC=clang-10 CXX=clang++-10',
+        'CC=gcc-10   CXX=g++-10'
+    ]
+    backends: [ 'posix' ]
+
 
 #- template: azure-templates/build-windows.yml
   #parameters:
