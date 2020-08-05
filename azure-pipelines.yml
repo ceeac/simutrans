@@ -5,33 +5,43 @@ trigger:
 
 
 jobs:
-- template: azure-templates/build-windows.yml
+- template: azure-templates/build-linux.yml
   parameters:
-    projects: [ 'Simutrans-Extended' ]
-    images: [ 'windows-2019' ]
-    archs:  [ 'x86', 'x64' ]
-    buildConfigs: [
-        'Debug (headless server)',
-        'Debug (no randomness)',
-        'Debug (OpenGL)',
-        'Debug (Optimised)',
-        'Debug (SDL)',
-        'Debug (SDL2)',
-        'Debug (single threaded)',
-        'Debug',
-        'Dr. Memory',
-        'Release (headless server)',
-        'Release (OpenGL)',
-        'Release (SDL)',
-        'Release (single threaded)',
-        'Release'
-      ]
-- template: azure-templates/build-windows.yml
-  parameters:
-    projects: [ 'Makeobj-Extended', 'Nettool-Extended' ]
-    images: [ 'windows-2019' ]
-    archs:  [ 'x86', 'x64' ]
-    buildConfigs: [
-        'Debug',
-        'Release'
-      ]
+    targets: [ 'all' ]
+    compilers: [
+        'CC=clang-10 CXX=clang++-10',
+        'CC=gcc-10   CXX=g++-10'
+    ]
+    backends: [ 'allegro', 'opengl', 'sdl', 'sdl2', 'mixer_sdl', 'mixer_sdl2', 'posix' ]
+
+
+#- template: azure-templates/build-windows.yml
+  #parameters:
+    #projects: [ 'Simutrans-Extended' ]
+    #images: [ 'windows-2019' ]
+    #archs:  [ 'x86', 'x64' ]
+    #buildConfigs: [
+        #'Debug (headless server)',
+        #'Debug (no randomness)',
+        #'Debug (OpenGL)',
+        #'Debug (Optimised)',
+        #'Debug (SDL)',
+        #'Debug (SDL2)',
+        #'Debug (single threaded)',
+        #'Debug',
+        #'Dr. Memory',
+        #'Release (headless server)',
+        #'Release (OpenGL)',
+        #'Release (SDL)',
+        #'Release (single threaded)',
+        #'Release'
+      #]
+#- template: azure-templates/build-windows.yml
+  #parameters:
+    #projects: [ 'Makeobj-Extended', 'Nettool-Extended' ]
+    #images: [ 'windows-2019' ]
+    #archs:  [ 'x86', 'x64' ]
+    #buildConfigs: [
+        #'Debug',
+        #'Release'
+      #]
