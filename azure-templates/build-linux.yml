@@ -8,8 +8,7 @@ jobs:
         pool:
           vmImage: 'ubuntu-20.04'
         steps:
-          - displayName: "Build"
-            script:
+          - script:
               set -ex
 
               sudo apt-get update && sudo apt-get -y install --no-install-recommends \
