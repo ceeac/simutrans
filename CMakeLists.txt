@@ -458,7 +458,7 @@ elseif (SIMUTRANS_BACKEND STREQUAL "mixer_sdl")
 
 elseif (SIMUTRANS_BACKEND STREQUAL "sdl2")
 	target_sources(simutrans PRIVATE sys/simsys_s2.cc ${BACKUP_SOUND} ${BACKUP_MUSIC})
-	target_link_libraries(simutrans PRIVATE SDL2::SDL2)
+	target_link_libraries(simutrans PRIVATE SDL2::Core)
 
 elseif (SIMUTRANS_BACKEND STREQUAL "allegro")
 	target_sources(simutrans PRIVATE sys/simsys_d.cc sound/allegro_sound.cc music/allegro_midi.cc)
