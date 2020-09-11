@@ -33,6 +33,10 @@ include(simutrans-revision)
 include(TestBigEndian)
 TEST_BIG_ENDIAN(SIMUTRANS_BIG_ENDIAN)
 
+set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_EXTENSIONS FALSE)
+
 
 #
 # Dependencies
