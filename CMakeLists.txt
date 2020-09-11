@@ -273,6 +273,7 @@ add_executable(simutrans
 	gui/scenario_info.cc
 	gui/schedule_gui.cc
 	gui/schedule_list.cc
+	gui/script_tool_frame.cc
 	gui/server_frame.cc
 	gui/settings_frame.cc
 	gui/settings_stats.cc
@@ -351,6 +352,7 @@ add_executable(simutrans
 	script/export_objs.cc
 	script/script.cc
 	script/script_loader.cc
+	script/script_tool_manager.cc
 	simcity.cc
 	simconvoi.cc
 	simdebug.cc
@@ -374,6 +376,7 @@ add_executable(simutrans
 	simsound.cc
 	simticker.cc
 	simtool.cc
+	simtool-scripted.cc
 	simware.cc
 	simworld.cc
 	squirrel/sq_extensions.cc
