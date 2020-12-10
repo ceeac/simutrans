@@ -22,6 +22,9 @@
 #include <cstring>
 
 
+bool classify_as_png(FILE *f, file_info_t *info);
+bool classify_as_bmp(FILE *f, file_info_t *info);
+bool classify_as_ppm(FILE *f, file_info_t *info);
 bool classify_as_zstd(FILE *f, file_info_t *info);
 bool classify_as_bzip2(FILE *f, file_info_t *info);
 bool classify_as_zip(FILE *f, file_info_t *info);
@@ -30,7 +33,7 @@ bool classify_file_data(rdwr_stream_t *stream, file_info_t *info);
 
 file_info_t::file_info_t() :
 	file_type(TYPE_RAW),
-	version(0),
+	version(INVALID_FILE_VERSION),
 	header_size(0)
 {
 	pak_extension[0] = 0;
@@ -56,7 +59,11 @@ file_classify_status_t classify_file(const char *path, file_info_t *info)
 		return FILE_CLASSIFY_INVALID_ARGS;
 	}
 
-	FILE *f = dr_fopen((const char *)path, "rb");
+#ifdef MAKEOBJ
+	FILE *f = fopen(path, "rb");
+#else
+	FILE *f = dr_fopen(path, "rb");
+#endif
 
 	if (!f) {
 		// Do not warn about this since we can also use this function to check whether a file exists
@@ -64,10 +71,35 @@ file_classify_status_t classify_file(const char *path, file_info_t *info)
 	}
 
 	fseek(f, 0, SEEK_SET);
+	if (classify_as_png(f, info)) {
+		fclose(f);
+		return FILE_CLASSIFY_OK;
+	}
+
+	fseek(f, 0, SEEK_SET);
+	if (classify_as_bmp(f, info)) {
+		fclose(f);
+		return FILE_CLASSIFY_OK;
+	}
+
+	fseek(f, 0, SEEK_SET);
+	if (classify_as_ppm(f, info)) {
+		fclose(f);
+		return FILE_CLASSIFY_OK;
+	}
+
+#ifdef MAKEOBJ
+	info->file_type = file_info_t::TYPE_RAW;
+	info->version = INVALID_FILE_VERSION;
+	info->header_size = 0;
+	return FILE_CLASSIFY_OK;
+#else
+
+	fseek(f, 0, SEEK_SET);
 	if (classify_as_zstd(f, info)) {
 		fclose(f);
 
-#if USE_ZSTD // otherwise we cannot read it
+#  if USE_ZSTD // otherwise we cannot read it
 		zstd_file_rdwr_stream_t s(path, false, 0);
 		if (!classify_file_data(&s, info)) {
 			info->file_type = file_info_t::TYPE_RAW;
@@ -75,9 +107,9 @@ file_classify_status_t classify_file(const char *path, file_info_t *info)
 			info->header_size = 0;
 		}
 		return FILE_CLASSIFY_OK;
-#else
+#  else
 		dbg->fatal( "classify_file()", "Compiled without zstd support but zstd savegame!" );
-#endif
+#  endif
 	}
 
 	fseek(f, 0, SEEK_SET);
@@ -118,9 +150,58 @@ file_classify_status_t classify_file(const char *path, file_info_t *info)
 	}
 
 	return FILE_CLASSIFY_OK;
+#endif // MAKEOBJ
 }
 
 
+bool classify_as_png(FILE *f, file_info_t *info)
+{
+	char buf[80];
+	if (fread(buf, 1, 8, f) != 8) {
+		return false;
+	}
+
+	if (memcmp(buf, "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a", 8) != 0) {
+		return false;
+	}
+
+	info->file_type = file_info_t::TYPE_PNG;
+	return true;
+}
+
+
+bool classify_as_bmp(FILE *f, file_info_t *info)
+{
+	char buf[80];
+	if (fread(buf, 1, 2, f) != 2) {
+		return false;
+	}
+
+	if (memcmp(buf, "BM", 2) != 0) {
+		return false;
+	}
+
+	info->file_type = file_info_t::TYPE_BMP;
+	return true;
+}
+
+
+bool classify_as_ppm(FILE *f, file_info_t *info)
+{
+	char buf[80];
+	if (fread(buf, 1, 2, f) != 2) {
+		return false;
+	}
+
+	if (memcmp(buf, "P6", 2) != 0) {
+		return false;
+	}
+
+	info->file_type = file_info_t::TYPE_PPM;
+	return true;
+}
+
+#ifndef MAKEOBJ
 bool classify_as_bzip2(FILE *f, file_info_t *info)
 {
 	char buf[80];
@@ -278,3 +359,4 @@ bool classify_file_data(rdwr_stream_t *stream, file_info_t *info)
 
 	return true;
 }
+#endif
