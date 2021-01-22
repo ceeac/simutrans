@@ -4,13 +4,17 @@
  */
 
 #include "network_file_transfer.h"
+
+#include "network_cmd.h"
+#include "network_cmd_ingame.h"
+
 #include "../simdebug.h"
 #include "../simloadingscreen.h"
 #include "../sys/simsys.h"
-
-#include <string.h>
-#include <errno.h>
 #include "../utils/cbuffer.h"
+
+#include <cstring>
+#include <cerrno>
 
 #ifndef NETTOOL
 #include "../dataobj/translator.h"
@@ -89,8 +93,6 @@ const char *network_receive_file(const SOCKET src_sock, const char *const save_a
  */
 #ifndef NETTOOL
 
-#include "network_cmd.h"
-#include "network_cmd_ingame.h"
 #include "network_socket_list.h"
 
 #include "../dataobj/loadsave.h"
@@ -193,66 +195,89 @@ const char *network_connect(const char *cp, karte_t *world)
 				goto end;
 			}
 		}
+
 		socket_list_t::reset();
 		socket_list_t::add_client(my_client_socket);
-		// wait for join command (tolerate some wrong commands)
-		network_command_t *nwc = NULL;
-		for(uint8 i=0; i<5; i++) {
-			nwc = network_check_activity( NULL, 10000 );
-			if (nwc  &&  nwc->get_id() == NWC_JOIN) break;
-		}
+
+		// wait for join reply from server
+		network_command_t *nwc = network_check_activity( NULL, 10000 );
+
 		if (nwc==NULL) {
 			err = "Server did not respond!";
 			goto end;
 		}
-		nwc_join_t *nwj = dynamic_cast<nwc_join_t*>(nwc);
+
+		assert(nwc->get_id() == NWC_JOIN);
+		nwc_join_t *nwj = dynamic_cast<nwc_join_t *>(nwc);
 		if (nwj==NULL) {
 			err = "Protocol error (expected NWC_JOIN)";
 			goto end;
 		}
+
 		if (nwj->answer!=1) {
 			err = "Server busy";
 			goto end;
 		}
+
 		// set nickname
-		env_t::nickname = nwj->nickname.c_str();
+		env_t::nickname = nwj->nickname;
 
 		network_set_client_id(nwj->client_id);
+
 		// update map counter
-		// wait for sync command (tolerate some wrong commands)
-		for(  uint8 i=0;  i<5;  ++i  ) {
-			nwc = network_check_activity( NULL, 10000 );
-			if(  nwc  &&  nwc->get_id()==NWC_SYNC  ) break;
+		// wait for sync command
+		nwc = network_check_activity( NULL, 10000 );
+		if (nwc == NULL) {
+			err = "Server did not respond!";
+			goto end;
 		}
-		if(  nwc==NULL  ||  nwc->get_id()!=NWC_SYNC  ) {
+
+		assert(nwc->get_id() == NWC_SYNC);
+		nwc_sync_t *nws = dynamic_cast<nwc_sync_t *>(nwc);
+		if (nws==NULL) {
 			err = "Protocol error (expected NWC_SYNC)";
 			goto end;
 		}
-		world->set_map_counter( ((nwc_sync_t*)nwc)->get_new_map_counter() );
+
+		world->set_map_counter( nws->get_new_map_counter() );
+
 		// receive nwc_game_t
 		{
 #ifndef NETTOOL // no display, no translator available
 			loadingscreen_t ls(translator::translate("Server preparing game ..."),300,true,true);
 #endif
-			// wait for game command for 5 min (tolerate some wrong commands) to leave it enough time for saving
+			// wait for game command for 5 min to leave the server enough time for saving
 			for(int i=0; i<300; i++) {
 #ifndef NETTOOL // no display, no translator available
 				ls.set_progress(i);
 #endif
+				nwc = network_get_received_command();
+				if (nwc) {
+					break;
+				}
+
 				nwc = network_check_activity( NULL, 1000 );
-				if (nwc  &&  nwc->get_id() == NWC_GAME) {
+				if (nwc) {
 					break;
 				}
 			}
 		}
-		if (nwc == NULL  ||  nwc->get_id()!=NWC_GAME) {
+
+		if (nwc == NULL) {
+			err = "Server did not respond!";
+			goto end;
+		}
+
+		if (nwc->get_id()!=NWC_GAME) {
 			err = "Protocol error (expected NWC_GAME)";
 			goto end;
 		}
-		int len = ((nwc_game_t*)nwc)->len;
+
+		uint32 len = static_cast<nwc_game_t *>(nwc)->len;
+
 		// guaranteed individual file name ...
 		char filename[256];
-		sprintf( filename, "client%i-network.sve", network_get_client_id() );
+		sprintf( filename, "client%u-network.sve", network_get_client_id() );
 		err = network_receive_file( my_client_socket, filename, len );
 	}
 end:

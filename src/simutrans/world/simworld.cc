@@ -6928,7 +6928,7 @@ bool karte_t::interactive(uint32 quit_month)
 					}
 
 					// no clients -> pause game
-					if (  env_t::networkmode  &&  env_t::pause_server_no_clients  &&  socket_list_t::get_playing_clients() == 0  &&  !nwc_join_t::is_pending()  ) {
+					if (  env_t::networkmode  &&  env_t::pause_server_no_clients  &&  socket_list_t::get_playing_clients() == 0  ) {
 						set_pause(true);
 					}
 				}

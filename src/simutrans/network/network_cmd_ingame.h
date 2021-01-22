@@ -118,12 +118,6 @@ public:
 	uint32 client_id;
 	uint8 answer;
 
-	/**
-	 * this clients is in the process of joining
-	 */
-	static SOCKET pending_join_client;
-
-	static bool is_pending() { return pending_join_client != INVALID_SOCKET; }
 private:
 	nwc_join_t(const nwc_join_t&);
 	nwc_join_t& operator=(const nwc_join_t&);
