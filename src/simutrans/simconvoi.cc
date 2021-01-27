@@ -327,6 +327,11 @@ uint32 convoi_t::move_to(route_t::index_t const start_index)
 
 void convoi_t::finish_rd()
 {
+	const bool old_recalc_data_front  = recalc_data_front;
+	const bool old_recalc_data        = recalc_data;
+	const bool old_recalc_speed_limit = recalc_speed_limit;
+	const sint32 old_loading_limit    = loading_limit;
+
 	if(schedule==NULL) {
 		if(  state!=INITIAL  ) {
 			grund_t *gr = welt->lookup(home_depot);
@@ -507,18 +512,12 @@ DBG_MESSAGE("convoi_t::finish_rd()","next_stop_index=%d", next_stop_index );
 			}
 		}
 	}
-	if(  state==LOADING  ) {
-		// the fully the shorter => register again as older convoi
-		wait_lock = 2000-loading_level*20;
+
 		if (distance_since_last_stop > 0) {
 			calc_gewinn();
 		}
-	}
 	// when saving with open window, this can happen
 	if(  state==EDIT_SCHEDULE  ) {
-		if (env_t::networkmode) {
-			wait_lock = 30000; // 60s to drive on, if the client in question had left
-		}
 		schedule->finish_editing();
 	}
 	// remove wrong freight
@@ -533,6 +532,14 @@ DBG_MESSAGE("convoi_t::finish_rd()","next_stop_index=%d", next_stop_index );
 	}
 
 	calc_speedbonus_kmh();
+
+	// Restore these variables to ensure delta_v is updated correctly on the first tick
+	// (update_speed_and_acceleration resets these variables)
+	recalc_data_front  = old_recalc_data_front;
+	recalc_data        = old_recalc_data;
+	recalc_speed_limit = old_recalc_speed_limit;
+
+	loading_limit = old_loading_limit;
 }
 
 
@@ -2195,7 +2202,6 @@ void convoi_t::rdwr(loadsave_t *file)
 {
 	xml_tag_t t( file, "convoi_t" );
 
-	sint32 dummy;
 	sint32 owner_n = welt->sp2num(owner);
 
 	if(file->is_saving()) {
@@ -2228,7 +2234,7 @@ void convoi_t::rdwr(loadsave_t *file)
 		file->rdwr_short( id );
 	}
 
-	dummy = vehicle_count;
+	sint32 dummy = vehicle_count;
 	file->rdwr_long(dummy);
 	vehicle_count = (uint8)dummy;
 
@@ -2613,6 +2619,22 @@ void convoi_t::rdwr(loadsave_t *file)
 		reserve_route();
 		recalc_catg_index();
 		unloading_state = false;
+	}
+
+	if (file->is_version_atleast(123, 1)) {
+		dummy_bool = recalc_data_front;
+		file->rdwr_bool(dummy_bool);
+		recalc_data_front = dummy_bool;
+
+		dummy_bool = recalc_data;
+		file->rdwr_bool(dummy_bool);
+		recalc_data = dummy_bool;
+
+		dummy_bool = recalc_speed_limit;
+		file->rdwr_bool(dummy_bool);
+		recalc_speed_limit = dummy_bool;
+
+		file->rdwr_long(loading_limit);
 	}
 }
 
