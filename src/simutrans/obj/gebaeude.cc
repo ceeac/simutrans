@@ -175,10 +175,12 @@ void gebaeude_t::rotate90()
 		// such a tile exist?
 		if(  building_desc->get_x(layout) > new_offset.x  &&  building_desc->get_y(layout) > new_offset.y  ) {
 			const building_tile_desc_t* const new_tile = building_desc->get_tile(layout, new_offset.x, new_offset.y);
+
 			// add new tile: but make them old (no construction)
-			uint32 old_insta_zeit = insta_zeit;
+			const uint32 old_insta_zeit = insta_zeit;
 			set_tile( new_tile, false );
 			insta_zeit = old_insta_zeit;
+
 			if(  building_desc->get_type() != building_desc_t::dock  &&  !tile->has_image()  ) {
 				// may have a rotation, that is not recoverable
 				if(  !is_factory  &&  new_offset!=koord(0,0)  ) {
@@ -786,7 +788,16 @@ void gebaeude_t::rdwr(loadsave_t *file)
 		file->rdwr_str(buf, lengthof(buf));
 	}
 	file->rdwr_short(idx);
-	file->rdwr_long(insta_zeit);
+
+	if (file->is_version_atleast(123, 1)) {
+		// store diff ticks only
+		uint32 diff_ticks = welt->get_ticks() - insta_zeit;
+		file->rdwr_long(diff_ticks);
+		insta_zeit = welt->get_ticks() - diff_ticks;
+	}
+	else {
+		file->rdwr_long(insta_zeit);
+	}
 
 	if(file->is_loading()) {
 		tile = hausbauer_t::find_tile(buf, idx);

@@ -903,25 +903,31 @@ void objlist_t::rdwr(loadsave_t *file, koord3d current_pos)
 
 				case obj_t::bahndepot:
 				{
-					// for compatibility reasons we may have to convert them to tram and monorail depots
-					bahndepot_t*                   bd;
-					gebaeude_t                     gb(file);
-					building_tile_desc_t const* const tile = gb.get_tile();
-					if(  tile  ) {
-						switch (tile->get_desc()->get_extra()) {
-							case monorail_wt: bd = new monoraildepot_t( gb.get_pos(), gb.get_owner(), tile); break;
-							case tram_wt:     bd = new tramdepot_t(     gb.get_pos(), gb.get_owner(), tile); break;
-							default:          bd = new bahndepot_t(     gb.get_pos(), gb.get_owner(), tile); break;
-						}
+					if (file->is_version_atleast(123, 1)) {
+						new_obj = new bahndepot_t(file);
 					}
 					else {
-						bd = new bahndepot_t( gb.get_pos(), gb.get_owner(), NULL );
+						// for compatibility reasons we may have to convert them to tram and monorail depots
+						bahndepot_t*                   bd;
+						gebaeude_t                     gb(file);
+						building_tile_desc_t const* const tile = gb.get_tile();
+						if(  tile  ) {
+							switch (tile->get_desc()->get_extra()) {
+								case monorail_wt: bd = new monoraildepot_t( gb.get_pos(), gb.get_owner(), tile); break;
+								case tram_wt:     bd = new tramdepot_t(     gb.get_pos(), gb.get_owner(), tile); break;
+								default:          bd = new bahndepot_t(     gb.get_pos(), gb.get_owner(), tile); break;
+							}
+						}
+						else {
+							bd = new bahndepot_t( gb.get_pos(), gb.get_owner(), NULL );
+						}
+
+						bd->rdwr_vehicles(file);
+						new_obj   = bd;
+						typ = new_obj->get_typ();
+						// do not remove from this position, since there will be nothing
+						gb.set_flag(obj_t::not_on_map);
 					}
-					bd->rdwr_vehicles(file);
-					new_obj   = bd;
-					typ = new_obj->get_typ();
-					// do not remove from this position, since there will be nothing
-					gb.set_flag(obj_t::not_on_map);
 				}
 				break;
 
