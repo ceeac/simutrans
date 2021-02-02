@@ -330,6 +330,7 @@ void convoi_t::finish_rd()
 	const bool old_recalc_data_front  = recalc_data_front;
 	const bool old_recalc_data        = recalc_data;
 	const bool old_recalc_speed_limit = recalc_speed_limit;
+	const sint64 old_sum_gesamtweight = sum_gesamtweight;
 	const sint32 old_loading_limit    = loading_limit;
 
 	if(schedule==NULL) {
@@ -538,8 +539,9 @@ DBG_MESSAGE("convoi_t::finish_rd()","next_stop_index=%d", next_stop_index );
 	recalc_data_front  = old_recalc_data_front;
 	recalc_data        = old_recalc_data;
 	recalc_speed_limit = old_recalc_speed_limit;
+	sum_gesamtweight   = old_sum_gesamtweight;
+	loading_limit      = old_loading_limit;
 
-	loading_limit = old_loading_limit;
 }
 
 
@@ -710,7 +712,6 @@ static inline sint32 res_power(sint64 speed, sint32 total_power, sint64 friction
  */
 void convoi_t::calc_acceleration(uint32 delta_t)
 {
-
 	if(  !recalc_data  &&  !recalc_speed_limit  &&  !recalc_data_front  &&  (
 		(sum_friction_weight == sum_gesamtweight  &&  akt_speed_soll <= akt_speed  &&  akt_speed_soll+24 >= akt_speed)  ||
 		(sum_friction_weight > sum_gesamtweight  &&  akt_speed_soll == akt_speed)  )
@@ -727,7 +728,7 @@ void convoi_t::calc_acceleration(uint32 delta_t)
 		const vehicle_t* v = front();
 		speed_limit = min( min_top_speed, v->get_speed_limit() );
 		if (recalc_data) {
-			sum_gesamtweight   = v->get_total_weight();
+			sum_gesamtweight    = v->get_total_weight();
 			sum_friction_weight = v->get_frictionfactor() * sum_gesamtweight;
 		}
 
