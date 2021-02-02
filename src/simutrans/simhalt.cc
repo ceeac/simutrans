@@ -2232,7 +2232,7 @@ void haltestelle_t::add_ware_to_halt(ware_t ware)
 		}
 	}
 	// here, if no free entries found
-	warray->append(ware);
+	warray->insert_at(0, ware);
 }
 
 
