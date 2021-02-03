@@ -2409,7 +2409,11 @@ void convoi_t::rdwr(loadsave_t *file)
 			// add to convoi
 			fahr[i] = v;
 		}
-		sum_gesamtweight = sum_weight;
+
+		sum_gesamtweight = 0;
+		for (uint8 i = 0; i < vehicle_count; ++i) {
+			sum_gesamtweight += fahr[i]->get_total_weight();
+		}
 	}
 
 	bool has_schedule = (schedule != NULL);
