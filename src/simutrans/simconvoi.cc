@@ -3151,16 +3151,18 @@ void convoi_t::calc_loading()
 {
 	int fracht_max = 0;
 	int fracht_menge = 0;
+
 	for(unsigned i=0; i<vehicle_count; i++) {
 		const vehicle_t* v = fahr[i];
 		fracht_max += v->get_cargo_max();
 		fracht_menge += v->get_total_cargo();
 	}
+
 	loading_level = fracht_max > 0 ? (fracht_menge*100)/fracht_max : 100;
 	loading_limit = 0; // will be set correctly from hat_gehalten() routine
 
 	// since weight has changed
-	recalc_data=true;
+	recalc_data = true;
 }
 
 
