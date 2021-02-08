@@ -50,9 +50,9 @@ resolution dr_query_screen_resolution()
 }
 
 // open the window
-int dr_os_open(int, int, bool)
+framebuffer_t dr_os_open(int, int, bool)
 {
-	return 1;
+	return framebuffer_t(NULL, 1, scr_size(0, 0));
 }
 
 
@@ -60,18 +60,6 @@ void dr_os_close()
 {
 }
 
-// resizes screen
-int dr_textur_resize(unsigned short** const textur, int, int)
-{
-	*textur = NULL;
-	return 1;
-}
-
-
-unsigned short *dr_textur_init()
-{
-	return NULL;
-}
 
 unsigned int get_system_color(unsigned int, unsigned int, unsigned int)
 {

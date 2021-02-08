@@ -323,6 +323,7 @@ SOURCES += descriptor/tunnel_desc.cc
 SOURCES += descriptor/vehicle_desc.cc
 SOURCES += descriptor/way_desc.cc
 SOURCES += display/font.cc
+SOURCES += display/framebuffer.cc
 SOURCES += display/simgraph$(COLOUR_DEPTH).cc
 SOURCES += display/simview.cc
 SOURCES += display/viewport.cc

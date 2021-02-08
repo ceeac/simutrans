@@ -144,8 +144,18 @@ static void create_window(DWORD const ex_style, DWORD const style, int const x, 
 }
 
 
+static PIXVAL *dr_textur_init()
+{
+	size_t const n = AllDib->bmiHeader.biWidth * AllDib->bmiHeader.biHeight;
+	AllDibData = MALLOCN(PIXVAL, n);
+	// start with black
+	MEMZERON(AllDibData, n);
+	return static_cast<PIXVAL *>(AllDibData);
+}
+
+
 // open the window
-int dr_os_open(int const w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 {
 	MaxSize.right = ((w*x_scale)/32+15) & 0x7FF0;
 	MaxSize.bottom = (h*y_scale)/32;
@@ -219,7 +229,7 @@ int dr_os_open(int const w, int const h, bool fullscreen)
 	masks[2]               = 0x0000001F;
 #endif
 
-	return header.biWidth;
+	return framebuffer_t(dr_textur_init(), header.biWidth, scr_size(MaxSize.right, MaxSize.bottom));
 }
 
 
@@ -246,11 +256,16 @@ void dr_os_close()
 
 
 // resizes screen
-int dr_textur_resize(unsigned short** const textur, int w, int const h)
+bool dr_textur_resize(framebuffer_t *framebuf, scr_size requested_size)
 {
+	assert(framebuf != NULL);
+
 #ifdef MULTI_THREAD
 	EnterCriticalSection( &redraw_underway );
 #endif
+
+	int w = requested_size.w;
+	int h = requested_size.h;
 
 	// some cards need those alignments
 	w = (w + 15) & 0x7FF0;
@@ -261,6 +276,7 @@ int dr_textur_resize(unsigned short** const textur, int w, int const h)
 	int img_w = w;
 	int img_h = h;
 
+	bool resized = false;
 	if(  w > (MaxSize.right/x_scale)*32  ||  h >= (MaxSize.bottom/y_scale)*32  ) {
 		// since the query routines that return the desktop data do not take into account a change of resolution
 		free(AllDibData);
@@ -268,7 +284,9 @@ int dr_textur_resize(unsigned short** const textur, int w, int const h)
 		MaxSize.right = (w*32)/x_scale;
 		MaxSize.bottom = ((h+1)*32)/y_scale;
 		AllDibData = MALLOCN(PIXVAL, img_w * img_h);
-		*textur = (unsigned short*)AllDibData;
+
+		*framebuf = framebuffer_t(static_cast<PIXVAL *>(AllDibData), MaxSize.right, scr_size(MaxSize.right, MaxSize.bottom));
+		resized = true;
 	}
 
 	AllDib->bmiHeader.biWidth  = img_w;
@@ -279,17 +297,7 @@ int dr_textur_resize(unsigned short** const textur, int w, int const h)
 #ifdef MULTI_THREAD
 	LeaveCriticalSection( &redraw_underway );
 #endif
-	return w;
-}
-
-
-unsigned short *dr_textur_init()
-{
-	size_t const n = AllDib->bmiHeader.biWidth * AllDib->bmiHeader.biHeight;
-	AllDibData = MALLOCN(PIXVAL, n);
-	// start with black
-	MEMZERON(AllDibData, n);
-	return (unsigned short*)AllDibData;
+	return resized;
 }
 
 

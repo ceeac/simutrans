@@ -24,6 +24,21 @@ static int width  = 800;
 static int height = 600;
 
 
+static BITMAP *texture_map;
+
+static PIXVAL *dr_textur_init()
+{
+	texture_map = create_bitmap(width, height);
+	if (texture_map == NULL) {
+		printf("Error: can't create double buffer bitmap, aborting!");
+		exit(1);
+	}
+
+	//	return reinterpret_cast<unsigned short*>(texture_map->line[0]);
+	return (PIXVAL *)(texture_map->line[0]);
+}
+
+
 /* event-handling */
 
 /* queue Eintraege sind wie folgt aufgebaut
@@ -186,7 +201,7 @@ bool dr_auto_scale(bool)
  * Hier sind die Basisfunktionen zur Initialisierung der Schnittstelle untergebracht
  * -> init,open,close
  */
-bool dr_os_init(int const* parameter)
+bool dr_os_init(const int *)
 {
 	if (allegro_init() != 0) {
 		dr_fatal_notify("Could not init Allegro.\n");
@@ -222,7 +237,7 @@ resolution dr_query_screen_resolution()
 }
 
 
-int dr_os_open(int const w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 {
 	width = w;
 	height = h;
@@ -233,12 +248,12 @@ int dr_os_open(int const w, int const h, bool fullscreen)
 	set_color_depth(COLOUR_DEPTH);
 	if (set_gfx_mode(fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED, w, h, 0, 0) != 0) {
 		fprintf(stderr, "Error: %s\n", allegro_error);
-		return 0;
+		return framebuffer_t();
 	}
 
 	if (install_mouse() < 0) {
 		fprintf(stderr, "Cannot init. mouse: no driver ?");
-		return 0;
+		return framebuffer_t();
 	}
 
 	set_mouse_speed(1, 1);
@@ -251,7 +266,7 @@ int dr_os_open(int const w, int const h, bool fullscreen)
 
 	set_window_title(SIM_TITLE);
 
-	return w;
+	return framebuffer_t(dr_textur_init(), w, scr_size(w, h));
 }
 
 
@@ -261,30 +276,11 @@ void dr_os_close()
 }
 
 
-/*
- * Hier beginnen die eigentlichen graphischen Funktionen
- */
-
-static BITMAP* texture_map;
-
-unsigned short* dr_textur_init()
-{
-	texture_map = create_bitmap(width, height);
-	if (texture_map == NULL) {
-		printf("Error: can't create double buffer bitmap, aborting!");
-		exit(1);
-	}
-
-//	return reinterpret_cast<unsigned short*>(texture_map->line[0]);
-	return (unsigned short *)(texture_map->line[0]);
-}
-
-
 // resizes screen (Not allowed)
-int dr_textur_resize(unsigned short**, int, int)
+bool dr_textur_resize(framebuffer_t *, scr_size)
 {
-	display_set_actual_width( width );
-	return width;
+	// resizing is not allowed
+	return false;
 }
 
 
@@ -320,6 +316,9 @@ void dr_flush()
 	display_flush_buffer();
 }
 
+#else
+	(void)(x+y+w+h);
+
 
 void move_pointer(int x, int y)
 {
@@ -327,7 +326,7 @@ void move_pointer(int x, int y)
 }
 
 
-void set_pointer(int loading)
+void set_pointer(int)
 {
 	// not supported
 }
@@ -397,7 +396,7 @@ void GetEventsNoWait()
 }
 
 
-void show_pointer(int yesno)
+void show_pointer(int)
 {
 }
 

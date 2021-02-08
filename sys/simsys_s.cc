@@ -76,8 +76,7 @@ static Uint8 blank_cursor[] = {
 };
 
 static SDL_Surface *screen;
-static int width = 16;
-static int height = 16;
+static scr_size tex_size;
 
 // switch on is a little faster (<3%)
 static int async_blit = 0;
@@ -188,8 +187,18 @@ resolution dr_query_screen_resolution()
 }
 
 
+
+static PIXVAL *dr_textur_init()
+{
+	if(  use_hw  ) {
+		SDL_LockSurface( screen );
+	}
+	return (unsigned short*)screen->pixels;
+}
+
+
 // open the window
-int dr_os_open(int w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
 {
 #ifdef MULTI_THREAD
 	// init barrier
@@ -203,7 +212,7 @@ int dr_os_open(int w, int const h, bool fullscreen)
 	redraw_param.ready = false;
 	if(  pthread_create( &(redraw_param.thread), &attr, redraw_thread, (void*)&redraw_param )  ) {
 		fprintf(stderr, "dr_os_open(): cannot multithread\n");
-		return 0;
+		return framebuffer_t();
 	}
 
 	pthread_attr_destroy( &attr );
@@ -213,13 +222,10 @@ int dr_os_open(int w, int const h, bool fullscreen)
 
 	// some cards need those alignments
 	// especially 64bit want a border of 8bytes
-	w = (w + 15) & 0x7FF0;
-	if(  w<=0  ) {
-		w = 16;
-	}
+	const int pitch = max(16, (w + 15) & 0x7FF0);
+	w = pitch;
 
-	width = w;
-	height = h;
+	tex_size = scr_size(w, h);
 
 	flags |= (fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE);
 	if(  use_hw  ) {
@@ -232,7 +238,7 @@ int dr_os_open(int w, int const h, bool fullscreen)
 	SDL_putenv("SDL_VIDEO_CENTERED="); // clear flag so it doesn't continually recenter upon resizing the window
 	if(  screen == NULL  ) {
 		fprintf(stderr, "Couldn't open the window: %s\n", SDL_GetError());
-		return 0;
+		return framebuffer_t();
 	}
 	else {
 		const SDL_VideoInfo* vi = SDL_GetVideoInfo();
@@ -255,8 +261,7 @@ int dr_os_open(int w, int const h, bool fullscreen)
 
 	SDL_ShowCursor(1);
 
-	display_set_actual_width( w );
-	return w;
+	return framebuffer_t(dr_textur_init(), w, scr_size(w, h));
 }
 
 
@@ -279,8 +284,10 @@ void dr_os_close()
 
 
 // resizes screen
-int dr_textur_resize(unsigned short** const textur, int w, int const h)
+bool dr_textur_resize(framebuffer_t *framebuf, scr_size requested_size)
 {
+	assert(framebuf != NULL);
+
 #ifdef MULTI_THREAD
 	pthread_mutex_lock( &redraw_mutex );
 #endif
@@ -289,44 +296,33 @@ int dr_textur_resize(unsigned short** const textur, int w, int const h)
 	}
 	Uint32 flags = screen->flags;
 
-	display_set_actual_width( w );
 	// some cards need those alignments
 	// especially 64bit want a border of 8bytes
-	w = (w + 15) & 0x7FF0;
-	if(  w<=0  ) {
-		w = 16;
-	}
+	const int pitch = max(16, (requested_size.w + 15) & 0x7FF0);
+	requested_size.w = pitch;
 
-	if(  w!=screen->w  ||  h!=screen->h  ) {
-		width = w;
-		height = h;
+	bool resized = false;
+	if(  requested_size.w!=screen->w  ||  requested_size.h!=screen->h  ) {
+		tex_size = requested_size;
 
-		screen = SDL_SetVideoMode(w, h, COLOUR_DEPTH, flags);
-		printf("textur_resize()::screen=%p\n", screen);
-		if (screen) {
-			DBG_MESSAGE("dr_textur_resize(SDL)", "SDL realized screen size width=%d, height=%d (requested w=%d, h=%d)", screen->w, screen->h, w, h);
+		screen = SDL_SetVideoMode(tex_size.w, tex_size.h, COLOUR_DEPTH, flags);
+		if (!screen) {
+			dbg->fatal("dr_textur_resize(SDL)", "Could not resize window to (%d,%d) (invalid screen surface)", tex_size.w, tex_size.h);
 		}
-		else {
-			if (dbg) {
-				dbg->warning("dr_textur_resize(SDL)", "screen is NULL. Good luck!");
-			}
-		}
+
+		DBG_MESSAGE("dr_textur_resize(SDL)", "SDL realized screen size width=%d, height=%d (requested w=%d, h=%d)", screen->w, screen->h, requested_size.w, requested_size.h);
 		fflush(NULL);
+		resized = true;
 	}
-	*textur = (unsigned short*)screen->pixels;
+
+	assert(screen->pitch % sizeof(PIXVAL) == 0);
+	*framebuf = framebuffer_t(static_cast<PIXVAL *>(screen->pixels), screen->pitch/sizeof(PIXVAL), requested_size);
+
 #ifdef MULTI_THREAD
 	pthread_mutex_unlock( &redraw_mutex );
 #endif
-	return w;
-}
 
-
-unsigned short *dr_textur_init()
-{
-	if(  use_hw  ) {
-		SDL_LockSurface( screen );
-	}
-	return (unsigned short*)screen->pixels;
+	return resized;
 }
 
 
@@ -487,7 +483,7 @@ static void internal_GetEvents(bool const wait)
 			sys_event.code = SYSTEM_RESIZE;
 			sys_event.new_window_size.w = event.resize.w;
 			sys_event.new_window_size.h = event.resize.h;
-			printf("expose: x=%i, y=%i\n", sys_event.mx, sys_event.my);
+			dbg->debug("internal_GetEvents(SDL)", "expose: x=%i, y=%i\n", sys_event.mx, sys_event.my);
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:

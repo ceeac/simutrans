@@ -11,7 +11,6 @@
 
 #include "../macros.h"
 #include "../simtypes.h"
-#include "font.h"
 #include "../pathes.h"
 #include "../simconst.h"
 #include "../sys/simsys.h"
@@ -25,8 +24,10 @@
 #include "../utils/simstring.h"
 #include "../io/raw_image.h"
 
-#include "simgraph.h"
 
+#include "font.h"
+#include "framebuffer.h"
+#include "simgraph.h"
 
 #ifdef _MSC_VER
 #	include <io.h>
@@ -50,8 +51,6 @@ static pthread_mutex_t recode_img_mutex;
 #define CLIPNUM_IGNORE
 #endif
 
-
-#include "simgraph.h"
 
 // undefine for debugging the update routines
 //#define DEBUG_FLUSH_BUFFER
@@ -355,9 +354,10 @@ struct imd {
 
 static int bitdepth = 16;
 
-static KOORD_VAL disp_width  = 640;
-static KOORD_VAL disp_actual_width  = 640;
-static KOORD_VAL disp_height = 480;
+/*
+ * Output framebuffer
+ */
+static framebuffer_t framebuf;
 
 
 /*
@@ -382,12 +382,6 @@ static image_id anz_images = 0;
  * (>= anz_images)
  */
 static image_id alloc_images = 0;
-
-
-/*
- * Output framebuffer
- */
-static PIXVAL* textur = NULL;
 
 
 /*
@@ -790,26 +784,26 @@ KOORD_VAL display_set_base_raster_width(KOORD_VAL new_raster)
 
 sint16 display_get_width()
 {
-	return disp_actual_width;
+	return framebuf.size.w;
 }
 
 
 // only use, if you are really really sure!
 void display_set_actual_width(KOORD_VAL w)
 {
-	disp_actual_width = w;
+	framebuf.size.w = w;
 }
 
 
 sint16 display_get_height()
 {
-	return disp_height;
+	return framebuf.size.h;
 }
 
 
 void display_set_height(KOORD_VAL const h)
 {
-	disp_height = h;
+	framebuf.size.h = h;
 }
 
 
@@ -868,8 +862,8 @@ clip_dimension display_get_clip_wh(CLIP_NUM_DEF0)
 void display_set_clip_wh(KOORD_VAL x, KOORD_VAL y, KOORD_VAL w, KOORD_VAL h  CLIP_NUM_DEF, bool fit)
 {
 	if (!fit) {
-		clip_wh( &x, &w, 0, disp_width);
-		clip_wh( &y, &h, 0, disp_height);
+		clip_wh( &x, &w, 0, framebuf.pitch);
+		clip_wh( &y, &h, 0, framebuf.size.h);
 	}
 	else {
 		clip_wh( &x, &w, CR.clip_rect.x, CR.clip_rect.xx);
@@ -1032,18 +1026,18 @@ static void mark_rect_dirty_nc(KOORD_VAL x1, KOORD_VAL y1, KOORD_VAL x2, KOORD_V
 void mark_rect_dirty_wc(KOORD_VAL x1, KOORD_VAL y1, KOORD_VAL x2, KOORD_VAL y2)
 {
 	// inside display?
-	if(  x2 >= 0  &&  y2 >= 0  &&  x1 < disp_width  &&  y1 < disp_height  ) {
+	if(  x2 >= 0  &&  y2 >= 0  &&  x1 < framebuf.pitch  &&  y1 < framebuf.size.h  ) {
 		if(  x1 < 0  ) {
 			x1 = 0;
 		}
 		if(  y1 < 0  ) {
 			y1 = 0;
 		}
-		if(  x2 >= disp_width  ) {
-			x2 = disp_width - 1;
+		if(  x2 >= framebuf.pitch  ) {
+			x2 = framebuf.pitch - 1;
 		}
-		if(  y2 >= disp_height  ) {
-			y2 = disp_height - 1;
+		if(  y2 >= framebuf.size.h  ) {
+			y2 = framebuf.size.h - 1;
 		}
 		mark_rect_dirty_nc( x1, y1, x2, y2 );
 	}
@@ -2336,7 +2330,7 @@ template<pixcopy_routines copyroutine>
 static void display_img_pc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, const PIXVAL *sp  CLIP_NUM_DEF)
 {
 	if(  h > 0  ) {
-		PIXVAL *tp = textur + yp * disp_width;
+		PIXVAL *tp = framebuf.access_pixel(0, yp);
 
 		// initialize clipping
 		init_ranges( yp  CLIP_NUM_PAR);
@@ -2375,7 +2369,7 @@ static void display_img_pc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, 
 
 			} while ((runlen = *sp++));
 
-			tp += disp_width;
+			tp += framebuf.pitch;
 		} while (--h);
 	}
 }
@@ -2387,7 +2381,7 @@ static void display_img_pc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, 
 static void display_img_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, const PIXVAL *sp  CLIP_NUM_DEF)
 {
 	if(  h > 0  ) {
-		PIXVAL *tp = textur + yp * disp_width;
+		PIXVAL *tp = framebuf.access_pixel(0, yp);
 
 		do { // line decoder
 			int xpos = xp;
@@ -2420,7 +2414,7 @@ static void display_img_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, 
 				xpos += runlen;
 			} while ((runlen = *sp++));
 
-			tp += disp_width;
+			tp += framebuf.pitch;
 		} while (--h);
 	}
 }
@@ -2432,7 +2426,7 @@ static void display_img_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, 
 static void display_img_nc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, const PIXVAL *sp)
 {
 	if (h > 0) {
-		PIXVAL *tp = textur + xp + yp * disp_width;
+		PIXVAL *tp = framebuf.access_pixel(xp, yp);
 
 		do { // line decoder
 			uint16 runlen = *sp++;
@@ -2496,7 +2490,7 @@ static void display_img_nc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, 
 				runlen = *sp++;
 			} while (runlen != 0);
 
-			tp += disp_width;
+			tp += framebuf.pitch;
 		} while (--h > 0);
 	}
 }
@@ -2834,7 +2828,7 @@ void display_img_stretch_blend( const stretch_map_t &imag, scr_rect area, FLAGGE
  */
 static void display_color_img_wc(const PIXVAL *sp, KOORD_VAL x, KOORD_VAL y, KOORD_VAL h  CLIP_NUM_DEF)
 {
-	PIXVAL *tp = textur + y * disp_width;
+	PIXVAL *tp = framebuf.access_pixel(0, y);
 
 	do { // line decoder
 		int xpos = x;
@@ -2862,7 +2856,7 @@ static void display_color_img_wc(const PIXVAL *sp, KOORD_VAL x, KOORD_VAL y, KOO
 			xpos += runlen;
 		} while ((runlen = *sp++));
 
-		tp += disp_width;
+		tp += framebuf.pitch;
 	} while (--h);
 }
 
@@ -3287,7 +3281,7 @@ void display_blend_wh_rgb(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, 
 				blend_proc blend = outline[ (alpha>>4) - 1 ];
 
 				for(  KOORD_VAL y=0;  y<h;  y++  ) {
-					blend( textur + xp + (yp+y) * disp_width, NULL, colval, w );
+					blend( framebuf.access_pixel(xp, yp+y), NULL, colval, w );
 				}
 			}
 			break;
@@ -3305,7 +3299,7 @@ void display_blend_wh_rgb(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, 
 					const PIXVAL g_src = (colval >> 5) & 0x1F;
 					const PIXVAL b_src = colval & 0x1F;
 					for(  ;  h>0;  yp++, h--  ) {
-						PIXVAL *dest = textur + yp*disp_width + xp;
+						PIXVAL *dest = framebuf.access_pixel(xp, yp);
 						const PIXVAL *const end = dest + w;
 						while (dest < end) {
 							const PIXVAL r_dest = (*dest >> 10) & 0x1F;
@@ -3324,7 +3318,7 @@ void display_blend_wh_rgb(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, 
 					const PIXVAL g_src = (colval >> 5) & 0x3F;
 					const PIXVAL b_src = colval & 0x1F;
 					for(  ;  h>0;  yp++, h--  ) {
-						PIXVAL *dest = textur + yp*disp_width + xp;
+						PIXVAL *dest = framebuf.access_pixel(xp, yp);
 						const PIXVAL *const end = dest + w;
 						while (dest < end) {
 							const PIXVAL r_dest = (*dest >> 11);
@@ -3346,7 +3340,7 @@ void display_blend_wh_rgb(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, 
 static void display_img_blend_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, const PIXVAL *sp, int colour, blend_proc p  CLIP_NUM_DEF )
 {
 	if(  h > 0  ) {
-		PIXVAL *tp = textur + yp * disp_width;
+		PIXVAL *tp = framebuf.access_pixel(0, yp);
 
 		do { // line decoder
 			int xpos = xp;
@@ -3372,7 +3366,7 @@ static void display_img_blend_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VA
 				xpos += runlen;
 			} while ((runlen = *sp++));
 
-			tp += disp_width;
+			tp += framebuf.pitch;
 		} while (--h);
 	}
 }
@@ -3549,7 +3543,7 @@ static void pix_alpha_recode_16(PIXVAL *dest, const PIXVAL *src, const PIXVAL *a
 static void display_img_alpha_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VAL yp, const PIXVAL *sp, const PIXVAL *alphamap, const uint8 alpha_flags, int colour, alpha_proc p  CLIP_NUM_DEF )
 {
 	if(  h > 0  ) {
-		PIXVAL *tp = textur + yp * disp_width;
+		PIXVAL *tp = framebuf.access_pixel(0, yp);
 
 		do { // line decoder
 			int xpos = xp;
@@ -3579,7 +3573,7 @@ static void display_img_alpha_wc(KOORD_VAL h, const KOORD_VAL xp, const KOORD_VA
 				alphamap++;
 			} while(  (runlen = *sp++)  );
 
-			tp += disp_width;
+			tp += framebuf.pitch;
 		} while(  --h  );
 	}
 }
@@ -3931,12 +3925,12 @@ void display_base_img_alpha(const image_id n, const image_id alpha_n, const unsi
 void display_scroll_band(KOORD_VAL start_y, KOORD_VAL x_offset, KOORD_VAL h)
 {
 	start_y  = max(start_y,  0);
-	x_offset = min(x_offset, disp_width);
-	h        = min(h,        disp_height);
+	x_offset = min(x_offset, framebuf.pitch);
+	h        = min(h,        framebuf.size.h);
 
-	const PIXVAL *const src = textur + start_y * disp_width + x_offset;
-	PIXVAL *const dst = textur + start_y * disp_width;
-	const size_t amount = sizeof(PIXVAL) * (h * disp_width - x_offset);
+	const PIXVAL *const src = framebuf.access_pixel(x_offset, start_y);
+	PIXVAL *const dst = framebuf.access_pixel(0, start_y);
+	const size_t amount = sizeof(PIXVAL) * (h * framebuf.pitch - x_offset);
 
 	memmove(dst, src, amount);
 }
@@ -3952,7 +3946,7 @@ static void display_pixel(KOORD_VAL x, KOORD_VAL y, PIXVAL color)
 #endif
 {
 	if(  x >= CR0.clip_rect.x  &&  x < CR0.clip_rect.xx  &&  y >= CR0.clip_rect.y  &&  y < CR0.clip_rect.yy  ) {
-		PIXVAL* const p = textur + x + y * disp_width;
+		PIXVAL* const p = framebuf.access_pixel(x, y);
 
 		*p = color;
 #ifdef DEBUG_FLUSH_BUFFER
@@ -3972,8 +3966,8 @@ static void display_pixel(KOORD_VAL x, KOORD_VAL y, PIXVAL color)
 static void display_fb_internal(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, PIXVAL colval, bool dirty, KOORD_VAL cL, KOORD_VAL cR, KOORD_VAL cT, KOORD_VAL cB)
 {
 	if (clip_lr(&xp, &w, cL, cR) && clip_lr(&yp, &h, cT, cB)) {
-		PIXVAL *p = textur + xp + yp * disp_width;
-		const int dx = disp_width - w;
+		PIXVAL *p = framebuf.access_pixel(xp, yp);
+		const int dx = framebuf.pitch - w;
 
 		if (dirty) {
 			mark_rect_dirty_nc(xp, yp, xp + w - 1, yp + h - 1);
@@ -4038,7 +4032,7 @@ static void display_fb_internal(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_V
 
 void display_fillbox_wh_rgb(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, PIXVAL color, bool dirty)
 {
-	display_fb_internal(xp, yp, w, h, color, dirty, 0, disp_width, 0, disp_height);
+	display_fb_internal(xp, yp, w, h, color, dirty, 0, framebuf.pitch, 0, framebuf.size.h);
 }
 
 
@@ -4054,13 +4048,13 @@ void display_fillbox_wh_clip_rgb(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_
 static void display_vl_internal(const KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL h, const PIXVAL colval, int dirty, KOORD_VAL cL, KOORD_VAL cR, KOORD_VAL cT, KOORD_VAL cB)
 {
 	if (xp >= cL && xp < cR && clip_lr(&yp, &h, cT, cB)) {
-		PIXVAL *p = textur + xp + yp * disp_width;
+		PIXVAL *p = framebuf.access_pixel(xp, yp);
 
 		if (dirty) mark_rect_dirty_nc(xp, yp, xp, yp + h - 1);
 
 		do {
 			*p = colval;
-			p += disp_width;
+			p += framebuf.pitch;
 		} while (--h != 0);
 	}
 }
@@ -4068,7 +4062,7 @@ static void display_vl_internal(const KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL h, c
 
 void display_vline_wh_rgb(const KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL h, const PIXVAL color, bool dirty)
 {
-	display_vl_internal(xp, yp, h, color, dirty, 0, disp_width, 0, disp_height);
+	display_vl_internal(xp, yp, h, color, dirty, 0, framebuf.pitch, 0, framebuf.size.h);
 }
 
 
@@ -4087,7 +4081,7 @@ void display_array_wh(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, cons
 	const KOORD_VAL xoff = clip_wh( &xp, &w, CR0.clip_rect.x, CR0.clip_rect.xx );
 	const KOORD_VAL yoff = clip_wh( &yp, &h, CR0.clip_rect.y, CR0.clip_rect.yy );
 	if(  w > 0  &&  h > 0  ) {
-		PIXVAL *p = textur + xp + yp * disp_width;
+		PIXVAL *p = framebuf.access_pixel(xp, yp);
 		const PIXVAL *arr_src = arr;
 
 		mark_rect_dirty_nc(xp, yp, xp + w - 1, yp + h - 1);
@@ -4100,7 +4094,7 @@ void display_array_wh(KOORD_VAL xp, KOORD_VAL yp, KOORD_VAL w, KOORD_VAL h, cons
 				*p++ = *arr_src++;
 			} while (--ww > 0);
 			arr_src += arr_w - w;
-			p += disp_width - w;
+			p += framebuf.pitch - w;
 		} while (--h != 0);
 	}
 }
@@ -4374,9 +4368,9 @@ int display_text_proportional_len_clip_rgb(KOORD_VAL x, KOORD_VAL y, const char*
 	}
 	else {
 		cL = 0;
-		cR = disp_width;
+		cR = framebuf.pitch;
 		cT = 0;
-		cB = disp_height;
+		cB = framebuf.size.h;
 	}
 
 	if (len < 0) {
@@ -4452,11 +4446,10 @@ int display_text_proportional_len_clip_rgb(KOORD_VAL x, KOORD_VAL y, const char*
 
 			const uint8 *p = fnt->get_glyph_bitmap(c) + glyph_yoffset + i*GLYPH_BITMAP_HEIGHT;
 			if(  mask!=0  ) {
-				int screen_pos = (y+glyph_yoffset) * disp_width + x + i*8;
+				PIXVAL *dst = framebuf.access_pixel(x+8*i, y+glyph_yoffset);
 
 				for (int h = glyph_yoffset; h < glyph_height; h++) {
 					unsigned int dat = *p++ & mask;
-					PIXVAL* dst = textur + screen_pos;
 
 					if(  dat  !=  0  ) {
 						for(  size_t dat_offset = 0 ; dat_offset < 8 ; dat_offset++  ) {
@@ -4465,7 +4458,7 @@ int display_text_proportional_len_clip_rgb(KOORD_VAL x, KOORD_VAL y, const char*
 							}
 						}
 					}
-					screen_pos += disp_width;
+					dst += framebuf.pitch;
 				}
 			}
 		}
@@ -4909,21 +4902,21 @@ void display_flush_buffer()
 		display_color_img(standard_pointer, sys_event.mx, sys_event.my, 0, false, true  CLIP_NUM_DEFAULT);
 
 		// if software emulated mouse pointer is over the ticker, redraw it totally at next occurs
-		if (!ticker::empty() && sys_event.my+images[standard_pointer].h >= disp_height-TICKER_YPOS_BOTTOM &&
-		   sys_event.my <= disp_height-TICKER_YPOS_BOTTOM+TICKER_HEIGHT) {
+		if (!ticker::empty() && sys_event.my+images[standard_pointer].h >= framebuf.size.h-TICKER_YPOS_BOTTOM &&
+		   sys_event.my <= framebuf.size.h-TICKER_YPOS_BOTTOM+TICKER_HEIGHT) {
 			ticker::set_redraw_all(true);
 		}
 	}
 	// no pointer image available, draw a crosshair
 	else {
-		display_fb_internal(sys_event.mx - 1, sys_event.my - 3, 3, 7, color_idx_to_rgb(COL_WHITE), true, 0, disp_width, 0, disp_height);
-		display_fb_internal(sys_event.mx - 3, sys_event.my - 1, 7, 3, color_idx_to_rgb(COL_WHITE), true, 0, disp_width, 0, disp_height);
+		display_fb_internal(sys_event.mx - 1, sys_event.my - 3, 3, 7, color_idx_to_rgb(COL_WHITE), true, 0, framebuf.pitch, 0, framebuf.size.h);
+		display_fb_internal(sys_event.mx - 3, sys_event.my - 1, 7, 3, color_idx_to_rgb(COL_WHITE), true, 0, framebuf.pitch, 0, framebuf.size.h);
 		display_direct_line_rgb( sys_event.mx-2, sys_event.my, sys_event.mx+2, sys_event.my, color_idx_to_rgb(COL_BLACK) );
 		display_direct_line_rgb( sys_event.mx, sys_event.my-2, sys_event.mx, sys_event.my+2, color_idx_to_rgb(COL_BLACK) );
 
 		// if crosshair is over the ticker, redraw it totally at next occurs
-		if(!ticker::empty() && sys_event.my+2 >= disp_height-TICKER_YPOS_BOTTOM &&
-		   sys_event.my-2 <= disp_height-TICKER_YPOS_BOTTOM+TICKER_HEIGHT) {
+		if(!ticker::empty() && sys_event.my+2 >= framebuf.size.h-TICKER_YPOS_BOTTOM &&
+		   sys_event.my-2 <= framebuf.size.h-TICKER_YPOS_BOTTOM+TICKER_HEIGHT) {
 			ticker::set_redraw_all(true);
 		}
 	}
@@ -5067,8 +5060,7 @@ void display_show_load_pointer(int loading)
  */
 void simgraph_init(scr_size window_size, bool full_screen)
 {
-	disp_actual_width = window_size.w;
-	disp_height = window_size.h;
+	framebuf.size = window_size;
 
 #ifdef MULTI_THREAD
 	pthread_mutex_init( &recode_img_mutex, NULL );
@@ -5085,10 +5077,9 @@ void simgraph_init(scr_size window_size, bool full_screen)
 	}
 
 	// get real width from os-dependent routines
-	disp_width = dr_os_open(window_size.w, window_size.h, full_screen);
-	if(  disp_width>0  ) {
-		textur = dr_textur_init();
+	framebuf = dr_os_open(window_size.w, window_size.h, full_screen);
 
+	if(  framebuf.is_valid()  ) {
 		// init, load, and check fonts
 		if(  !display_load_font(env_t::fontname.c_str())  &&  !display_load_font(FONT_PATH_X "prop.fnt") ) {
 			dr_fatal_notify( "No fonts found!" );
@@ -5103,9 +5094,9 @@ void simgraph_init(scr_size window_size, bool full_screen)
 	}
 
 	// allocate dirty tile flags
-	tiles_per_line = (disp_width + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
+	tiles_per_line = (framebuf.pitch + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
 	tile_buffer_per_line = (tiles_per_line + 31) & ~31;
-	tile_lines = (disp_height + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
+	tile_lines = (framebuf.size.h + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
 	tile_buffer_length = (tile_lines * tile_buffer_per_line / 32);
 
 	tile_dirty = MALLOCN( uint32, tile_buffer_length );
@@ -5120,7 +5111,7 @@ void simgraph_init(scr_size window_size, bool full_screen)
 		player_offsets[i][1] = i*8+24;
 	}
 
-	display_set_clip_wh(0, 0, disp_width, disp_height);
+	display_set_clip_wh(0, 0, framebuf.pitch, framebuf.size.h);
 
 	// Calculate daylight rgbmap and save it for unshaded tile drawing
 	player_day = 0;
@@ -5183,7 +5174,7 @@ void simgraph_init(scr_size window_size, bool full_screen)
  */
 bool is_display_init()
 {
-	return textur != NULL  &&  default_font.is_loaded()  &&  images!=NULL;
+	return framebuf.data != NULL  &&  default_font.is_loaded()  &&  images!=NULL;
 }
 
 
@@ -5214,30 +5205,29 @@ void simgraph_exit()
  */
 void simgraph_resize(scr_size new_window_size)
 {
-	disp_actual_width = max( 16, new_window_size.w );
+	framebuf.size.w = max( 16, new_window_size.w );
 	if(  new_window_size.h<=0  ) {
 		new_window_size.h = 64;
 	}
-	// only resize, if internal values are different
-	if (disp_width != new_window_size.w || disp_height != new_window_size.h) {
-		KOORD_VAL new_pitch = dr_textur_resize(&textur, new_window_size.w, new_window_size.h);
-		if(  new_pitch!=disp_width  ||  disp_height != new_window_size.h) {
-			disp_width = new_pitch;
-			disp_height = new_window_size.h;
 
+	// only resize, if internal values are different
+	if (framebuf.pitch != new_window_size.w || framebuf.size.h != new_window_size.h) {
+		const bool resized = dr_textur_resize(&framebuf, new_window_size);
+
+		if(  resized  ) {
 			free( tile_dirty_old );
 			free( tile_dirty);
 
 			// allocate dirty tile flags
-			tiles_per_line = (disp_width + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
+			tiles_per_line = (framebuf.pitch + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
 			tile_buffer_per_line = (tiles_per_line + 31) & ~31;
-			tile_lines = (disp_height + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
+			tile_lines = (framebuf.size.h + DIRTY_TILE_SIZE - 1) / DIRTY_TILE_SIZE;
 			tile_buffer_length = (tile_lines * tile_buffer_per_line / 32);
 
 			tile_dirty = MALLOCN( uint32, tile_buffer_length );
 			tile_dirty_old = MALLOCN( uint32, tile_buffer_length );
 
-			display_set_clip_wh(0, 0, disp_actual_width, disp_height);
+			display_set_clip_wh(0, 0, framebuf.size.w, framebuf.size.h);
 		}
 
 		mark_screen_dirty();
@@ -5265,13 +5255,13 @@ bool display_snapshot( const scr_rect &area )
 
 	// now save the screenshot
 	scr_rect clipped_area = area;
-	clipped_area.clip(scr_rect(0, 0, disp_actual_width, disp_height));
+	clipped_area.clip(scr_rect(0, 0, framebuf.size.w, framebuf.size.h));
 
 	raw_image_t img(clipped_area.w, clipped_area.h, raw_image_t::FMT_RGB888);
 
 	for (scr_coord_val y = clipped_area.y; y < clipped_area.y + clipped_area.h; ++y) {
 		uint8 *dst = img.access_pixel(0, y);
-		const PIXVAL *row = textur + 0 + y*disp_width;
+		const PIXVAL *row = framebuf.access_pixel(0, y);
 
 		for (scr_coord_val x = clipped_area.x; x < clipped_area.x + clipped_area.w; ++x) {
 			const PIXVAL pixel = *row++;
