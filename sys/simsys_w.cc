@@ -155,10 +155,10 @@ static PIXVAL *dr_textur_init()
 
 
 // open the window
-framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(scr_size window_size, bool fullscreen)
 {
-	MaxSize.right = ((w*x_scale)/32+15) & 0x7FF0;
-	MaxSize.bottom = (h*y_scale)/32;
+	MaxSize.right = ((window_size.w*x_scale)/32+15) & 0x7FF0;
+	MaxSize.bottom = (window_size.h*y_scale)/32;
 
 #ifdef MULTI_THREAD
 	InitializeCriticalSection( &redraw_underway );
@@ -183,8 +183,9 @@ framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 			if(  COLOUR_DEPTH<32  ) {
 				settings.dmBitsPerPel = 32;
 			}
-			printf( "dr_os_open()::Could not reduce color depth to 16 Bit in fullscreen." );
+			dbg->warning( "dr_os_open(Windows)", "Could not reduce color depth to 16 Bit in fullscreen." );
 		}
+
 		if(  ChangeDisplaySettings(&settings, CDS_TEST)!=DISP_CHANGE_SUCCESSFUL  ) {
 			ChangeDisplaySettings( NULL, 0 );
 			fullscreen = false;
@@ -192,6 +193,7 @@ framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 		else {
 			ChangeDisplaySettings(&settings, CDS_FULLSCREEN);
 		}
+
 		is_fullscreen = fullscreen;
 	}
 	if(  fullscreen  ) {
@@ -207,8 +209,8 @@ framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 	AllDib = MALLOCF(BITMAPINFO, bmiColors, 3);
 	BITMAPINFOHEADER& header = AllDib->bmiHeader;
 	header.biSize          = sizeof(BITMAPINFOHEADER);
-	header.biWidth         = (w+15) & 0x7FF0;
-	header.biHeight        = h;
+	header.biWidth         = (window_size.w+15) & 0x7FF0;
+	header.biHeight        = window_size.h;
 	header.biPlanes        = 1;
 	header.biBitCount      = COLOUR_DEPTH;
 	header.biCompression   = BI_RGB;

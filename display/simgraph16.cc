@@ -5077,7 +5077,7 @@ void simgraph_init(scr_size window_size, bool full_screen)
 	}
 
 	// get real width from os-dependent routines
-	framebuf = dr_os_open(window_size.w, window_size.h, full_screen);
+	framebuf = dr_os_open(window_size, full_screen);
 
 	if(  framebuf.is_valid()  ) {
 		// init, load, and check fonts

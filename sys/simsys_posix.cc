@@ -50,7 +50,7 @@ resolution dr_query_screen_resolution()
 }
 
 // open the window
-framebuffer_t dr_os_open(int, int, bool)
+framebuffer_t dr_os_open(scr_size, bool)
 {
 	return framebuffer_t(NULL, 1, scr_size(0, 0));
 }

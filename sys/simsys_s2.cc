@@ -294,11 +294,11 @@ static PIXVAL *dr_textur_init()
 }
 
 // open the window
-framebuffer_t dr_os_open(int screen_width, int screen_height, bool fullscreen)
+framebuffer_t dr_os_open(scr_size window_size, bool fullscreen)
 {
 	// scale up
-	const int tex_w = SCREEN_TO_TEX_X(screen_width);
-	const int tex_h = SCREEN_TO_TEX_Y(screen_height);
+	const int tex_w = SCREEN_TO_TEX_X(window_size.w);
+	const int tex_h = SCREEN_TO_TEX_Y(window_size.h);
 
 	// some cards need those alignments
 	// especially 64bit want a border of 8bytes
@@ -307,7 +307,7 @@ framebuffer_t dr_os_open(int screen_width, int screen_height, bool fullscreen)
 	Uint32 flags = fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP: SDL_WINDOW_RESIZABLE;
 	flags |= SDL_WINDOW_ALLOW_HIGHDPI; // apparently needed for Apple retina displays
 
-	window = SDL_CreateWindow( SIM_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height, flags );
+	window = SDL_CreateWindow( SIM_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_size.w, window_size.h, flags );
 	if(  window == NULL  ) {
 		dbg->error("dr_os_open(SDL2)", "Could not open the window: %s", SDL_GetError() );
 		return framebuffer_t();
@@ -321,7 +321,7 @@ framebuffer_t dr_os_open(int screen_width, int screen_height, bool fullscreen)
 	if(  !internal_create_surfaces( tex_pitch, tex_h )  ) {
 		return framebuffer_t();
 	}
-	DBG_MESSAGE("dr_os_open(SDL2)", "SDL realized screen size width=%d, height=%d (internal w=%d, h=%d)", screen_width, screen_height, screen->w, screen->h );
+	DBG_MESSAGE("dr_os_open(SDL2)", "SDL realized screen size width=%d, height=%d (internal w=%d, h=%d)", window_size.w, window_size.h, screen->w, screen->h );
 
 	SDL_ShowCursor(0);
 	arrow = SDL_GetCursor();

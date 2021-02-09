@@ -20,15 +20,13 @@
 
 static void simtimer_init();
 
-static int width  = 800;
-static int height = 600;
-
+static scr_size windowsize = scr_size(800, 600);
 
 static BITMAP *texture_map;
 
 static PIXVAL *dr_textur_init()
 {
-	texture_map = create_bitmap(width, height);
+	texture_map = create_bitmap(windowsize.w, windowsize.h);
 	if (texture_map == NULL) {
 		printf("Error: can't create double buffer bitmap, aborting!");
 		exit(1);
@@ -230,23 +228,21 @@ resolution dr_query_screen_resolution()
 {
 	resolution res;
 	if (get_desktop_resolution(&res.w, &res.h) != 0) {
-		res.w = width;
-		res.h = height;
+		res.w = windowsize.w;
+		res.h = windowsize.h;
 	}
 	return res;
 }
 
 
-framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(scr_size window_size, bool fullscreen)
 {
-	width = w;
-	height = h;
-
+	windowsize = window_size;
 
 	install_keyboard();
 
 	set_color_depth(COLOUR_DEPTH);
-	if (set_gfx_mode(fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED, w, h, 0, 0) != 0) {
+	if (set_gfx_mode(fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED, window_size.w, window_size.h, 0, 0) != 0) {
 		fprintf(stderr, "Error: %s\n", allegro_error);
 		return framebuffer_t();
 	}
@@ -266,7 +262,7 @@ framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 
 	set_window_title(SIM_TITLE);
 
-	return framebuffer_t(dr_textur_init(), w, scr_size(w, h));
+	return framebuffer_t(dr_textur_init(), window_size.w, window_size);
 }
 
 

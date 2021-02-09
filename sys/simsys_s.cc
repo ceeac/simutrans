@@ -198,7 +198,7 @@ static PIXVAL *dr_textur_init()
 
 
 // open the window
-framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(scr_size window_size, bool fullscreen)
 {
 #ifdef MULTI_THREAD
 	// init barrier
@@ -222,10 +222,8 @@ framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
 
 	// some cards need those alignments
 	// especially 64bit want a border of 8bytes
-	const int pitch = max(16, (w + 15) & 0x7FF0);
-	w = pitch;
-
-	tex_size = scr_size(w, h);
+	const int pitch = max(16, (window_size.w + 15) & 0x7FF0);
+	tex_size = scr_size(pitch, window_size.h);
 
 	flags |= (fullscreen ? SDL_FULLSCREEN : SDL_RESIZABLE);
 	if(  use_hw  ) {
@@ -234,7 +232,7 @@ framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
 
 	// open the window now
 	SDL_putenv("SDL_VIDEO_CENTERED=center"); // request game window centered to stop it opening off screen since SDL1.2 has no way to open at a fixed position
-	screen = SDL_SetVideoMode( w, h, COLOUR_DEPTH, flags );
+	screen = SDL_SetVideoMode( tex_size.w, tex_size.h, COLOUR_DEPTH, flags );
 	SDL_putenv("SDL_VIDEO_CENTERED="); // clear flag so it doesn't continually recenter upon resizing the window
 	if(  screen == NULL  ) {
 		fprintf(stderr, "Couldn't open the window: %s\n", SDL_GetError());
@@ -247,7 +245,7 @@ framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
 		fprintf(stderr, "SDL_driver=%s, hw_available=%i, video_mem=%i, blit_sw=%i, bpp=%i, bytes=%i\n", driver_name, vi->hw_available, vi->video_mem, vi->blit_sw, vi->vfmt->BitsPerPixel, vi->vfmt->BytesPerPixel );
 		fprintf(stderr, "Screen Flags: requested=%x, actual=%x\n", flags, screen->flags );
 	}
-	printf("dr_os_open(SDL): SDL realized screen size width=%d, height=%d (requested w=%d, h=%d)\n", screen->w, screen->h, w, h );
+	printf("dr_os_open(SDL): SDL realized screen size width=%d, height=%d (requested w=%d, h=%d)\n", screen->w, screen->h, window_size.w, window_size.h );
 
 	SDL_EnableUNICODE(true);
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -261,7 +259,7 @@ framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
 
 	SDL_ShowCursor(1);
 
-	return framebuffer_t(dr_textur_init(), w, scr_size(w, h));
+	return framebuffer_t(dr_textur_init(), tex_size.w, tex_size);
 }
 
 

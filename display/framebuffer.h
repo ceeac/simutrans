@@ -17,8 +17,8 @@ public:
 	framebuffer_t(PIXVAL *data, size_t pitch, scr_size size);
 
 public:
-	const PIXVAL *access_pixel(scr_coord_val x, scr_coord_val y) const { return data + x + y*pitch; }
-	PIXVAL *      access_pixel(scr_coord_val x, scr_coord_val y)       { return data + x + y*pitch; }
+	const PIXVAL *access_pixel(scr_coord_val x, scr_coord_val y) const { assert(data); return data + x + y*pitch; }
+	PIXVAL *      access_pixel(scr_coord_val x, scr_coord_val y)       { assert(data); return data + x + y*pitch; }
 
 	bool is_valid() const { return pitch > 0; }
 
