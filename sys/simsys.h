@@ -8,6 +8,7 @@
 
 
 #include "../simtypes.h"
+#include "../display/framebuffer.h"
 
 #ifndef NETTOOL
 #include <zlib.h>
@@ -75,14 +76,13 @@ bool dr_auto_scale(bool);
 bool dr_os_init(int const* parameter);
 
 /* maximum size possible (if there) */
-struct resolution
-{
-	int w;
-	int h;
-};
-resolution dr_query_screen_resolution();
+scr_size dr_query_screen_resolution();
 
-int dr_os_open(int w, int h, bool fullscreen);
+/// Opens the main window, either windowed or fullscreen
+/// @returns Valid frambuffer that can be drawn to on success
+/// (Check for validity with @ref framebuffer_t::is_valid)
+framebuffer_t dr_os_open(int screen_width, int screen_height, bool fullscreen);
+
 void dr_os_close();
 
 // returns the locale; NULL if unknown
@@ -131,15 +131,16 @@ int dr_stat(const char *path, struct stat *buf);
 /* query home directory */
 char const* dr_query_homedir();
 
-unsigned short* dr_textur_init();
-
 // returns the file path to a font file (or more than one, if used with number higher than zero)
 const char *dr_query_fontpath( int );
 
 void dr_textur(int xp, int yp, int w, int h);
 
-/* returns the actual width (might be larger than requested! */
-int dr_textur_resize(unsigned short** textur, int w, int h);
+/// Resizes the internal screen buffer in response to a window resize
+/// @param[in,out] framebuf screen buffer (as returned by dr_os_open)
+/// @param new_size Desired size in pixels of the internal screen buffer.
+/// @returns true on success
+bool dr_textur_resize(framebuffer_t &framebuf, scr_size new_size);
 
 // needed for screen update
 void dr_prepare_flush(); // waits, if previous update not yet finished

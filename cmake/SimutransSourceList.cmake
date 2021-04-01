@@ -80,6 +80,7 @@ target_sources(simutrans PRIVATE
 		descriptor/vehicle_desc.cc
 		descriptor/way_desc.cc
 		display/font.cc
+		display/framebuffer.cc
 		display/simview.cc
 		display/viewport.cc
 		finder/placefinder.cc

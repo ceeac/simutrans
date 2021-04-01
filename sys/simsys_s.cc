@@ -163,33 +163,39 @@ bool dr_os_init(const int* parameter)
 }
 
 
-resolution dr_query_screen_resolution()
+scr_size dr_query_screen_resolution()
 {
-	resolution res;
 #if SDL_VERSION_ATLEAST(1, 2, 10)
 	SDL_VideoInfo const& vi = *SDL_GetVideoInfo();
-	res.w = vi.current_w;
-	res.h = vi.current_h;
+	return { vi.current_w, vi.current_h };
+
 #elif defined _WIN32
-	res.w = GetSystemMetrics(SM_CXSCREEN);
-	res.h = GetSystemMetrics(SM_CYSCREEN);
+	return { GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN) };
+
 #else
 	SDL_Rect** const modi = SDL_ListModes(0, SDL_FULLSCREEN);
 	if (modi && modi != (SDL_Rect**)-1) {
 		// return first
-		res.w = modi[0]->w;
-		res.h = modi[0]->h;
-	} else {
-		res.w = 704;
-		res.h = 560;
+		return { modi[0]->w, modi[0]->h };
+	}
+	else {
+		return { 704, 560 };
 	}
 #endif
-	return res;
+}
+
+
+static PIXVAL *dr_textur_init()
+{
+	if(  use_hw  ) {
+		SDL_LockSurface( screen );
+	}
+	return reinterpret_cast<PIXVAL *>(screen->pixels);
 }
 
 
 // open the window
-int dr_os_open(int w, int const h, bool fullscreen)
+framebuffer_t dr_os_open(int w, int const h, bool fullscreen)
 {
 #ifdef MULTI_THREAD
 	// init barrier
@@ -203,7 +209,7 @@ int dr_os_open(int w, int const h, bool fullscreen)
 	redraw_param.ready = false;
 	if(  pthread_create( &(redraw_param.thread), &attr, redraw_thread, (void*)&redraw_param )  ) {
 		dbg->error("dr_os_open(SDL)", "pthread_create failed, cannot multithread.");
-		return 0;
+		return framebuffer_t();
 	}
 
 	pthread_attr_destroy( &attr );
@@ -232,7 +238,7 @@ int dr_os_open(int w, int const h, bool fullscreen)
 	SDL_putenv("SDL_VIDEO_CENTERED="); // clear flag so it doesn't continually recenter upon resizing the window
 	if(  screen == NULL  ) {
 		dbg->error("dr_os_open(SDL)", "Couldn't open the window: %s", SDL_GetError());
-		return 0;
+		return framebuffer_t();
 	}
 
 	const SDL_VideoInfo* vi = SDL_GetVideoInfo();
@@ -254,8 +260,7 @@ int dr_os_open(int w, int const h, bool fullscreen)
 
 	SDL_ShowCursor(1);
 
-	display_set_actual_width( w );
-	return w;
+	return framebuffer_t(scr_size(w, h), w, dr_textur_init());
 }
 
 
@@ -278,7 +283,7 @@ void dr_os_close()
 
 
 // resizes screen
-int dr_textur_resize(unsigned short** const textur, int w, int const h)
+bool dr_textur_resize(framebuffer_t &framebuf, const scr_size new_size)
 {
 #ifdef MULTI_THREAD
 	pthread_mutex_lock( &redraw_mutex );
@@ -288,45 +293,32 @@ int dr_textur_resize(unsigned short** const textur, int w, int const h)
 	}
 	Uint32 flags = screen->flags;
 
-	display_set_actual_width( w );
 	// some cards need those alignments
 	// especially 64bit want a border of 8bytes
-	w = (w + 15) & 0x7FF0;
-	if(  w<=0  ) {
-		w = 16;
-	}
+	const int tex_pitch = max((new_size.w + 15) & 0x7FF0, 16);
 
-	if(  w!=screen->w  ||  h!=screen->h  ) {
-		width = w;
-		height = h;
+	if(  tex_pitch!=screen->w  ||  new_size.h!=screen->h  ) {
+		width = tex_pitch;
+		height = new_size.h;
 
-		screen = SDL_SetVideoMode(w, h, COLOUR_DEPTH, flags);
+		screen = SDL_SetVideoMode(tex_pitch, new_size.h, COLOUR_DEPTH, flags);
 
-		if (screen) {
-			DBG_MESSAGE("dr_textur_resize(SDL)", "SDL realized screen size width=%d, height=%d (requested w=%d, h=%d)", screen->w, screen->h, w, h);
-		}
-		else if (dbg) {
+		if (!screen) {
 			dbg->error("dr_textur_resize(SDL)", "screen is NULL. Good luck!");
+			fflush(NULL);
+			return false;
 		}
-		fflush(NULL);
+
+		DBG_MESSAGE("dr_textur_resize(SDL)", "SDL realized screen size width=%d, height=%d (requested w=%d, h=%d)", screen->w, screen->h, tex_pitch, new_size.h);
 	}
 
-	*textur = (unsigned short*)screen->pixels;
+	framebuf = framebuffer_t(new_size, tex_pitch, static_cast<PIXVAL *>(screen->pixels));
 
 #ifdef MULTI_THREAD
 	pthread_mutex_unlock( &redraw_mutex );
 #endif
 
-	return w;
-}
-
-
-unsigned short *dr_textur_init()
-{
-	if(  use_hw  ) {
-		SDL_LockSurface( screen );
-	}
-	return (unsigned short*)screen->pixels;
+	return framebuf.is_valid();
 }
 
 

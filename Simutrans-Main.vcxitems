@@ -123,6 +123,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)descriptor\reader\way_reader.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)descriptor\reader\xref_reader.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)display\font.cc" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)display\framebuffer.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)display\simview.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)display\viewport.cc" />
     <ClCompile Include="$(MSBuildThisFileDirectory)finder\placefinder.cc" />
@@ -487,6 +488,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)descriptor\reader\xref_reader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)display\clip_num.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)display\font.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)display\framebuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)display\scr_coord.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)display\simgraph.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)display\simimg.h" />

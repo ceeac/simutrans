@@ -212,9 +212,9 @@ bool dr_os_init(const int *)
 }
 
 
-resolution dr_query_screen_resolution()
+scr_size dr_query_screen_resolution()
 {
-	resolution res;
+	scr_size res;
 	if (get_desktop_resolution(&res.w, &res.h) != 0) {
 		res.w = width;
 		res.h = height;
@@ -223,7 +223,20 @@ resolution dr_query_screen_resolution()
 }
 
 
-int dr_os_open(int const w, int const h, bool fullscreen)
+static BITMAP* texture_map;
+
+static PIXVAL *dr_textur_init()
+{
+	texture_map = create_bitmap(width, height);
+	if (texture_map == NULL) {
+		dbg->fatal("dr_textur_init(allegro)", "Cannot create double buffer bitmap, aborting!");
+	}
+
+	return reinterpret_cast<PIXVAL *>(texture_map->line[0]);
+}
+
+
+framebuffer_t dr_os_open(int const w, int const h, bool fullscreen)
 {
 	width = w;
 	height = h;
@@ -233,12 +246,12 @@ int dr_os_open(int const w, int const h, bool fullscreen)
 	set_color_depth(COLOUR_DEPTH);
 	if (set_gfx_mode(fullscreen ? GFX_AUTODETECT : GFX_AUTODETECT_WINDOWED, w, h, 0, 0) != 0) {
 		dbg->error("dr_os_open(allegro)", "Cannot set_gfx_mode: %s", allegro_error);
-		return 0;
+		return framebuffer_t();
 	}
 
 	if (install_mouse() < 0) {
 		dbg->error("dr_os_open(allegro)", "Cannot initialize mouse: no driver?");
-		return 0;
+		return framebuffer_t();
 	}
 
 	set_mouse_speed(1, 1);
@@ -250,7 +263,7 @@ int dr_os_open(int const w, int const h, bool fullscreen)
 	sys_event.my = mouse_y;
 
 	set_window_title(SIM_TITLE);
-	return w;
+	return framebuffer_t(scr_size(w, h), w, dr_textur_init());
 }
 
 
@@ -264,25 +277,11 @@ void dr_os_close()
  * Hier beginnen die eigentlichen graphischen Funktionen
  */
 
-static BITMAP* texture_map;
-
-unsigned short* dr_textur_init()
-{
-	texture_map = create_bitmap(width, height);
-	if (texture_map == NULL) {
-		dbg->fatal("dr_textur_init(allegro)", "Cannot create double buffer bitmap, aborting!");
-	}
-
-//	return reinterpret_cast<unsigned short*>(texture_map->line[0]);
-	return (unsigned short *)(texture_map->line[0]);
-}
-
 
 // resizes screen (Not allowed)
-int dr_textur_resize(unsigned short**, int, int)
+bool dr_textur_resize(framebuffer_t &, scr_size)
 {
-	display_set_actual_width( width );
-	return width;
+	return true;
 }
 
 

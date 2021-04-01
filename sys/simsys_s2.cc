@@ -202,15 +202,12 @@ bool dr_os_init(const int* parameter)
 }
 
 
-resolution dr_query_screen_resolution()
+scr_size dr_query_screen_resolution()
 {
-	resolution res;
 	SDL_DisplayMode mode;
 	SDL_GetCurrentDisplayMode( 0, &mode );
-	DBG_MESSAGE("dr_query_screen_resolution(SDL2)", "screen resolution width=%d, height=%d", mode.w, mode.h );
-	res.w = mode.w;
-	res.h = mode.h;
-	return res;
+	DBG_MESSAGE("dr_query_screen_resolution(SDL2)", "Screen resolution width=%d, height=%d", mode.w, mode.h );
+	return { mode.w, mode.h };
 }
 
 
@@ -272,7 +269,8 @@ bool internal_create_surfaces(int tex_width, int tex_height)
 	if(  !SDL_PixelFormatEnumToMasks( pixel_format, &bpp, &rmask, &gmask, &bmask, &amask )  ) {
 		dbg->error( "internal_create_surfaces(SDL2)", "Pixel format error. Couldn't generate masks: %s", SDL_GetError() );
 		return false;
-	} else if(  bpp != COLOUR_DEPTH  ||  amask != 0  ) {
+	}
+	else if(  bpp != COLOUR_DEPTH  ||  amask != 0  ) {
 		dbg->error( "internal_create_surfaces(SDL2)", "Pixel format error. Bpp got %d, needed %d. Amask got %d, needed 0.", bpp, COLOUR_DEPTH, amask );
 		return false;
 	}
@@ -287,8 +285,19 @@ bool internal_create_surfaces(int tex_width, int tex_height)
 }
 
 
+static PIXVAL *dr_textur_init()
+{
+	// SDL_LockTexture modifies pixels, so copy it first
+	void *pixels = screen->pixels;
+	int pitch = screen->pitch;
+
+	SDL_LockTexture( screen_tx, NULL, &pixels, &pitch );
+	return reinterpret_cast<PIXVAL *>(screen->pixels);
+}
+
+
 // open the window
-int dr_os_open(int screen_width, int screen_height, bool fullscreen)
+framebuffer_t dr_os_open(int screen_width, int screen_height, bool fullscreen)
 {
 	// scale up
 	const int tex_w = SCREEN_TO_TEX_X(screen_width);
@@ -304,7 +313,7 @@ int dr_os_open(int screen_width, int screen_height, bool fullscreen)
 	window = SDL_CreateWindow( SIM_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, screen_width, screen_height, flags );
 	if(  window == NULL  ) {
 		dbg->error("dr_os_open(SDL2)", "Could not open the window: %s", SDL_GetError() );
-		return 0;
+		return framebuffer_t();
 	}
 
 	// Non-integer scaling -> enable bilinear filtering (must be done before texture creation)
@@ -313,8 +322,9 @@ int dr_os_open(int screen_width, int screen_height, bool fullscreen)
 	}
 
 	if(  !internal_create_surfaces( tex_pitch, tex_h )  ) {
-		return 0;
+		return framebuffer_t();
 	}
+
 	DBG_MESSAGE("dr_os_open(SDL2)", "SDL realized screen size width=%d, height=%d (internal w=%d, h=%d)", screen_width, screen_height, screen->w, screen->h );
 
 	SDL_ShowCursor(0);
@@ -332,9 +342,7 @@ int dr_os_open(int screen_width, int screen_height, bool fullscreen)
 	assert(tex_h <= screen->h);
 	assert(tex_w <= tex_pitch);
 
-	display_set_actual_width( tex_w );
-	display_set_height( tex_h );
-	return tex_pitch;
+	return framebuffer_t(scr_size(tex_w, tex_h), tex_pitch, dr_textur_init());
 }
 
 
@@ -350,13 +358,13 @@ void dr_os_close()
 
 
 // resizes screen
-int dr_textur_resize(unsigned short** const textur, int tex_w, int const tex_h)
+bool dr_textur_resize(framebuffer_t &framebuf, scr_size new_size)
 {
 	// enforce multiple of 16 pixels, or there are likely mismatches
-	const int tex_pitch = max((tex_w + 15) & 0x7FF0, 16);
+	const size_t tex_pitch = max((new_size.w + 15) & 0x7FF0, 16);
 
 	SDL_UnlockTexture( screen_tx );
-	if(  tex_pitch != screen->w  ||  tex_h != screen->h  ) {
+	if(  (int)tex_pitch != screen->w  ||  new_size.h != screen->h  ) {
 		// Recreate the SDL surfaces at the new resolution.
 		// First free surface and then renderer.
 		SDL_FreeSurface( screen );
@@ -366,35 +374,21 @@ int dr_textur_resize(unsigned short** const textur, int tex_w, int const tex_h)
 		renderer = NULL;
 		screen_tx = NULL;
 
-		internal_create_surfaces( tex_pitch, tex_h );
-		if(  screen  ) {
-			DBG_MESSAGE("dr_textur_resize(SDL2)", "SDL realized screen size width=%d, height=%d (internal w=%d, h=%d)", tex_w, tex_h, screen->w, screen->h );
-		}
-		else {
+		internal_create_surfaces( tex_pitch, new_size.h );
+		if(  !screen  ) {
 			dbg->error("dr_textur_resize(SDL2)", "screen is NULL. Good luck!");
+			fflush(NULL);
+			return false;
 		}
-		fflush( NULL );
+		DBG_MESSAGE("dr_textur_resize(SDL2)", "SDL realized screen size width=%d, height=%d (internal w=%d, h=%d)", tex_pitch, new_size.h, screen->w, screen->h );
 	}
 
-	*textur = dr_textur_init();
+	assert((int)tex_pitch <= screen->pitch / (int)sizeof(PIXVAL));
+	assert(new_size.h <= screen->h);
+	assert(new_size.w <= (int)tex_pitch);
 
-	assert(tex_pitch <= screen->pitch / (int)sizeof(PIXVAL));
-	assert(tex_h <= screen->h);
-	assert(tex_w <= tex_pitch);
-
-	display_set_actual_width( tex_w );
-	return tex_pitch;
-}
-
-
-unsigned short *dr_textur_init()
-{
-	// SDL_LockTexture modifies pixels, so copy it first
-	void *pixels = screen->pixels;
-	int pitch = screen->pitch;
-
-	SDL_LockTexture( screen_tx, NULL, &pixels, &pitch );
-	return (unsigned short*)screen->pixels;
+	framebuf = framebuffer_t(new_size, tex_pitch, dr_textur_init());
+	return framebuf.is_valid();
 }
 
 

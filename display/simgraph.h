@@ -158,8 +158,6 @@ void mark_screen_dirty();
 
 scr_coord_val display_get_width();
 scr_coord_val display_get_height();
-void display_set_height(scr_coord_val);
-void display_set_actual_width(scr_coord_val);
 
 // force a certain size on a image (for rescaling tool images)
 void display_fit_img_to_width( const image_id n, sint16 new_w );

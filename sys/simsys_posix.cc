@@ -43,16 +43,15 @@ bool dr_os_init(const int*)
 	return true;
 }
 
-resolution dr_query_screen_resolution()
+scr_size dr_query_screen_resolution()
 {
-	resolution const res = { 0, 0 };
-	return res;
+	return { 0, 0 };
 }
 
 // open the window
-int dr_os_open(int, int, bool)
+framebuffer_t dr_os_open(int, int, bool)
 {
-	return 1;
+	return framebuffer_t(scr_size(0, 0), 1, NULL);
 }
 
 
@@ -60,18 +59,14 @@ void dr_os_close()
 {
 }
 
-// resizes screen
-int dr_textur_resize(unsigned short** const textur, int, int)
+
+bool dr_textur_resize(framebuffer_t &framebuf, scr_size)
 {
-	*textur = NULL;
-	return 1;
+	framebuf.pitch = 1;
+	framebuf.textur = NULL;
+	return true;
 }
 
-
-unsigned short *dr_textur_init()
-{
-	return NULL;
-}
 
 unsigned int get_system_color(unsigned int, unsigned int, unsigned int)
 {
