@@ -48,9 +48,6 @@ private:
 
 	inline void intern_insert_at(obj_t* new_obj, uint8 pri);
 
-	// only used internal for loading. DO NOT USE OTHERWISE! Use add instead!
-	bool append(obj_t *obj);
-
 	// this will automatically give the right order for citycars and the like ...
 	bool intern_add_moving(obj_t* new_obj);
 
@@ -83,6 +80,9 @@ public:
 
 	// usually used only for copying by grund_t
 	obj_t *remove_last();
+
+	// only used for loading. DO NOT USE OTHERWISE! Use add instead!
+	bool append(obj_t *obj);
 
 	/// This routine will automatically obey the correct order of things during insertion.
 	bool add(obj_t *obj);

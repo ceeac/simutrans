@@ -56,8 +56,8 @@ boden_t::boden_t(loadsave_t *file, koord pos ) : grund_t( koord3d(pos,0) )
 			}
 
 			if (desc) {
-				baum_t *tree = new baum_t( get_pos(), (uint8)id, age, slope );
-				objlist.add( tree );
+				// We already know the position is correct because we saved the tree in the correct order
+				objlist.append( new baum_t( get_pos(), (uint8)id, age, slope ) );
 			}
 			else {
 				dbg->warning( "boden_t::boden_t()", "Could not restore tree type %hhu at (%s)", (uint8)id, pos.get_str() );
