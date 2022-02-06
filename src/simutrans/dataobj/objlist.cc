@@ -903,7 +903,7 @@ void objlist_t::rdwr(loadsave_t *file, koord3d current_pos)
 
 				case obj_t::bahndepot:
 				{
-					if (file->is_version_atleast(123, 1)) {
+					if (file->is_version_atleast(123, 2)) {
 						new_obj = new bahndepot_t(file);
 					}
 					else {

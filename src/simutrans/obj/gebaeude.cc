@@ -789,7 +789,7 @@ void gebaeude_t::rdwr(loadsave_t *file)
 	}
 	file->rdwr_short(idx);
 
-	if (file->is_version_atleast(123, 1)) {
+	if (file->is_version_atleast(123, 2)) {
 		// store diff ticks only
 		uint32 diff_ticks = welt->get_ticks() - insta_zeit;
 		file->rdwr_long(diff_ticks);

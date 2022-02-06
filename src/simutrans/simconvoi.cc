@@ -2626,7 +2626,7 @@ void convoi_t::rdwr(loadsave_t *file)
 		unloading_state = false;
 	}
 
-	if (file->is_version_atleast(123, 1)) {
+	if (file->is_version_atleast(123, 2)) {
 		dummy_bool = recalc_data_front;
 		file->rdwr_bool(dummy_bool);
 		recalc_data_front = dummy_bool;
