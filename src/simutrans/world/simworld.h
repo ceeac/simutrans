@@ -441,7 +441,7 @@ private:
 	checklist_t last_checklists[LAST_CHECKLISTS_COUNT];
 #define LCHKLST(x) (last_checklists[(x) % LAST_CHECKLISTS_COUNT])
 	/// @note variable used in interactive()
-	uint8  network_frame_count;
+	uint8  network_frame_count = 0;
 	/**
 	 * @note Variable used in interactive().
 	 * @note Set in reset_timer().

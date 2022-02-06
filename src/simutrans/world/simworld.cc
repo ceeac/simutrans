@@ -5014,6 +5014,17 @@ void karte_t::rdwr_gamestate(loadsave_t *file, loadingscreen_t *ls)
 	file->rdwr_long(last_month);
 	file->rdwr_long(last_year);
 
+	if (file->is_version_atleast(123, 2)) {
+		file->rdwr_byte(network_frame_count);
+		file->rdwr_long(steps);
+		file->rdwr_long(sync_steps);
+	}
+	else if (file->is_loading()) {
+		network_frame_count = 0;
+		steps = 0;
+		sync_steps = 0;
+	}
+	
 	if (file->is_loading()) {
 		if(file->is_version_less(86, 6)) {
 			last_year += env_t::default_settings.get_starting_year();
@@ -5032,9 +5043,6 @@ void karte_t::rdwr_gamestate(loadsave_t *file, loadingscreen_t *ls)
 		season = (2+last_month/3)&3; // summer always zero
 		next_month_ticks = ( (ticks >> karte_t::ticks_per_world_month_shift) + 1 ) << karte_t::ticks_per_world_month_shift;
 		last_step_ticks = ticks;
-		steps = 0;
-		network_frame_count = 0;
-		sync_steps = 0;
 		sync_steps_barrier = sync_steps;
 		step_mode = PAUSE_FLAG;
 
@@ -6753,7 +6761,6 @@ bool karte_t::interactive(uint32 quit_month)
 	sync_steps = 0;
 	sync_steps_barrier = sync_steps;
 
-	network_frame_count = 0;
 	vector_tpl<uint16>hashes_ok; // bit set: this client can do something with this player
 
 	if(  !scenario->rdwr_ok()  ) {
