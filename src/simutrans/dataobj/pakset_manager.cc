@@ -20,7 +20,7 @@
 #include "../gui/simwin.h"
 
 
-pakset_manager_t::obj_map*                                    pakset_manager_t::obj_reader;
+pakset_manager_t::obj_map*                                    pakset_manager_t::registered_readers;
 inthashtable_tpl<obj_type, stringhashtable_tpl<obj_desc_t*> > pakset_manager_t::loaded;
 pakset_manager_t::unresolved_map                              pakset_manager_t::unresolved;
 ptrhashtable_tpl<obj_desc_t**, int>                           pakset_manager_t::fatals;
@@ -30,11 +30,11 @@ stringhashtable_tpl<missing_level_t>                          pakset_manager_t::
 
 void pakset_manager_t::register_reader(obj_reader_t *reader)
 {
-	if(!obj_reader) {
-		obj_reader = new obj_map;
+	if(!registered_readers) {
+		registered_readers = new obj_map;
 	}
 
-	obj_reader->put(reader->get_type(), reader);
+	registered_readers->put(reader->get_type(), reader);
 	//printf("This program can read %s objects\n", get_type_name());
 }
 
@@ -42,7 +42,7 @@ void pakset_manager_t::register_reader(obj_reader_t *reader)
 bool pakset_manager_t::load_paks_from_directory(const char *path, const char *message)
 {
 	searchfolder_t find;
-	std::string name = find.complete(path, "dat");
+	const std::string name = find.complete(path, "dat");
 	size_t i;
 	const bool drawing = is_display_init();
 
@@ -101,7 +101,7 @@ bool pakset_manager_t::load_paks_from_directory(const char *path, const char *me
 		if(drawing  &&  skinverwaltung_t::biglogosymbol==NULL) {
 			display_fillbox_wh_rgb( 0, 0, display_get_width(), display_get_height(), color_idx_to_rgb(COL_BLACK), true );
 			if (!load_pak_file((name+"symbol.BigLogo.pak").c_str())) {
-				dbg->warning("obj_reader_t::load()", "File 'symbol.BigLogo.pak' cannot be read, startup logo will not be displayed!");
+				dbg->warning("pakset_manager_t::load_paks_from_directory", "File 'symbol.BigLogo.pak' cannot be read, startup logo will not be displayed!");
 			}
 		}
 
@@ -114,19 +114,19 @@ bool pakset_manager_t::load_paks_from_directory(const char *path, const char *me
 			}
 
 			if(ground_desc_t::outside==NULL) {
-				dbg->warning("obj_reader_t::load()", "ground.Outside.pak not found, cannot guess tile size! (driving on left will not work!)");
+				dbg->warning("pakset_manager_t::load_paks_from_directory", "File ground.Outside.pak not found, cannot guess tile size! (driving on left will not work!)");
 			}
 			else if (char const* const copyright = ground_desc_t::outside->get_copyright()) {
 				ls.set_info(copyright);
 			}
 		}
 
-DBG_MESSAGE("obj_reader_t::load()", "reading from '%s'", name.c_str());
+DBG_MESSAGE("pakset_manager_t::load_paks_from_directory", "Reading from '%s'", name.c_str());
 
 		uint n = 0;
 		for(char* const& i : find) {
 			if (!load_pak_file(i)) {
-				dbg->warning("obj_reader_t::load()", "Cannot load '%s', some objects might be unavailable!", i);
+				dbg->warning("pakset_manager_t::load_paks_from_directory", "Cannot load '%s', some objects might be unavailable!", i);
 			}
 
 			if ((n++ & step) == 0 && drawing) {
@@ -143,11 +143,11 @@ DBG_MESSAGE("obj_reader_t::load()", "reading from '%s'", name.c_str());
 bool pakset_manager_t::load_pak_file(const char *name)
 {
 	// added trace
-	DBG_DEBUG("obj_reader_t::read_file()", "filename='%s'", name);
+	DBG_DEBUG("pakset_manager_t::load_pak_file", "filename='%s'", name);
 
 	FILE* const fp = dr_fopen(name, "rb");
 	if (!fp) {
-		dbg->error("obj_reader_t::read_file()", "reading '%s' failed!", name);
+		dbg->error("pakset_manager_t::load_pak_file", "Reading '%s' failed!", name);
 		return false;
 	}
 
@@ -161,7 +161,7 @@ bool pakset_manager_t::load_pak_file(const char *name)
 	} while(c != EOF && c != 0x1a);
 
 	if(c == EOF) {
-		dbg->error("obj_reader_t::read_file()", "unexpected end of file after %u bytes while reading '%s'!",n, name);
+		dbg->error("pakset_manager_t::load_pak_file", "Unexpected end of file after %u bytes while reading '%s'!", n, name);
 		fclose(fp);
 		return false;
 	}
@@ -177,7 +177,7 @@ bool pakset_manager_t::load_pak_file(const char *name)
 	char *p = dummy;
 	const uint32 version = decode_uint32(p);
 
-	DBG_DEBUG("obj_reader_t::read_file()", "read %u blocks, file version is %x", n, version);
+	DBG_DEBUG("pakset_manager_t::load_pak_file", "Read %u blocks, file version is %x", n, version);
 
 	if(version <= COMPILER_VERSION_CODE) {
 		obj_desc_t *data = NULL;
@@ -187,7 +187,7 @@ bool pakset_manager_t::load_pak_file(const char *name)
 		}
 	}
 	else {
-		DBG_DEBUG("obj_reader_t::read_file()","version of '%s' is too old, %u instead of %u", name, version, COMPILER_VERSION_CODE );
+		DBG_DEBUG("pakset_manager_t::load_pak_file", "Version of '%s' is too old, %u instead of %u", name, version, COMPILER_VERSION_CODE );
 		fclose(fp);
 		return false;
 	}
@@ -211,14 +211,15 @@ bool pakset_manager_t::finish_loading()
 
 	resolve_xrefs();
 
-	for(auto const& i : *obj_reader) {
-		DBG_MESSAGE("obj_reader_t::finish_loading()","Checking %s objects...", i.value->get_type_name());
+	for(auto const& elem : *registered_readers) {
+		DBG_MESSAGE("pakset_manager_t::finish_loading", "Checking %s objects...", elem.value->get_type_name());
 
-		if (!i.value->successfully_loaded()) {
-			dbg->warning("obj_reader_t::finish_loading()","... failed!");
+		if (!elem.value->successfully_loaded()) {
+			dbg->warning("pakset_manager_t::finish_loading", "... failed!");
 			return false;
 		}
 	}
+
 	return true;
 }
 
@@ -301,7 +302,7 @@ static bool read_node_info(obj_node_info_t& node, FILE* const f, uint32 const ve
 
 	char *p = data;
 	node.type     = decode_uint32(p);
-	node.children = decode_uint16(p);
+	node.nchildren = decode_uint16(p);
 	node.size     = decode_uint16(p);
 
 	// can have larger records
@@ -323,19 +324,20 @@ bool pakset_manager_t::read_nodes(FILE *fp, obj_desc_t *&data, int register_node
 		return false;
 	}
 
-	obj_reader_t *reader = obj_reader->get(static_cast<obj_type>(node.type));
+	obj_reader_t *reader = registered_readers->get(static_cast<obj_type>(node.type));
 
 	if(reader) {
-//DBG_DEBUG("obj_reader_t::read_nodes()","Reading %.4s-node of length %d with '%s'", reinterpret_cast<const char *>(&node.type), node.size, reader->get_type_name());
+//dbg->debug("pakset_manager_t::read_nodes", "Reading %.4s-node of length %d with '%s'", reinterpret_cast<const char *>(&node.type), node.size, reader->get_type_name());
 		data = reader->read_node(fp, node);
+
 		if (!data) {
 			return false;
 		}
 
-		if (node.children != 0) {
-			data->children = new obj_desc_t *[node.children];
+		if (node.nchildren != 0) {
+			data->children = new obj_desc_t *[node.nchildren];
 
-			for (int i = 0; i < node.children; i++) {
+			for (int i = 0; i < node.nchildren; i++) {
 				if (!read_nodes(fp, data->children[i], register_nodes + 1, version)) {
 					// Note: cannot delete siblings of data->children[i], since equal images point to the same desc
 					delete data; // data->children is delete[]'d by the destructor
@@ -353,12 +355,12 @@ bool pakset_manager_t::read_nodes(FILE *fp, obj_desc_t *&data, int register_node
 	}
 	else {
 		// no reader found ...
-		dbg->warning("obj_reader_t::read_nodes()","skipping unknown %.4s-node\n",reinterpret_cast<const char *>(&node.type));
+		dbg->warning("pakset_manager_t::read_nodes", "Skipping unknown %.4s-node\n", reinterpret_cast<const char *>(&node.type));
 		if (fseek(fp, node.size, SEEK_CUR) != 0) {
 			return false;
 		}
 
-		for(int i = 0; i < node.children; i++) {
+		for(int i = 0; i < node.nchildren; i++) {
 			if (!skip_nodes(fp,version)) {
 				return false;
 			}
@@ -382,7 +384,7 @@ bool pakset_manager_t::skip_nodes(FILE *fp,uint32 version)
 		return false;
 	}
 
-	for(int i = 0; i < node.children; i++) {
+	for(int i = 0; i < node.nchildren; i++) {
 		if (!skip_nodes(fp,version)) {
 			return false;
 		}
@@ -407,7 +409,7 @@ void pakset_manager_t::resolve_xrefs()
 
 			for(obj_desc_t** const x : i.value) {
 				if (!obj_loaded && fatals.get(x)) {
-					dbg->fatal("obj_reader_t::resolve_xrefs", "cannot resolve '%4.4s-%s'", &u.key, i.key);
+					dbg->fatal("pakset_manager_t::resolve_xrefs", "Cannot resolve '%4.4s-%s'", &u.key, i.key);
 				}
 				// delete old xref-node
 				xref_nodes.append(*x);

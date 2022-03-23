@@ -37,7 +37,7 @@ class pakset_manager_t
 {
 	/// table of registered obj readers sorted by id
 	typedef inthashtable_tpl<obj_type, obj_reader_t *> obj_map;
-	static obj_map* obj_reader;
+	static obj_map *registered_readers;
 
 	//
 	// object addresses needed for resolving xrefs later
@@ -69,7 +69,7 @@ public:
 	 */
 	static bool load_paks_from_directory(const char *path, const char *message);
 
-	// Only for single files, must take care of all the cleanup/registering matrix themselves
+	/// Only for single files, must take care of all the cleanup/registering matrix themselves
 	static bool load_pak_file(const char *name);
 
 	static bool finish_loading();
