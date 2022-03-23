@@ -14,13 +14,18 @@
 #include "../descriptor/reader/obj_reader.h"
 #include "../descriptor/vehicle_desc.h"
 #include "../utils/simstring.h"
+#include "../utils/cbuffer.h"
+#include "../dataobj/translator.h"
+#include "../gui/help_frame.h"
+#include "../gui/simwin.h"
 
 
 pakset_manager_t::obj_map*                                    pakset_manager_t::obj_reader;
 inthashtable_tpl<obj_type, stringhashtable_tpl<obj_desc_t*> > pakset_manager_t::loaded;
 pakset_manager_t::unresolved_map                              pakset_manager_t::unresolved;
 ptrhashtable_tpl<obj_desc_t**, int>                           pakset_manager_t::fatals;
-std::string pakset_manager_t::doublettes;
+std::string                                                   pakset_manager_t::doublettes;
+stringhashtable_tpl<missing_level_t>                          pakset_manager_t::missing_pak_names;
 
 
 void pakset_manager_t::register_reader(obj_reader_t *reader)
@@ -215,6 +220,74 @@ bool pakset_manager_t::finish_loading()
 		}
 	}
 	return true;
+}
+
+
+void pakset_manager_t::clear_missing_paks()
+{
+	missing_pak_names.clear();
+}
+
+// store missing obj during load and their severity
+void pakset_manager_t::add_missing_paks( const char *name, missing_level_t level )
+{
+	if(  missing_pak_names.get( name )==NOT_MISSING  ) {
+		missing_pak_names.put( strdup(name), level );
+	}
+}
+
+
+void pakset_manager_t::warn_if_paks_missing()
+{
+	if(  missing_pak_names.empty()  ) {
+		return; // everything OK
+	}
+
+	cbuffer_t msg;
+	msg.append("<title>");
+	msg.append(translator::translate("Missing pakfiles"));
+	msg.append("</title>\n");
+
+	cbuffer_t error_paks;
+	cbuffer_t warning_paks;
+
+	cbuffer_t paklog;
+	paklog.append( "\n" );
+	for(auto const& i : missing_pak_names) {
+		if (i.value <= MISSING_ERROR) {
+			error_paks.append(translator::translate(i.key));
+			error_paks.append("<br>\n");
+			paklog.append( i.key );
+			paklog.append("\n" );
+		}
+		else {
+			warning_paks.append(translator::translate(i.key));
+			warning_paks.append("<br>\n");
+		}
+	}
+
+	if(  error_paks.len()>0  ) {
+		msg.append("<h1>");
+		msg.append(translator::translate("Pak which may cause severe errors:"));
+		msg.append("</h1><br>\n");
+		msg.append("<br>\n");
+		msg.append( error_paks );
+		msg.append("<br>\n");
+		dbg->warning( "The following paks are missing and may cause errors", paklog );
+	}
+
+	if(  warning_paks.len()>0  ) {
+		msg.append("<h1>");
+		msg.append(translator::translate("Pak which may cause visual errors:"));
+		msg.append("</h1><br>\n");
+		msg.append("<br>\n");
+		msg.append( warning_paks );
+		msg.append("<br>\n");
+	}
+
+	help_frame_t *win = new help_frame_t();
+	win->set_text( msg );
+	create_win(win, w_info, magic_pakset_info_t);
 }
 
 

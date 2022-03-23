@@ -17,6 +17,22 @@ class obj_desc_t;
 class obj_reader_t;
 
 
+/// Missing things during loading:
+/// factories, vehicles, roadsigns or catenary may be severe
+enum missing_level_t
+{
+	NOT_MISSING     = 0,
+	MISSING_FACTORY = 1,
+	MISSING_VEHICLE = 2,
+	MISSING_SIGN    = 3,
+	MISSING_WAYOBJ  = 4,
+	MISSING_ERROR   = 4,
+	MISSING_BRIDGE,
+	MISSING_BUILDING,
+	MISSING_WAY
+};
+
+
 class pakset_manager_t
 {
 	/// table of registered obj readers sorted by id
@@ -41,6 +57,7 @@ class pakset_manager_t
 	static bool skip_nodes(FILE *fp, uint32 version);
 
 	static std::string doublettes;
+	static stringhashtable_tpl<missing_level_t> missing_pak_names;
 
 public:
 	static void register_reader(obj_reader_t *reader);
@@ -56,6 +73,15 @@ public:
 	static bool read_file(const char *name);
 
 	static bool finish_loading();
+
+	static void clear_missing_paks();
+
+	/// For warning, when stuff had to be removed/replaced
+	/// level must be >=1 (1=factory, 2=vehicles, 3=not so important)
+	/// may be refined later
+	static void add_missing_paks( const char *name, missing_level_t critical_level );
+
+	static void warn_if_paks_missing();
 
 	/* special error handling for double objects */
 	static void doubled( const char *what, const char *name );

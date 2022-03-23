@@ -613,7 +613,7 @@ void roadsign_t::rdwr(loadsave_t *file)
 			desc = roadsign_t::table.get(translator::compatibility_name(bname));
 			if(  desc==NULL  ) {
 				dbg->warning("roadsign_t::rwdr", "description %s for roadsign/signal at %d,%d not found! (may be ignored)", bname, get_pos().x, get_pos().y);
-				welt->add_missing_paks( bname, karte_t::MISSING_SIGN );
+				pakset_manager_t::add_missing_paks( bname, MISSING_SIGN );
 			}
 			else {
 				dbg->warning("roadsign_t::rwdr", "roadsign/signal %s at %d,%d replaced by %s", bname, get_pos().x, get_pos().y, desc->get_name() );
