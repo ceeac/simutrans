@@ -39,7 +39,7 @@ void pakset_manager_t::register_reader(obj_reader_t *reader)
 }
 
 
-bool pakset_manager_t::load(const char *path, const char *message)
+bool pakset_manager_t::load_paks_from_directory(const char *path, const char *message)
 {
 	searchfolder_t find;
 	std::string name = find.complete(path, "dat");
@@ -70,7 +70,7 @@ bool pakset_manager_t::load(const char *path, const char *message)
 
 				find.search(buf, "pak");
 				for(const char* const& i : find) {
-					if (!read_file(i)) {
+					if (!load_pak_file(i)) {
 						return false;
 					}
 				}
@@ -100,7 +100,7 @@ bool pakset_manager_t::load(const char *path, const char *message)
 
 		if(drawing  &&  skinverwaltung_t::biglogosymbol==NULL) {
 			display_fillbox_wh_rgb( 0, 0, display_get_width(), display_get_height(), color_idx_to_rgb(COL_BLACK), true );
-			if (!read_file((name+"symbol.BigLogo.pak").c_str())) {
+			if (!load_pak_file((name+"symbol.BigLogo.pak").c_str())) {
 				dbg->warning("obj_reader_t::load()", "File 'symbol.BigLogo.pak' cannot be read, startup logo will not be displayed!");
 			}
 		}
@@ -109,7 +109,7 @@ bool pakset_manager_t::load(const char *path, const char *message)
 
 		if(  ground_desc_t::outside==NULL  ) {
 			// defining the pak tile width ....
-			if (!read_file((name+"ground.Outside.pak").c_str())) {
+			if (!load_pak_file((name+"ground.Outside.pak").c_str())) {
 				return false;
 			}
 
@@ -125,7 +125,7 @@ DBG_MESSAGE("obj_reader_t::load()", "reading from '%s'", name.c_str());
 
 		uint n = 0;
 		for(char* const& i : find) {
-			if (!read_file(i)) {
+			if (!load_pak_file(i)) {
 				dbg->warning("obj_reader_t::load()", "Cannot load '%s', some objects might be unavailable!", i);
 			}
 
@@ -140,7 +140,7 @@ DBG_MESSAGE("obj_reader_t::load()", "reading from '%s'", name.c_str());
 }
 
 
-bool pakset_manager_t::read_file(const char *name)
+bool pakset_manager_t::load_pak_file(const char *name)
 {
 	// added trace
 	DBG_DEBUG("obj_reader_t::read_file()", "filename='%s'", name);

@@ -67,10 +67,10 @@ public:
 	 * @param path Directory to be scanned for PAK files
 	 * @param message Label to show over the progress bar
 	 */
-	static bool load(const char *path, const char *message);
+	static bool load_paks_from_directory(const char *path, const char *message);
 
 	// Only for single files, must take care of all the cleanup/registering matrix themselves
-	static bool read_file(const char *name);
+	static bool load_pak_file(const char *name);
 
 	static bool finish_loading();
 
