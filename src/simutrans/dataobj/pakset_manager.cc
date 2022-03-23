@@ -20,7 +20,7 @@ pakset_manager_t::obj_map*                                    pakset_manager_t::
 inthashtable_tpl<obj_type, stringhashtable_tpl<obj_desc_t*> > pakset_manager_t::loaded;
 pakset_manager_t::unresolved_map                              pakset_manager_t::unresolved;
 ptrhashtable_tpl<obj_desc_t**, int>                           pakset_manager_t::fatals;
-
+std::string pakset_manager_t::doublettes;
 
 
 void pakset_manager_t::register_reader(obj_reader_t *reader)
@@ -385,3 +385,11 @@ void pakset_manager_t::xref_to_resolve(obj_type type, const char *name, obj_desc
 	}
 }
 
+/**
+ * writes a warning into the log.
+ */
+void pakset_manager_t::doubled(const char *what, const char *name )
+{
+	dbg->warning("pakset_manager_t::doubled", "Object %s::%s is overlaid, using data of new object", what, name);
+	doublettes.append( (std::string)what+"::"+name+"<br/>" );
+}

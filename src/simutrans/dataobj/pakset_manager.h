@@ -40,6 +40,8 @@ class pakset_manager_t
 	static bool read_nodes(FILE* fp, obj_desc_t *&data, int register_nodes, uint32 version);
 	static bool skip_nodes(FILE *fp, uint32 version);
 
+	static std::string doublettes;
+
 public:
 	static void register_reader(obj_reader_t *reader);
 
@@ -54,6 +56,12 @@ public:
 	static bool read_file(const char *name);
 
 	static bool finish_loading();
+
+	/* special error handling for double objects */
+	static void doubled( const char *what, const char *name );
+	static bool had_overlaid() { return !doublettes.empty(); }
+	static void clear_overlaid() { doublettes.clear(); }
+	static std::string get_overlaid() { return doublettes; }
 
 public:
 	static void obj_for_xref(obj_type type, const char *name, obj_desc_t *data);

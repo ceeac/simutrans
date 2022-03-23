@@ -23,6 +23,7 @@
 #include "../dataobj/scenario.h"
 #include "../dataobj/translator.h"
 #include "../dataobj/environment.h"
+#include "../dataobj/pakset_manager.h"
 
 #include "../gui/trafficlight_info.h"
 #include "../gui/privatesign_info.h"
@@ -682,7 +683,7 @@ bool roadsign_t::register_desc(roadsign_desc_t *desc)
 {
 	// avoid duplicates with same name
 	if(const roadsign_desc_t *old_desc = table.remove(desc->get_name())) {
-		dbg->doubled( "roadsign", desc->get_name() );
+		pakset_manager_t::doubled( "roadsign", desc->get_name() );
 		tool_t::general_tool.remove( old_desc->get_builder() );
 		delete old_desc->get_builder();
 		delete old_desc;

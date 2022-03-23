@@ -1249,10 +1249,10 @@ int simu_main(int argc, char** argv)
 
 	std::string overlaid_warning; // more prominent handling of double objects
 
-	if(  dbg->had_overlaid()  ) {
+	if(  pakset_manager_t::had_overlaid()  ) {
 		overlaid_warning = translator::translate("<h1>Error</h1><p><strong>");
-		overlaid_warning.append( env_t::pak_name + translator::translate("contains the following doubled objects:</strong><p>") + dbg->get_overlaid() + "<p>" );
-		dbg->clear_overlaid();
+		overlaid_warning.append( env_t::pak_name + translator::translate("contains the following doubled objects:</strong><p>") + pakset_manager_t::get_overlaid() + "<p>" );
+		pakset_manager_t::clear_overlaid();
 	}
 
 	if(  env_t::default_settings.get_with_private_paks()  ) {
@@ -1263,9 +1263,9 @@ int simu_main(int argc, char** argv)
 			env_t::default_settings.set_with_private_paks( false );
 		}
 		dr_chdir( env_t::base_dir );
-		if(  dbg->had_overlaid()  ) {
-			overlaid_warning.append( translator::translate("<h1>Warning</h1><p><strong>addons for") + env_t::pak_name + translator::translate("contains the following doubled objects:</strong><p>") + dbg->get_overlaid() );
-			dbg->clear_overlaid();
+		if(  pakset_manager_t::had_overlaid()  ) {
+			overlaid_warning.append( translator::translate("<h1>Warning</h1><p><strong>addons for") + env_t::pak_name + translator::translate("contains the following doubled objects:</strong><p>") + pakset_manager_t::get_overlaid() );
+			pakset_manager_t::clear_overlaid();
 		}
 	}
 
