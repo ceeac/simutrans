@@ -1243,7 +1243,7 @@ int simu_main(int argc, char** argv)
 
 	// loading all objects in the pak
 	dbg->message("simu_main()","Reading object data from %s...", env_t::pak_dir.c_str());
-	if (!obj_reader_t::load( env_t::pak_dir.c_str(), translator::translate("Loading paks ...") )) {
+	if (!pakset_manager_t::load( env_t::pak_dir.c_str(), translator::translate("Loading paks ...") )) {
 		dbg->fatal("simu_main()", "Failed to load pakset. Please re-download or select another pakset.");
 	}
 
@@ -1258,7 +1258,7 @@ int simu_main(int argc, char** argv)
 	if(  env_t::default_settings.get_with_private_paks()  ) {
 		// try to read addons from private directory
 		dr_chdir( env_t::user_dir );
-		if(!obj_reader_t::load(("addons/" + env_t::pak_name).c_str(), translator::translate("Loading addon paks ..."))) {
+		if(!pakset_manager_t::load(("addons/" + env_t::pak_name).c_str(), translator::translate("Loading addon paks ..."))) {
 			dbg->warning("simu_main", "Reading addon object data failed (disabling).");
 			env_t::default_settings.set_with_private_paks( false );
 		}
@@ -1269,7 +1269,7 @@ int simu_main(int argc, char** argv)
 		}
 	}
 
-	if (!obj_reader_t::finish_loading()) {
+	if (!pakset_manager_t::finish_loading()) {
 		dbg->fatal("simu_main()", "Failed to load pakset. Please re-download or select another pakset.");
 	}
 
