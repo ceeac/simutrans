@@ -12,6 +12,7 @@
 
 #include "../simdebug.h"
 #include "../world/simworld.h"
+#include "../world/worldgen.h"
 #include "simwin.h"
 #include "../display/simimg.h"
 
@@ -23,7 +24,6 @@
 #include "../display/simgraph.h"
 
 #include "../utils/simrandom.h"
-
 
 koord enlarge_map_frame_t::koord_from_rotation(settings_t const* const sets, sint16 const x, sint16 const y, sint16 const w, sint16 const h)
 {
@@ -148,7 +148,7 @@ bool enlarge_map_frame_t::action_triggered( gui_action_creator_t *comp,value_t v
 	}
 	else if(comp==&start_button) {
 		destroy_all_win( true );
-		welt->enlarge_map(sets, NULL);
+		welt->init_or_enlarge_map(sets, NULL);
 	}
 	else {
 		return false;
@@ -204,7 +204,7 @@ void enlarge_map_frame_t::update_preview()
 			}
 			else {
 				// new part
-				const sint16 height = karte_t::perlin_hoehe(sets, pos, koord(old_x,old_y) );
+				const sint16 height = worldgen_t::perlin_hoehe(sets, pos, koord(old_x,old_y) );
 				color = minimap_t::calc_height_color(height, sets->get_groundwater());
 			}
 			map.at(i,j) = color;

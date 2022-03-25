@@ -427,9 +427,6 @@ finish:
 // Create a certain number of tourist attractions
 void factory_builder_t::distribute_attractions(int max_number)
 {
-	// current number of tourist attractions constructed
-	int current_number=0;
-
 	// select without timeline disappearing dates
 	if(hausbauer_t::get_random_attraction(welt->get_timeline_year_month(),true,temperate_climate)==NULL) {
 		// nothing at all?
@@ -439,8 +436,11 @@ void factory_builder_t::distribute_attractions(int max_number)
 	// very fast, so we do not bother updating progress bar
 	dbg->message("factory_builder_t::distribute_attractions()", "Distributing %i tourist attractions", max_number);
 
-	int retrys = max_number*4;
-	while(current_number<max_number  &&  retrys-->0) {
+	// current number of tourist attractions constructed
+	int current_number=0;
+	int retries = max_number*4;
+
+	while(current_number<max_number  &&  retries-->0) {
 		koord3d pos=koord3d( koord::koord_random(welt->get_size().x,welt->get_size().y),1);
 		const building_desc_t *attraction=hausbauer_t::get_random_attraction(welt->get_timeline_year_month(),true,(climate)simrand((int)arctic_climate+1));
 
@@ -455,10 +455,10 @@ void factory_builder_t::distribute_attractions(int max_number)
 			// space found, build attraction
 			hausbauer_t::build(welt->get_public_player(), pos.get_2d(), rotation, attraction);
 			current_number ++;
-			retrys = max_number*4;
+			retries = max_number*4;
 		}
-
 	}
+
 	// update an open map
 	minimap_t::get_instance()->calc_map_size();
 }

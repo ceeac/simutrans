@@ -324,6 +324,7 @@ target_sources(simutrans PRIVATE
 		src/simutrans/world/simworld.cc
 		src/simutrans/world/surface.cc
 		src/simutrans/world/terraformer.cc
+		src/simutrans/world/worldgen.cc
 		src/squirrel/sq_extensions.cc
 		src/squirrel/sqstdlib/sqstdaux.cc
 		src/squirrel/sqstdlib/sqstdblob.cc

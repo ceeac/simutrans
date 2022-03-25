@@ -31,6 +31,8 @@
 
 #include "../simdebug.h"
 
+#include <functional>
+
 
 struct sound_info;
 class stadt_t;
@@ -57,7 +59,7 @@ class terraformer_t;
 /**
  * Threaded function caller.
  */
-typedef void (karte_t::*xy_loop_func)(sint16, sint16, sint16, sint16);
+using xy_loop_func = std::function<void (sint16, sint16, sint16, sint16)>;
 
 
 /**
@@ -66,23 +68,14 @@ typedef void (karte_t::*xy_loop_func)(sint16, sint16, sint16, sint16);
  */
 class karte_t : public surface_t
 {
+	friend class worldgen_t;
+
 	friend karte_t* world();  // to access the single instance
 	friend class karte_ptr_t; // to access the single instance
 
 	static karte_t* world; ///< static single instance
 
 public:
-	/**
-	 * Height of a point of the map with "perlin noise".
-	 * Uses map roughness and mountain height from @p sets.
-	 */
-	static sint32 perlin_hoehe(settings_t const *sets, koord k, koord size);
-
-	/**
-	 * Loops over tiles setting heights from perlin noise
-	 */
-	void perlin_hoehe_loop(sint16, sint16, sint16, sint16);
-
 	enum player_cost {
 		WORLD_CITIZENS = 0,      ///< total people
 		WORLD_GROWTH,            ///< growth (just for convenience)
@@ -256,12 +249,6 @@ private:
 	interaction_t *eventmanager;
 
 private:
-	/**
-	 * The fractal generation of the map is not perfect.
-	 * cleanup_karte() eliminates errors.
-	 */
-	void cleanup_karte( int xoff, int yoff );
-
 	/**
 	 * @name Player management
 	 *       Variables related to the player management in game.
@@ -491,45 +478,28 @@ private:
 	void restore_history(bool restore_transported_only);
 
 	/**
-	 * Will create rivers.
-	 */
-	void create_rivers(sint16 number);
-
-	/**
-	 * Will create lakes (multithreaded).
-	 */
-	void create_lakes_loop(sint16, sint16, sint16, sint16);
-
-	/**
-	 * Will create lakes.
-	 */
-	void create_lakes( int xoff, int yoff, sint8 max_lake_height );
-
-	/**
-	 * Will create beaches.
-	 */
-	void create_beaches( int xoff, int yoff );
-
-	/**
-	 * Distribute groundobjs and cities on the map but not
-	 * in the rectangle from (0,0) till (old_x, old_y).
-	 * It's now an extra function so we don't need the code twice.
-	 */
-	void distribute_cities(int new_cities, sint32 new_mean_citizen_count, sint16 old_x, sint16 old_y );
-	void distribute_groundobjs(sint16 old_x, sint16 old_y);
-	void distribute_movingobjs(sint16 old_x, sint16 old_y);
-
-	/**
 	 * The last time when a server announce was performed (in ms).
 	 */
 	uint32 server_last_announce_time;
 
-	enum {
-		SYNCX_FLAG = 1 << 0,
-		GRIDS_FLAG = 1 << 1
+	enum xy_loop_type_t
+	{
+		LOOP_NORMAL = 0,
+		LOOP_SYNCX  = 1,
+		LOOP_GRIDS  = 2
 	};
 
-	void world_xy_loop(xy_loop_func func, uint8 flags);
+	/// Example:
+	/// Foo foo;  world->world_xy_loop(&foo, &Foo::do_something_on_grid, GRIDS_FLAG);
+	template<typename T>
+	void world_xy_loop(T *obj, void (T::*func)(sint16, sint16, sint16, sint16), xy_loop_type_t flags = LOOP_NORMAL)
+	{
+		world_xy_loop(
+			[obj, func](sint16 xmin, sint16 xmax, sint16 ymin, sint16 ymax) {
+				(obj->*func)(xmin, xmax, ymin, ymax);
+			}, flags);
+	}
+	void world_xy_loop(xy_loop_func func, xy_loop_type_t flags = LOOP_NORMAL);
 	static void *world_xy_loop_thread(void *);
 
 	/**
@@ -541,8 +511,6 @@ private:
 	 * Updates all images.
 	 */
 	void update_map_intern(sint16, sint16, sint16, sint16);
-
-	bool can_flood_to_depth(koord k, sint8 new_water_height, sint8 *stage, sint8 *our_stage, sint16, sint16, sint16, sint16) const;
 
 	void flood_to_depth(sint8 new_water_height, sint8 *stage);
 
@@ -949,7 +917,7 @@ public:
 
 	void init_tiles();
 
-	void enlarge_map(settings_t const*, sint8 const* h_field);
+	void init_or_enlarge_map(settings_t const*, sint8 const* h_field);
 
 	karte_t();
 
@@ -1117,19 +1085,9 @@ public:
 	void assign_climate_map_region( sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom );
 
 	/**
-	 * Since the trees follow humidity, we have to redistribute them only in the new region
-	 */
-	void distribute_trees_region( sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom );
-
-	/**
 	 * Loop recalculating transitions - suitable for multithreading
 	 */
 	void recalc_transitions_loop(sint16, sint16, sint16, sint16);
-
-	/**
-	 * Loop cleans grounds so that they have correct boden and slope - suitable for multithreading
-	 */
-	void cleanup_grounds_loop(sint16, sint16, sint16, sint16);
 
 	/**
 	 * @return A list of all buildable squares with size w, h.
