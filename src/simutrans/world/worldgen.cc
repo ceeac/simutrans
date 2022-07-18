@@ -656,9 +656,6 @@ void worldgen_t::perlin_hoehe_loop( sint16 x_min, sint16 x_max, sint16 y_min, si
 
 void worldgen_t::cleanup_map_grid()
 {
-	const koord new_size(sets->get_size_x(), sets->get_size_y());
-	const koord old_size = world->get_size();
-
 	/** @note First we'll copy the border heights to the adjacent tile.
 	 * The best way I could find is raising the first new grid point to
 	 * the same height the adjacent old grid point was and lowering to the
