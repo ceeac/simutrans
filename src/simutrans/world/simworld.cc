@@ -262,7 +262,7 @@ void karte_t::world_xy_loop(xy_loop_func function, karte_t::xy_loop_type_t loop_
 
 #else
 	// slow serial way of display
-	(this->*function)( 0, max_x, 0, max_y );
+	function( 0, max_x, 0, max_y );
 #endif
 }
 
