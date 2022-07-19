@@ -82,9 +82,6 @@ void worldgen_t::generate_terrain(loadingscreen_t &ls, const sint8 *h_field)
 	memset( new_grid_hgts, world->get_groundwater(), sizeof(sint8) * (new_size.x + 1) * (new_size.y + 1) );
 	memset( new_water_hgts, world->get_groundwater(), sizeof(sint8) * new_size.x * new_size.y );
 
-	const koord old_size = world->get_size();
-	const bool new_world = old_size.x == 0 && old_size.y == 0;
-
 	world->settings.set_size_x(new_size.x);
 	world->settings.set_size_y(new_size.y);
 	world->cached_grid_size = new_size;
@@ -93,13 +90,6 @@ void worldgen_t::generate_terrain(loadingscreen_t &ls, const sint8 *h_field)
 	world->cached_size.y = world->cached_grid_size.y-1;
 
 	if(  !new_world  ) {
-		world->mute_sound(true);
-		minimap_t::is_visible = false;
-
-		if(is_display_init()) {
-			display_show_pointer(false);
-		}
-
 // Copy old values:
 		for (sint16 iy = 0; iy<old_size.y; iy++) {
 			for (sint16 ix = 0; ix<old_size.x; ix++) {
@@ -172,6 +162,9 @@ void worldgen_t::generate_terrain(loadingscreen_t &ls, const sint8 *h_field)
 	}
 
 	cleanup_map_grid();
+
+	// smooth the new part, reassign slopes on new part
+	cleanup_karte();
 }
 
 
@@ -695,9 +688,6 @@ void worldgen_t::cleanup_map_grid()
 			world->lower_grid_to(old_size.x+1, old_size.y+1, h);
 		}
 	}
-
-	// smooth the new part, reassign slopes on new part
-	cleanup_karte();
 }
 
 
@@ -711,7 +701,7 @@ void worldgen_t::cleanup_karte()
 	sint8 *grid_hgts_cpy = new sint8[grid_size];
 	memcpy( grid_hgts_cpy, world->grid_hgts, grid_size );
 
-	// the trick for smoothing is to raise each tile by one
+	// the trick for smoothing is to raise each tile by one ...
 	sint32 i,j;
 	for(j=0; j<=world->get_size().y; j++) {
 		for(i=j>=yoff?0:xoff; i<=world->get_size().x; i++) {
@@ -720,7 +710,7 @@ void worldgen_t::cleanup_karte()
 	}
 	delete [] grid_hgts_cpy;
 
-	// but to leave the map unchanged, we lower the height again
+	// ... but to leave the map unchanged, we lower the height again
 	for(j=0; j<=world->get_size().y; j++) {
 		for(i=j>=yoff?0:xoff; i<=world->get_size().x; i++) {
 			world->grid_hgts[i+j*(world->get_size().x+1)] --;

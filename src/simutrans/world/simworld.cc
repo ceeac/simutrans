@@ -704,12 +704,19 @@ DBG_DEBUG("karte_t::init()","built timeline");
 
 void karte_t::init_or_enlarge_map(settings_t const* sets, sint8 const* const h_field)
 {
+	world->mute_sound(true);
+	minimap_t::is_visible = false;
+
+	if(is_display_init()) {
+		display_show_pointer(false);
+	}
+
+	intr_disable();
+
 	const koord new_size(sets->get_size_x(), sets->get_size_y());
 	const koord old_size = world->get_size();
 	const bool new_world = old_size.x == 0 && old_size.y == 0;
 	const bool minimap_was_visible = minimap_t::is_visible;
-
-	intr_disable();
 
 	const int max_display_progress = 16 + (new_world
 		? (4*sets->get_city_count() +   world->settings.get_factory_count())
@@ -819,7 +826,7 @@ void karte_t::init_or_enlarge_map(settings_t const* sets, sint8 const* const h_f
 	set_schedule_counter();
 
 	if (new_world) {
-// 		gen.generate_factories();
+		gen.generate_factories();
 
 		settings.set_factory_count( fab_list.get_count() );
 		finance_history_year[0][karte_t::WORLD_FACTORIES] = finance_history_month[0][karte_t::WORLD_FACTORIES] = fab_list.get_count();

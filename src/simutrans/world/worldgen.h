@@ -39,7 +39,7 @@ public:
 	/// @{
 	/// @ingroup worldgen-functions
 	/// These functions are called to generate a new world or enlarge an existing world.
-	/// They are called from top to bottom, see @ref karte_t::enlarge_map.
+	/// They are called from top to bottom, see @ref karte_t::init_or_enlarge_map.
 public:
 	void generate_terrain(loadingscreen_t &ls, const sint8 *h_field);
 	void generate_climates();
