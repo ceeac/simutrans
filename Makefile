@@ -608,6 +608,7 @@ SOURCES += src/simutrans/world/simplan.cc
 SOURCES += src/simutrans/world/simworld.cc
 SOURCES += src/simutrans/world/surface.cc
 SOURCES += src/simutrans/world/terraformer.cc
+SOURCES += src/simutrans/world/worldgen.cc
 SOURCES += src/squirrel/sq_extensions.cc
 SOURCES += src/squirrel/sqstdlib/sqstdaux.cc
 SOURCES += src/squirrel/sqstdlib/sqstdblob.cc
