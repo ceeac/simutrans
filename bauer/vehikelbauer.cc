@@ -64,7 +64,7 @@ static stringhashtable_tpl< vehicle_desc_t*, N_BAGS_SMALL> name_fahrzeuge;
 
 // index 0 aur, 1...8 at normal waytype index
 #define GET_WAYTYPE_INDEX(wt) ((int)(wt)>8 ? 0 : (wt))
-static slist_tpl<vehicle_desc_t*> typ_fahrzeuge[vehicle_builder_t::sb_length][9];
+static slist_tpl<vehicle_desc_t *> typ_fahrzeuge[vehicle_builder_t::sb_length][9];
 static uint8 tmp_sort_idx;
 
 
@@ -396,7 +396,7 @@ const vehicle_desc_t *vehicle_builder_t::get_info(const char *name)
 	return name_fahrzeuge.get(name);
 }
 
-slist_tpl<vehicle_desc_t*> const & vehicle_builder_t::get_info(waytype_t typ, uint8 sortkey)
+slist_tpl<vehicle_desc_t *> const & vehicle_builder_t::get_info(waytype_t typ, uint8 sortkey)
 {
 	return typ_fahrzeuge[sortkey][GET_WAYTYPE_INDEX(typ)];
 }

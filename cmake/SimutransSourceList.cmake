@@ -275,6 +275,7 @@ target_sources(simutrans-extended PRIVATE
 	player/finance.cc
 	player/simplay.cc
 	script/api/api_city.cc
+	script/api/api_command.cc
 	script/api/api_const.cc
 	script/api/api_control.cc
 	script/api/api_convoy.cc
@@ -286,6 +287,7 @@ target_sources(simutrans-extended PRIVATE
 	script/api/api_map_objects.cc
 	script/api/api_obj_desc_base.cc
 	script/api/api_obj_desc.cc
+	script/api/api_pathfinding.cc
 	script/api/api_player.cc
 	script/api/api_scenario.cc
 	script/api/api_schedule.cc
@@ -301,6 +303,7 @@ target_sources(simutrans-extended PRIVATE
 	script/dynamic_string.cc
 	script/export_objs.cc
 	script/script.cc
+	script/script_loader.cc
 	simcity.cc
 	simconvoi.cc
 	simdebug.cc
