@@ -36,9 +36,10 @@ vehiclelist_stats_t::vehiclelist_stats_t(const vehicle_desc_t *v)
 	veh = v;
 
 	// width of image
-	scr_coord_val x, y, w, h;
+	scr_coord_val x = 0, y = 0, w = 0, h = 0;
 	const image_id image = veh->get_image_id( ribi_t::dir_south, veh->get_freight_type() );
 	display_get_base_image_offset(image, &x, &y, &w, &h );
+
 	if( w > img_width ) {
 		img_width = w + D_H_SPACE;
 	}
@@ -119,12 +120,14 @@ void vehiclelist_stats_t::draw( scr_coord offset )
 	offset += pos;
 
 	offset.x += D_MARGIN_LEFT;
-	scr_coord_val x, y, w, h;
+	scr_coord_val x = 0, y = 0, w = 0, h = 0;
 	const image_id image = veh->get_image_id( ribi_t::dir_south, veh->get_freight_type() );
+
 	display_get_base_image_offset(image, &x, &y, &w, &h );
 	display_base_img(image, offset.x - x, offset.y - y, world()->get_active_player_nr(), false, true);
 
 	const uint8 upgradable_state = veh->has_available_upgrade(month);
+
 	// upgradable symbol
 	if (upgradable_state && skinverwaltung_t::upgradable) {
 		if (world()->get_settings().get_show_future_vehicle_info() || (!world()->get_settings().get_show_future_vehicle_info() && veh->is_future(month) != 2)) {

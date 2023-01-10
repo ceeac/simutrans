@@ -878,8 +878,9 @@ void gui_vehicleinfo_t::draw(scr_coord offset)
 			const uint8 upgradable_state = v->get_desc()->has_available_upgrade(month_now);
 
 			// first image
-			scr_coord_val x, y, w, h;
+			scr_coord_val x = 0, y = 0, w = 0, h = 0;
 			const image_id image = v->get_loaded_image();
+
 			display_get_base_image_offset(image, &x, &y, &w, &h);
 			display_base_img(image, 11 - x + pos.x + offset.x, pos.y + offset.y + total_height - y + 2 + LINESPACE, cnv->get_owner()->get_player_nr(), false, true);
 			w = max(40, w + 4) + 11;
