@@ -5131,7 +5131,9 @@ void haltestelle_t::display_status(sint16 xpos, sint16 ypos)
 				continue; // ignore freight none
 			}
 		}
-		if (i==goods_manager_t::INDEX_PAS && !get_pax_enabled() || i==goods_manager_t::INDEX_MAIL && !get_mail_enabled() || i>goods_manager_t::INDEX_NONE && !get_ware_enabled()) {
+		if ((i==goods_manager_t::INDEX_PAS  && !get_pax_enabled()) ||
+			(i==goods_manager_t::INDEX_MAIL && !get_mail_enabled()) ||
+			(i >goods_manager_t::INDEX_NONE && !get_ware_enabled())) {
 			continue;
 		}
 		uint8 g_class = 1;
