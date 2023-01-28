@@ -152,9 +152,9 @@ city_info_t::city_info_t(stadt_t* city) :
 	lb_allow_growth(""),
 	pax_map(city),
 	location_map(city),
+	scrolly_stats(&cont_city_stats, true),
 	transportation_last_year(scr_size(D_INDICATOR_BOX_WIDTH, GOODS_COLOR_BOX_HEIGHT), false),
-	transportation_this_year(scr_size(D_INDICATOR_BOX_WIDTH, GOODS_COLOR_BOX_HEIGHT), false),
-	scrolly_stats(&cont_city_stats, true)
+	transportation_this_year(scr_size(D_INDICATOR_BOX_WIDTH, GOODS_COLOR_BOX_HEIGHT), false)
 {
 	if (city) {
 		init();
