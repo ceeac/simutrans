@@ -78,7 +78,7 @@ public:
 		}
 	}
 
-	void display_overlay(int xpos, int ypos) const;
+	void display_overlay(int xpos, int ypos) const OVERRIDE;
 
 	FLAGGED_PIXVAL get_outline_colour() const OVERRIDE
 	{
