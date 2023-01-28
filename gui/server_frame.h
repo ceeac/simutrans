@@ -39,7 +39,7 @@ private:
 	button_t show_mismatched, show_offline;
 	gui_label_t pak_version;
 	gui_label_buf_t revision, date, label_size;
-#if DEBUG>=4
+#if defined(DEBUG) && DEBUG>=4
 	gui_label_buf_t pakset_checksum;
 #endif
 	gui_minimap_t *map;

@@ -9703,7 +9703,7 @@ bool tool_change_convoi_t::init( player_t *player )
 	// the first will delete the convoi, the second should not trigger an assertion
 	// catch such commands here
 	if( !cnv.is_bound()) {
-#if DEBUG>=4
+#if defined(DEBUG) && DEBUG>=4
 		if (is_local_execution()) {
 			create_win( new news_img("Convoy already deleted!"), w_time_delete, magic_none);
 		}
