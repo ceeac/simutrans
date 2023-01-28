@@ -705,9 +705,9 @@ void haltestelle_t::rotate90( const sint16 y_size )
 	}
 
 #ifdef MULTI_THREAD
-	const sint32 po = world()->get_parallel_operations() + 2;
+	const uint32 po = world()->get_parallel_operations() + 2;
 #else
-	const sint32 po = 1;
+	const uint32 po = 1;
 #endif
 
 	for (uint32 i = 0; i < po; i++)
