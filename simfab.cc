@@ -4402,9 +4402,6 @@ void fabrik_t::calc_max_intransit_percentages()
 			continue;
 		}
 
-		const factory_supplier_desc_t* flb = desc->get_supplier(index);
-		const uint32 vb = flb ? flb->get_consumption() : 0;
-
 		const sint32 base_production = get_current_production();
 		uint64 consumed_per_month = max((uint64)base_production, 1);
 

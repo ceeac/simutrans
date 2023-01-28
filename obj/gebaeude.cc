@@ -1016,8 +1016,6 @@ void gebaeude_t::info(cbuffer_t & buf) const
 #endif
 		buf.printf("%s: %d\n", translator::translate("Mail demand/output"), get_adjusted_mail_demand());
 
-		building_desc_t const& h = *tile->get_desc();
-
 		buf.append("\n");
 		if (get_owner() == NULL) {
 			buf.append(translator::translate("Wert"));

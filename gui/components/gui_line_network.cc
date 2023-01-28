@@ -502,7 +502,7 @@ void gui_line_network_t::init_diagram()
 }
 
 
-bool gui_line_network_t::action_triggered(gui_action_creator_t *comp, value_t v)
+bool gui_line_network_t::action_triggered(gui_action_creator_t *comp, value_t)
 {
 	if( comp==&bt_own_network ) {
 		filter_own_network = !filter_own_network;

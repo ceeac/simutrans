@@ -289,7 +289,7 @@ obj_desc_t * building_reader_t::read_node(FILE *fp, obj_node_info_t &node)
 		desc->maintenance = decode_sint32(p);
 		desc->price = decode_sint32(p);
 		desc->allow_underground = decode_uint8(p);
-		uint16 dummy = decode_uint16(p);
+		(void)decode_uint16(p);
 		//desc->preservation_year_month = decode_uint16(p);
 	}
 	else if(version == 8  ||  version == 9) {
