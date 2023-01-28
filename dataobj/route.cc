@@ -445,7 +445,7 @@ bool route_t::find_route(karte_t *welt, const koord3d start, test_driver_t *tdri
 			}
 
 			if (destination_city ||
-				((!current_city && (straight_line_tiles < max_commuting_distance_road_tiles) ||
+				(((!current_city && straight_line_tiles < max_commuting_distance_road_tiles) ||
 				(destination_attraction && welt->get_settings().get_do_not_record_private_car_routes_to_city_attractions() < destination_attraction->get_adjusted_visitor_demand()) ||
 				(destination_industry && welt->get_settings().get_do_not_record_private_car_routes_to_city_industries() < destination_industry->get_building()->get_adjusted_visitor_demand())) ||
 				(!destination_industry && !destination_attraction && !welt->get_settings().get_do_not_record_private_car_routes_to_city_buildings())))

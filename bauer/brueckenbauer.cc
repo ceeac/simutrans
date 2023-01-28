@@ -297,9 +297,9 @@ bool bridge_builder_t::is_blocked(koord3d pos, ribi_t::ribi check_ribi, player_t
 
 			weg_t *w = gr2->get_weg_nr(0);
 			const bool public_service = player ? player->is_public_service() : false;
-			if ((w && w->get_max_speed() > 0) && ((gr2->is_water() && !public_service))
-				||	(w && (!w->is_low_clearence(player,permissive)
-					|| (w->is_public_right_of_way() && (!w->is_disused() || welt->get_city(gr2->get_pos().get_2d()) ) ))))
+			if (((w && w->get_max_speed() > 0) && ((gr2->is_water() && !public_service))) ||
+				(w && (!w->is_low_clearence(player,permissive) ||
+				(w->is_public_right_of_way() && (!w->is_disused() || welt->get_city(gr2->get_pos().get_2d()) ) ))))
 			{
 				error_msg = "Bridge blocked by way below or above.";
 				return true;
