@@ -4050,7 +4050,7 @@ bool tool_build_tunnel_t::check_ventilation(const way_builder_t &bauigel){
 			}
 
 			if(const grund_t *gr=welt->lookup(pos)){
-				if(const weg_t *w = gr->get_weg(desc->get_waytype())){
+				if(gr->get_weg(desc->get_waytype())){
 					vent_checker_t vent_check(desc->get_length_limit());
 					route_t vent_route;
 					if(vent_route.find_route(welt,pos,&vent_check,0,ribi_t::all,0,1,0,desc->get_length_limit()/welt->get_settings().get_meters_per_tile()+1,false)){
@@ -6349,11 +6349,9 @@ bool tool_build_pier_t::init(player_t *){
 }
 
 
-const char* tool_build_pier_t::check_pos(player_t *, koord3d pos){
-	if( grund_t *gr = welt->lookup( pos )){
-		return NULL;
-	}
-	return "Missing ground (fatal!)";
+const char* tool_build_pier_t::check_pos(player_t *, koord3d pos)
+{
+	return welt->lookup(pos) ? NULL : "Missing ground (fatal!)";
 }
 
 void tool_build_pier_t::begin_move(player_t *, koord3d pos) {
