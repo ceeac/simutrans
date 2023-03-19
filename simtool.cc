@@ -9805,8 +9805,8 @@ bool tool_change_convoi_t::init( player_t *player )
 				}
 				break;
 			}
-			// Else fallthrough
 		}
+		// fallthrough
 
 		case 'R': // Add new replace
 		{

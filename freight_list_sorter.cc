@@ -172,8 +172,8 @@ bool freight_list_sorter_t::compare_ware(ware_t const& w1, ware_t const& w2)
 		else if (v2.is_bound()) {
 			return true;
 		}
-		/* FALLTHROUGH */
 	}
+	/* FALLTHROUGH */
 
 	case by_line:
 	case by_line_via: {
