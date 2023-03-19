@@ -892,7 +892,7 @@ void bridge_builder_t::build_bridge(player_t *player, const koord3d start, const
 			weg_t * const weg = weg_t::alloc( desc->get_waytype() );
 			weg->set_desc( way_desc );
 			weg->set_bridge_weight_limit(desc->get_max_weight());
-			const slope_t::type hang = start_gr ? start_gr->get_weg_hang() :  slope_t::flat;
+			const slope_t::type hang = start_gr ? start_gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 			if(hang != slope_t::flat)
 			{
 				const uint slope_height = (hang & 7) ? 1 : 2;
@@ -945,7 +945,7 @@ void bridge_builder_t::build_bridge(player_t *player, const koord3d start, const
 			weg->set_bridge_weight_limit(desc->get_max_weight());
 			player->book_construction_costs(player, -bruecke->neuen_weg_bauen(weg, ribi_t::doubles(ribi), player) - weg->get_desc()->get_value(), weg->get_pos().get_2d(), weg->get_waytype());
 			const grund_t* gr = welt->lookup(weg->get_pos());
-			const slope_t::type hang = gr ? gr->get_weg_hang() :  slope_t::flat;
+			const slope_t::type hang = gr ? gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 			const weg_t* old_way = gr ? gr->get_weg(way_desc->get_wtyp()) : NULL;
 
 			if(hang != slope_t::flat)
@@ -1033,7 +1033,7 @@ void bridge_builder_t::build_bridge(player_t *player, const koord3d start, const
 				}
 				weg->set_bridge_weight_limit(desc->get_max_weight());
 				const weg_t* old_way = gr ? gr->get_weg(way_desc->get_wtyp()) : NULL;
-				const slope_t::type hang = gr ? gr->get_weg_hang() :  slope_t::flat;
+				const slope_t::type hang = gr ? gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 				if(hang != slope_t::flat)
 				{
 					const uint slope_height = (hang & 7) ? 1 : 2;
@@ -1153,7 +1153,7 @@ void bridge_builder_t::build_ramp(player_t* player, koord3d end, ribi_t::ribi ri
 			player_t::book_construction_costs(player, -bruecke->neuen_weg_bauen( weg, ribi_neu, player ) - weg->get_desc()->get_value(), end.get_2d(), desc->get_waytype());
 		}
 		const grund_t* gr = welt->lookup(weg->get_pos());
-		const slope_t::type hang = gr ? gr->get_weg_hang() : slope_t::flat;
+		const slope_t::type hang = gr ? gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 		if(hang != slope_t::flat)
 		{
 			const uint slope_height = (hang & 7) ? 1 : 2;

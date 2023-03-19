@@ -548,7 +548,7 @@ void tunnel_builder_t::build_tunnel_portal(player_t *player, koord3d end, koord 
 			tunnel->neuen_weg_bauen( weg, ribi, player );
 		}
 		const grund_t* gr = welt->lookup(weg->get_pos());
-		const slope_t::type hang = gr ? gr->get_weg_hang() : slope_t::flat;
+		const slope_t::type hang = gr ? gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 		if(hang != slope_t::flat)
 		{
 			const uint slope_height = (hang & 7) ? 1 : 2;

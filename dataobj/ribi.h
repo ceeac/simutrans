@@ -39,7 +39,7 @@ public:
 	/**
 	 * Named constants for special cases.
 	 */
-	enum _type {
+	enum _type : type {
 		flat = 0,
 
 		northwest = 27, ///< NW corner
@@ -157,11 +157,13 @@ class ribi_t {
 	};
 
 public:
+	typedef uint8 ribi;
+
 	/**
 	 * Named constants for all possible directions.
 	 * 1=North, 2=East, 4=South, 8=West
 	 */
-	enum _ribi {
+	enum _ribi : ribi {
 		none           = 0,
 		north          = 1,
 		east           = 2,
@@ -179,7 +181,7 @@ public:
 		southeastwest  = 14,
 		all            = 15
 	};
-	typedef uint8 ribi;
+
 
 	/**
 	 * Named constants to translate direction to image number for vehicles, signs.

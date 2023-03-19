@@ -85,7 +85,7 @@ void gui_way_detail_info_t::draw(scr_coord offset)
 
 		add_table(5,0);
 		{
-			const slope_t::type hang = gr ? gr->get_weg_hang() : slope_t::flat;
+			const slope_t::type hang = gr ? gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 			const sint32 potential_way_speed = !hang ? way->get_desc()->get_topspeed() : hang == 1 ? way->get_desc()->get_topspeed_gradient_1() : way->get_desc()->get_topspeed_gradient_2();
 
 			if( bridge ) {

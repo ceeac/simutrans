@@ -287,7 +287,7 @@ void weg_t::set_desc(const way_desc_t *b, bool from_saved_game)
 
 void weg_t::calc_speed_limit(grund_t* gr, const bruecke_t* bridge, const tunnel_t* tunnel)
 {
-	const slope_t::type hang = gr ? gr->get_weg_hang() : slope_t::flat;
+	const slope_t::type hang = gr ? gr->get_weg_hang() : (slope_t::type)slope_t::flat;
 
 	if (!bridge)
 	{

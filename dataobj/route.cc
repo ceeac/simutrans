@@ -1344,7 +1344,7 @@ void route_t::postprocess_water_route(karte_t *welt)
 				// Do not go on a tile where a one way sign forbids going.
 				// This saves time and fixed the bug that a one way sign on the final tile was ignored.
 				weg_t* wg = gr->get_weg(wegtyp);
-				ribi_t::ribi go_dir = wg ? wg->get_ribi_maske(): ribi_t::all;
+				ribi_t::ribi go_dir = wg ? wg->get_ribi_maske() : (ribi_t::ribi)ribi_t::all;
 				if((ribi & go_dir) != 0)
 				{
 					if(is_rail_type)

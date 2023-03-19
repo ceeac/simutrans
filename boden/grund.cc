@@ -2030,7 +2030,7 @@ sint64 grund_t::neuen_weg_bauen(weg_t *weg, ribi_t::ribi ribi, player_t *player,
 				const koord3d kn3d(kn, welt->lookup_hgt(kn));
 				grund_t* to = welt->lookup(kn3d);
 				const weg_t* connecting_way = to ? to->get_weg(weg->get_waytype()) : NULL;
-				const ribi_t::ribi connecting_ribi = connecting_way ? connecting_way->get_ribi() : ribi_t::all;
+				const ribi_t::ribi connecting_ribi = connecting_way ? connecting_way->get_ribi() : (ribi_t::ribi)ribi_t::all;
 				if(route->is_contained(kn3d) || (ribi_t::is_single(ribi) && ribi_t::is_single(connecting_ribi)))
 				{
 					continue;
