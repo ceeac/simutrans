@@ -335,7 +335,7 @@ void gui_factory_connection_stat_t::draw(scr_coord offset)
 	int yoff = pos.y;
 
 	double distance;
-	char distance_display[10];
+	char distance_display[12];
 
 	fab_list = is_input_display ? fab->get_suppliers() : fab->get_consumers();
 
