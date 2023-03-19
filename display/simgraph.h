@@ -174,7 +174,7 @@ void register_image(class image_t *);
 void display_free_all_images_above( image_id above );
 
 // unzoomed offsets
-void display_get_base_image_offset( image_id image, scr_coord_val *xoff, scr_coord_val *yoff, scr_coord_val *xw, scr_coord_val *yw );
+void display_get_base_image_offset( image_id image, scr_coord_val &xoff, scr_coord_val &yoff, scr_coord_val &xw, scr_coord_val &yw );
 // zoomed offsets
 void display_get_image_offset( image_id image, scr_coord_val *xoff, scr_coord_val *yoff, scr_coord_val *xw, scr_coord_val *yw );
 void display_mark_img_dirty( image_id image, scr_coord_val x, scr_coord_val y );

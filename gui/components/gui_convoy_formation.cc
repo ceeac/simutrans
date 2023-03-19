@@ -151,7 +151,7 @@ scr_size gui_convoy_formation_t::draw_vehicles(scr_coord offset, bool display_im
 	for(unsigned i=0; i<cnv->get_vehicle_count();i++) {
 		scr_coord_val x = 0, y = 0, w = 0, h = 0;
 		const image_id image = cnv->get_vehicle(i)->get_loaded_image();
-		display_get_base_image_offset(image, &x, &y, &w, &h );
+		display_get_base_image_offset(image, x, y, w, h );
 		if (display_images) {
 			display_base_img(image, p.x + s.w - x, p.y - y - h/2, cnv->get_owner()->get_player_nr(), false, true);
 		}

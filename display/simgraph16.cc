@@ -2249,13 +2249,13 @@ void display_get_image_offset(image_id image, scr_coord_val *xoff, scr_coord_val
 
 
 // query un-zoomed offsets
-void display_get_base_image_offset(image_id image, scr_coord_val *xoff, scr_coord_val *yoff, scr_coord_val *xw, scr_coord_val *yw)
+void display_get_base_image_offset(image_id image, scr_coord_val &xoff, scr_coord_val &yoff, scr_coord_val &xw, scr_coord_val &yw)
 {
 	if(  image < anz_images  ) {
-		*xoff = images[image].base_x;
-		*yoff = images[image].base_y;
-		*xw   = images[image].base_w;
-		*yw   = images[image].base_h;
+		xoff = images[image].base_x;
+		yoff = images[image].base_y;
+		xw   = images[image].base_w;
+		yw   = images[image].base_h;
 	}
 }
 

@@ -39,7 +39,7 @@ void gui_building_t::init(const building_desc_t* d, int r)
 				images.append(img);
 				// compute bounding box
 				scr_coord_val x = 0,y = 0, w = 0, h = 0;
-				display_get_base_image_offset( id, &x, &y, &w, &h );
+				display_get_base_image_offset( id, x, y, w, h );
 				tl.clip_rightbottom(img->get_pos() + scr_coord(x,y));
 				br.clip_lefttop(img->get_pos() + scr_coord(x+w,y+h));
 			}
