@@ -1333,7 +1333,8 @@ halthandle_t halt_info_t::get_convoy_target_halt(convoihandle_t cnv)
 	uint8 entry = cnv->is_reversed() ? schedule->get_count()-1 : 0;
 	halthandle_t origin_halt;
 	bool found_in_forward=false;
-	while (entry>=0 && entry<schedule->get_count()) {
+
+	while (entry < schedule->get_count()) {
 		const halthandle_t entry_halt = haltestelle_t::get_halt(schedule->entries[entry].pos, cnv->get_owner());
 		if (entry_halt.is_bound()) {
 			if (entry_halt == halt) {

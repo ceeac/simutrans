@@ -1190,7 +1190,7 @@ bool rail_vehicle_t::can_enter_tile(const grund_t *gr, sint32 &restart_speed, ui
 	if(route_steps <= brake_steps || brake_steps < 0)
 	{
 		sint32 check_tile = modify_check_tile ? route_index + 1 : next_block; // This might otherwise end up as -1 without the ? block, which would be an attempt to check the *previous* tile, which would be silly.
-		if((check_tile > 0) && check_tile >= cnv->get_route()->get_count()) // Checking if check_tile > 0 is necessary because get_count() is a uint32
+		if((check_tile > 0) && (uint32)check_tile >= cnv->get_route()->get_count()) // Checking if check_tile > 0 is necessary because get_count() is a uint32
 		{
 			check_tile = cnv->get_route()->get_count() - 1;
 		}
@@ -2320,7 +2320,7 @@ sint32 rail_vehicle_t::block_reserver(route_t *route, uint16 start_index, uint16
 			const bool telegraph_directional = (time_interval_reservation && previous_telegraph_directional) || (next_signal_working_method == time_interval_with_telegraph && (((last_longblock_signal_index == last_stop_signal_index && first_stop_signal_index == last_longblock_signal_index) && last_longblock_signal_index < INVALID_INDEX) || (first_double_block_signal_index < INVALID_INDEX && next_signal_protects_no_junctions)));
 			const schiene_t::reservation_type rt = directional_only || (telegraph_directional && i > modified_sighting_distance_tiles) ? schiene_t::directional : schiene_t::block;
 			bool transitioning_from_time_interval = (working_method == time_interval || working_method == time_interval_with_telegraph) && (next_signal_working_method == absolute_block || next_signal_working_method == track_circuit_block || next_signal_working_method == token_block);
-			bool attempt_reservation = directional_only || time_interval_reservation || previous_telegraph_directional || ((next_signal_working_method != time_interval && next_signal_working_method != time_interval_with_telegraph && ((next_signal_working_method != drive_by_sight && !transitioning_from_time_interval) || i < start_index + modified_sighting_distance_tiles + 1)) && (!stop_at_station_signal.is_bound() || stop_at_station_signal == check_halt));
+			bool attempt_reservation = directional_only || time_interval_reservation || previous_telegraph_directional || ((next_signal_working_method != time_interval && next_signal_working_method != time_interval_with_telegraph && ((next_signal_working_method != drive_by_sight && !transitioning_from_time_interval) || i < start_index + modified_sighting_distance_tiles + 1u)) && (!stop_at_station_signal.is_bound() || stop_at_station_signal == check_halt));
 			previous_telegraph_directional = telegraph_directional;
 			previous_time_interval_reservation = time_interval_reservation ? is_true : is_false;
 			if(!reserving_beyond_a_train && attempt_reservation && !sch1->reserve(cnv->self, ribi_type(route->at(max(1u,i)-1u), route->at(min(route->get_count()-1u,i+1u))), rt, (working_method == time_interval || working_method == time_interval_with_telegraph)))
@@ -2952,7 +2952,7 @@ sint32 rail_vehicle_t::block_reserver(route_t *route, uint16 start_index, uint16
 						}
 					}
 
-					if((signal->get_desc()->get_working_method() == time_interval || signal->get_desc()->get_working_method() == time_interval_with_telegraph) && (end_of_block || i >= last_stop_signal_index + 1 || time_interval_junction_signal))
+					if((signal->get_desc()->get_working_method() == time_interval || signal->get_desc()->get_working_method() == time_interval_with_telegraph) && (end_of_block || i >= last_stop_signal_index + 1u || time_interval_junction_signal))
 					{
 						if((signal->get_desc()->get_working_method() == time_interval_with_telegraph || signal->get_desc()->get_working_method() == time_interval) && signal->get_desc()->is_longblock_signal())
 						{

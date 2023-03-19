@@ -2761,7 +2761,7 @@ bool grund_t::removing_way_would_disrupt_public_right_of_way(waytype_t wt)
 			const uint32 bridge_weight_limit = gr->ist_bruecke() ? w->get_bridge_weight_limit() : 0;
 			const uint32 bridge_weight = max_axle_load * (w->get_waytype() == road_wt ? 2 : 1);  // This is something of a fudge, but it is reasonable to assume that most road vehicles have 2 axles.
 
-			for (uint32 i = 0; i < intersections.get_count() - 1; i++)
+			for (uint32 i = 0; i < intersections.get_count() - 1u; i++)
 			{
 				route_t existing_route;
 				route_t existing_route_2;
