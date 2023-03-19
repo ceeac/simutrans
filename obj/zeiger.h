@@ -91,7 +91,9 @@ public:
 	// higilight this marker
 	void set_selected(bool yesno) { is_selected = yesno; }
 
+#ifdef MULTI_THREAD
 	void display_overlay(int xpos, int ypos) const OVERRIDE;
+#endif
 };
 
 #endif

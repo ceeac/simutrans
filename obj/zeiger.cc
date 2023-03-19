@@ -138,6 +138,7 @@ schedule_marker_t::schedule_marker_t(koord3d pos, player_t *player, waytype_t wt
 	set_owner(player);
 }
 
+#ifdef MULTI_THREAD
 void schedule_marker_t::display_overlay(int xpos, int ypos) const
 {
 	char buf[4];
@@ -199,3 +200,4 @@ void schedule_marker_t::display_overlay(int xpos, int ypos) const
 	xpos -= proportional_string_width(buf)>>1;
 	display_proportional_rgb(xpos+1, ypos+3, buf, ALIGN_TOP, text_color, false);
 }
+#endif
