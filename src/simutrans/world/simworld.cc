@@ -3658,21 +3658,6 @@ void karte_t::update_map_intern(sint16 x_min, sint16 x_max, sint16 y_min, sint16
 }
 
 
-void karte_t::flood_to_depth( sint8 new_water_height, sint8 *stage )
-{
-	const uint16 size_x = get_size().x;
-	const uint16 size_y = get_size().y;
-
-	uint32 offset_max = size_x*size_y;
-	for(  uint32 offset = 0;  offset < offset_max;  offset++  ) {
-		if(  stage[offset] == -1  ) {
-			continue;
-		}
-		water_hgts[offset] = new_water_height;
-	}
-}
-
-
 // recalcs all ground tiles on the map
 void karte_t::update_map()
 {

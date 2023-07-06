@@ -74,6 +74,7 @@ private:
 	void create_lakes_internal(sint8 height);
 	void create_lakes_loop(sint16 xmin, sint16 xmax, sint16 ymin, sint16 ymax);
 	bool can_flood_to_depth(koord pos, sint8 new_water_height, sint8 *stage, sint8 *our_stage, sint16, sint16, sint16, sint16) const;
+	void flood_to_depth(sint8 new_water_height, sint8 *stage);
 
 	void distribute_trees_region(sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom);
 

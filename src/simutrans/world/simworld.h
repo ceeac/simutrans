@@ -512,8 +512,6 @@ private:
 	 */
 	void update_map_intern(sint16, sint16, sint16, sint16);
 
-	void flood_to_depth(sint8 new_water_height, sint8 *stage);
-
 public:
 	enum server_announce_type_t
 	{

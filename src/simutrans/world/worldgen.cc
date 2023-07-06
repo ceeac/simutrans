@@ -1154,7 +1154,7 @@ void worldgen_t::create_lakes_internal( sint8 max_lake_height )
 		world->world_xy_loop(this, &worldgen_t::create_lakes_loop);
 
 		if (need_to_flood) {
-			world->flood_to_depth(  h, stage  );
+			this->flood_to_depth(  h, stage  );
 		}
 		else {
 			break;
@@ -1326,6 +1326,21 @@ exit_iteration:
 	}
 
 	return succeeded;
+}
+
+
+void worldgen_t::flood_to_depth( sint8 new_water_height, sint8 *stage)
+{
+	const uint16 size_x = world->get_size().x;
+	const uint16 size_y = world->get_size().y;
+
+	uint32 offset_max = size_x*size_y;
+	for(  uint32 offset = 0;  offset < offset_max;  offset++  ) {
+		if(  stage[offset] == -1  ) {
+			continue;
+		}
+		world->water_hgts[offset] = new_water_height;
+	}
 }
 
 
