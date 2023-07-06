@@ -14,21 +14,32 @@
 #include "../builder/tunnelbauer.h"
 #include "../builder/vehikelbauer.h"
 #include "../builder/wegbauer.h"
+
 #include "../dataobj/environment.h"
 #include "../dataobj/route.h"
 #include "../dataobj/translator.h"
+
 #include "../descriptor/groundobj_desc.h"
+
 #include "../display/viewport.h"
+
 #include "../ground/boden.h"
 #include "../ground/wasser.h"
+
 #include "../gui/minimap.h"
+
 #include "../obj/groundobj.h"
+
 #include "../simloadingscreen.h"
+
 #include "../simintr.h"
 #include "../simmesg.h"
 #include "../simsound.h"
+
 #include "../sys/simsys.h"
+
 #include "../utils/simrandom.h"
+
 #include "../vehicle/vehicle.h"
 #include "../vehicle/movingobj.h"
 
@@ -450,7 +461,7 @@ void worldgen_t::generate_cities()
 		}
 
 		// center on first city
-		if(  old_size.x+old_size.y == 0  &&  world->get_cities().get_count()>0) {
+		if(  old_size.x+old_size.y == 0  &&  !world->get_cities().empty()) {
 			world->get_viewport()->change_world_position( world->get_cities()[0]->get_pos() );
 		}
 
@@ -486,10 +497,9 @@ void worldgen_t::generate_cities()
 			sint32 growth = 32;
 			sint32 current_bev = 1;
 
-			/* grow gradually while aging
-				* the difference to the current end year will be halved,
-				* while the growth step is doubled
-				*/
+			// grow gradually while aging
+			// the difference to the current end year will be halved,
+			// while the growth step is doubled
 			world->current_month = game_start;
 			bool not_updated = false;
 			bool new_town = true;

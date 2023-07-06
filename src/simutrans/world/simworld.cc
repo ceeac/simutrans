@@ -3,116 +3,85 @@
  * (see LICENSE.txt)
  */
 
-#include <algorithm>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-
-#include <sys/stat.h>
+#include "simworld.h"
 
 #include "simcity.h"
-#include "../simcolor.h"
-#include "../simconvoi.h"
-#include "../simdebug.h"
-#include "../obj/depot.h"
-#include "../simfab.h"
-#include "../display/simgraph.h"
-#include "../display/viewport.h"
-#include "../simhalt.h"
-#include "../display/simimg.h"
-#include "../siminteraction.h"
-#include "../simintr.h"
-#include "../simlinemgmt.h"
-#include "../simloadingscreen.h"
-#include "../tool/simmenu.h"
-#include "../simmesg.h"
-#include "../simskin.h"
-#include "../simsound.h"
-#include "../simticker.h"
-#include "../simunits.h"
-#include "../simversion.h"
-#include "../display/simview.h"
-#include "../tool/simtool-scripted.h"
-#include "../gui/simwin.h"
-#include "simworld.h"
-#include "../sys/simsys.h"
+#include "worldgen.h"
 
-#include "../tpl/vector_tpl.h"
-#include "../tpl/binary_heap_tpl.h"
 
-#include "../ground/boden.h"
-#include "../ground/wasser.h"
+#include "../builder/hausbauer.h"
+#include "../builder/fabrikbauer.h"
+#include "../builder/tree_builder.h"
+#include "../builder/vehikelbauer.h"
+#include "../builder/wegbauer.h"
 
-#include "../old_blockmanager.h"
-#include "../vehicle/vehicle.h"
-#include "../vehicle/simroadtraffic.h"
-#include "../vehicle/pedestrian.h"
-#include "../vehicle/movingobj.h"
-#include "../obj/way/schiene.h"
-
-#include "../obj/zeiger.h"
-#include "../obj/baum.h"
-#include "../obj/signal.h"
-#include "../obj/roadsign.h"
-#include "../obj/wayobj.h"
-#include "../obj/groundobj.h"
-#include "../obj/gebaeude.h"
-#include "../obj/leitung2.h"
-#include "../obj/wolke.h"
-
-#include "../gui/password_frame.h"
-#include "../gui/messagebox.h"
-#include "../gui/help_frame.h"
-#include "../gui/minimap.h"
-#include "../gui/player_frame.h"
-
-#include "../network/network.h"
-#include "../network/network_file_transfer.h"
-#include "../network/network_socket_list.h"
-#include "../network/network_cmd_ingame.h"
-
-#include "../dataobj/height_map_loader.h"
-#include "../dataobj/ribi.h"
-#include "../dataobj/translator.h"
-#include "../dataobj/loadsave.h"
-#include "../dataobj/marker.h"
-#include "../dataobj/scenario.h"
-#include "../dataobj/settings.h"
 #include "../dataobj/environment.h"
+#include "../dataobj/height_map_loader.h"
+#include "../dataobj/pakset_manager.h"
 #include "../dataobj/powernet.h"
 #include "../dataobj/records.h"
-#include "../dataobj/pakset_manager.h"
-
-#include "../utils/cbuffer.h"
-#include "../utils/simrandom.h"
-#include "../utils/simstring.h"
-
-#include "../network/memory_rw.h"
-
-#include "../builder/brueckenbauer.h"
-#include "../builder/tunnelbauer.h"
-#include "../builder/fabrikbauer.h"
-#include "../builder/wegbauer.h"
-#include "../builder/hausbauer.h"
-#include "../builder/vehikelbauer.h"
+#include "../dataobj/scenario.h"
+#include "../dataobj/translator.h"
 
 #include "../descriptor/ground_desc.h"
 #include "../descriptor/intro_dates.h"
+#include "../descriptor/vehicle_desc.h"
 
-#include "../player/simplay.h"
-#include "../player/finance.h"
-#include "../player/ai_passenger.h"
-#include "../player/ai_goods.h"
-#include "../player/ai_scripted.h"
+#include "../display/simview.h"
+#include "../display/viewport.h"
 
-#include "terraformer.h"
-#include "worldgen.h"
+#include "../gui/help_frame.h"
+#include "../gui/messagebox.h"
+#include "../gui/minimap.h"
+#include "../gui/password_frame.h"
+#include "../gui/player_frame.h"
+#include "../gui/simwin.h"
 
 #include "../io/rdwr/adler32_stream.h"
 
+#include "../network/network_cmd.h"
+#include "../network/network_cmd_ingame.h"
+#include "../network/network_socket_list.h"
+#include "../network/network_file_transfer.h"
+
+#include "../obj/depot.h"
+#include "../obj/leitung2.h"
+#include "../obj/roadsign.h"
+#include "../obj/wolke.h"
+#include "../obj/zeiger.h"
+
+#include "../player/ai_goods.h"
+#include "../player/ai_passenger.h"
+#include "../player/ai_scripted.h"
+#include "../player/finance.h"
+#include "../player/simplay.h"
+
+#include "../sys/simsys.h"
+
+#include "../tool/simmenu.h"
+#include "../tool/simtool-scripted.h"
+
+#include "../utils/simrandom.h"
+#include "../utils/simstring.h"
+
+#include "../vehicle/movingobj.h"
+#include "../vehicle/pedestrian.h"
+#include "../vehicle/vehicle.h"
+
+#include "../old_blockmanager.h"
 #include "../pathes.h"
+#include "../simconvoi.h"
+#include "../simfab.h"
+#include "../simhalt.h"
+#include "../simintr.h"
+#include "../simloadingscreen.h"
+#include "../simmesg.h"
+#include "../simsound.h"
+#include "../simticker.h"
+#include "../siminteraction.h"
+#include "../simversion.h"
+
+#include <sys/stat.h>
 
 
 // forward declaration - management of rotation for scripting
@@ -574,13 +543,8 @@ void karte_t::set_scenario(scenario_t *s)
 }
 
 
-
-sint8 *humidity;
-
 void karte_t::init(settings_t* const sets, sint8 const* const h_field)
 {
-	humidity = NULL;
-
 	clear_random_mode( 7 );
 	mute_sound(true);
 	if (env_t::networkmode) {
@@ -1735,7 +1699,7 @@ void karte_t::buche(sint64 const betrag, player_cost const type)
 }
 
 
-inline sint32 get_population(stadt_t const* const c)
+static inline sint32 get_city_population(stadt_t const* const c)
 {
 	return c->get_einwohner();
 }
@@ -1790,7 +1754,7 @@ void karte_t::new_month()
 
 
 //	DBG_MESSAGE("karte_t::new_month()","cities");
-	stadt.update_weights(get_population);
+	stadt.update_weights(get_city_population);
 	for(stadt_t* const i : stadt) {
 		i->new_month(need_locality_update);
 	}
@@ -2654,7 +2618,6 @@ void karte_t::switch_server( bool start_server, bool port_forwarding )
 		}
 	}
 }
-
 
 
 // just the preliminaries, opens the file, checks the versions ...
@@ -3676,6 +3639,7 @@ void karte_t::update_underground()
 	minimap_t::get_instance()->calc_map();
 }
 
+
 void karte_t::prepare_tiles(rect_t const &new_area, rect_t const &old_area) {
 	if (new_area == old_area) {
 		// area already prepared
@@ -3713,8 +3677,6 @@ void karte_t::prepare_tiles(rect_t const &new_area, rect_t const &old_area) {
 		}
 	}
 }
-
-
 
 
 void karte_t::recalc_transitions_loop( sint16 x_min, sint16 x_max, sint16 y_min, sint16 y_max )
@@ -4149,6 +4111,7 @@ const char* karte_t::call_work_api(tool_t *tool, player_t *player, koord3d pos, 
 	suspended = false;
 	const char *err = NULL;
 	bool network_safe_tool = tool->is_work_keeps_game_state() || tool->is_work_here_keeps_game_state(player, pos);
+
 	if(  !env_t::networkmode  ||  network_safe_tool  ) {
 		// do the work
 		tool->flags |= tool_t::WFL_LOCAL;
@@ -4893,6 +4856,7 @@ const vector_tpl<const goods_desc_t*> &karte_t::get_goods_list()
 
 	return goods_in_game;
 }
+
 
 player_t *karte_t::get_public_player() const
 {
