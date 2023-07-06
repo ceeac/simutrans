@@ -218,7 +218,7 @@ void worldgen_t::generate_rivers()
 	koord last_koord(0,0);
 	const sint16 max_dist = world->get_size().x+world->get_size().y;
 
-	// trunk of 16 will ensure that rivers are long enough apart ...
+	// trunk of 16 will ensure that rivers are long enough apart
 	for(  sint16 y = 8;  y < world->get_size().y;  y+=16  ) {
 		for(  sint16 x = 8;  x < world->get_size().x;  x+=16  ) {
 			koord k(x,y);
@@ -261,8 +261,9 @@ void worldgen_t::generate_rivers()
 		// build a list of matching targets
 		vector_tpl<koord> valid_water_tiles;
 		for(  uint32 i=0;  i<water_tiles.get_count();  i++  ) {
-			const sint16 dist = koord_distance(start,water_tiles[i]);
-			if(  world->settings.get_min_river_length() < dist  &&  dist < world->settings.get_max_river_length()  ) {
+			const uint32 dist = koord_distance(start,water_tiles[i]);
+
+			if(  (uint32)world->settings.get_min_river_length() < dist  &&  dist < (uint32)world->settings.get_max_river_length()  ) {
 				valid_water_tiles.append( water_tiles[i] );
 			}
 		}
@@ -271,11 +272,14 @@ void worldgen_t::generate_rivers()
 		for(  sint32 i=0;  i<256  &&  !valid_water_tiles.empty();  i++  ) {
 			koord const end = pick_any(valid_water_tiles);
 			valid_water_tiles.remove( end );
+
 			way_builder_t riverbuilder(world->get_public_player());
 			riverbuilder.init_builder(way_builder_t::river, river_desc);
-			sint16 dist = koord_distance(start,end);
+
+			const sint16 dist = koord_distance(start,end);
 			riverbuilder.set_maximum( dist*50 );
 			riverbuilder.calc_route( world->lookup_kartenboden(end)->get_pos(), world->lookup_kartenboden(start)->get_pos() );
+
 			if(  riverbuilder.get_count() >= (uint32)world->settings.get_min_river_length()  ) {
 				// do not built too short rivers
 				riverbuilder.build();
@@ -301,46 +305,49 @@ void worldgen_t::generate_beaches()
 	for(  uint16 iy = 0;  iy < new_size.y;  iy++  ) {
 		for(  uint16 ix = (iy >= old_size.y - 19) ? 0 : max( old_size.x - 19, 0 );  ix < new_size.x;  ix++  ) {
 			grund_t *gr = world->lookup_kartenboden_nocheck(ix,iy);
-			if(  gr->is_water()  &&  gr->get_hoehe()==world->groundwater  &&  gr->kann_alle_obj_entfernen(NULL)==NULL) {
-				koord k( ix, iy );
-				uint8 neighbour_water = 0;
-				bool water[8] = {};
-				sint16 total_ground = 0;
-				// check whether nearby tiles are water
-				for(  int i = 0;  i < 8;  i++  ) {
-					if(  grund_t *gr2 = world->lookup_kartenboden( k + koord::neighbours[i] )  ) {
-						total_ground++;
-						if( gr2->hat_weg( water_wt ) ) {
-							// never ever make a beach near a river mound
-							neighbour_water = 8;
-							break;
-						}
-						if(  gr2->is_water()  ) {
-							water[i] = 1;
-							neighbour_water++;
-						}
+			if(  !gr->is_water()  ||  gr->get_hoehe()!=world->groundwater  ||  gr->kann_alle_obj_entfernen(NULL)!=NULL) {
+				continue;
+			}
+
+			koord k( ix, iy );
+			uint8 neighbour_water = 0;
+			bool water[8] = {};
+			sint16 total_ground = 0;
+
+			// check whether nearby tiles are water
+			for(  int i = 0;  i < 8;  i++  ) {
+				if(  grund_t *gr2 = world->lookup_kartenboden( k + koord::neighbours[i] )  ) {
+					total_ground++;
+					if( gr2->hat_weg( water_wt ) ) {
+						// never ever make a beach near a river mound
+						neighbour_water = 8;
+						break;
+					}
+					if(  gr2->is_water()  ) {
+						water[i] = 1;
+						neighbour_water++;
 					}
 				}
+			}
 
-				// make a count of nearby tiles - where tiles on opposite (+-1 direction) sides are water these count much more so we don't block straits
-				for(  int i = 0;  i < 8;  i++  ) {
-					if(  water[i]  ) {
-						if(  water[(i + 3) & 7]  ||  water[(i + 4) & 7]  ||  water[(i + 5) & 7]  ) {
-							neighbour_water++;
-						}
+			// make a count of nearby tiles - where tiles on opposite (+-1 direction) sides are water these count much more so we don't block straits
+			for(  int i = 0;  i < 8;  i++  ) {
+				if(  water[i]  ) {
+					if(  water[(i + 3) & 7]  ||  water[(i + 4) & 7]  ||  water[(i + 5) & 7]  ) {
+						neighbour_water++;
 					}
 				}
+			}
 
-				// if not much nearby water then turn into a beach
-				if(  neighbour_water < (3*total_ground)/4  ) {
-					world->set_water_hgt_nocheck( k, gr->get_hoehe() - 1 );
-					world->raise_grid_to( ix, iy, gr->get_hoehe() );
-					world->raise_grid_to( ix + 1, iy, gr->get_hoehe() );
-					world->raise_grid_to( ix, iy + 1, gr->get_hoehe() );
-					world->raise_grid_to( ix + 1, iy + 1 , gr->get_hoehe() );
-					world->access_nocheck(k)->correct_water();
-					world->access_nocheck(k)->set_climate( desert_climate );
-				}
+			// if not much nearby water then turn into a beach
+			if(  neighbour_water < (3*total_ground)/4  ) {
+				world->set_water_hgt_nocheck( k, gr->get_hoehe() - 1 );
+				world->raise_grid_to( ix, iy, gr->get_hoehe() );
+				world->raise_grid_to( ix + 1, iy, gr->get_hoehe() );
+				world->raise_grid_to( ix, iy + 1, gr->get_hoehe() );
+				world->raise_grid_to( ix + 1, iy + 1 , gr->get_hoehe() );
+				world->access_nocheck(k)->correct_water();
+				world->access_nocheck(k)->set_climate( desert_climate );
 			}
 		}
 	}
