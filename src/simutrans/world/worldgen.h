@@ -27,7 +27,8 @@ class worldgen_t
 	const bool new_world;
 
 public:
-	worldgen_t(karte_t *world, const settings_t *settings);
+	/// @param overwrite_existing true to overwrite data in existing world (old_size), used while importing old save files
+	worldgen_t(karte_t *world, const settings_t *settings, bool overwrite_existing = false);
 
 public:
 	/**

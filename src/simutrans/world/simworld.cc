@@ -3457,7 +3457,8 @@ void karte_t::rdwr_gamestate(loadsave_t *file, loadingscreen_t *ls)
 		}
 		else if(  file->is_version_less(112, 7)  ) {
 			// distribute climates
-			calc_climate_map_region(0,0,get_size().x,get_size().y);
+			worldgen_t gen(this, &settings, true);
+			gen.generate_climates();
 		}
 		else {
 			for(  sint16 y = 0;  y < get_size().y;  y++  ) {

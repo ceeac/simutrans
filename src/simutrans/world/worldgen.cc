@@ -43,11 +43,11 @@ static bool global_lake_fill;
 static sint8 h;
 
 
-worldgen_t::worldgen_t(karte_t *world, const settings_t *settings)
+worldgen_t::worldgen_t(karte_t *world, const settings_t *settings, bool overwrite_existing)
 	: world(world)
 	, sets(settings)
-	, old_size(world->get_size())
-	, new_size(settings->get_size_x(), settings->get_size_y())
+	, old_size(overwrite_existing ? koord{ 0, 0 }     : world->get_size())
+	, new_size(overwrite_existing ? world->get_size() : koord(settings->get_size_x(), settings->get_size_y()))
 	, new_world(old_size.x == 0 && old_size.y == 0)
 {
 }
