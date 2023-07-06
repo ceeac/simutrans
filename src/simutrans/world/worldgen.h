@@ -63,9 +63,15 @@ private:
 	void cleanup_karte();
 	void cleanup_grounds_loop(sint16 x_min, sint16 x_max, sint16 y_min, sint16 y_max);
 
-	void create_lakes_internal(sint8 height);
+	// climates
+	void calc_climate_map_region(sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom);
+	void assign_climate_map_region(sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom);
+
+	/// Calculates appropriate climate for a region using elliptic areas for each
+	void calc_humidity_map_region(sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom);
 
 	/// Will create lakes (multithreaded).
+	void create_lakes_internal(sint8 height);
 	void create_lakes_loop(sint16 xmin, sint16 xmax, sint16 ymin, sint16 ymax);
 	bool can_flood_to_depth(koord pos, sint8 new_water_height, sint8 *stage, sint8 *our_stage, sint16, sint16, sint16, sint16) const;
 

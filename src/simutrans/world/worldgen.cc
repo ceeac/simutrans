@@ -172,11 +172,11 @@ void worldgen_t::generate_climates()
 {
 	// set climates in new area
 	if( new_world ) {
-		world->calc_climate_map_region( 0, 0, new_size.x, new_size.y );
+		calc_climate_map_region( 0, 0, new_size.x, new_size.y );
 	}
 	else {
-		world->calc_climate_map_region( 0, old_size.y, old_size.x, new_size.y );
-		world->calc_climate_map_region( old_size.x, 0, new_size.x, new_size.y );
+		calc_climate_map_region( 0, old_size.y, old_size.x, new_size.y );
+		calc_climate_map_region( old_size.x, 0, new_size.x, new_size.y );
 	}
 }
 
@@ -764,6 +764,345 @@ void worldgen_t::cleanup_grounds_loop(sint16 x_min, sint16 x_max, sint16 y_min, 
 
 			if(  world->max_hgt_nocheck(k) > water_hgt  ) {
 				world->set_water_hgt_nocheck(k, world->get_groundwater()-4);
+			}
+		}
+	}
+}
+
+
+void worldgen_t::calc_climate_map_region(sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom)
+{
+	if( xtop == 0 && ytop == 0 ) {
+		world->climate_map.clear();
+	}
+	world->climate_map.resize( xbottom, ybottom, 0x7F );
+
+	switch(world->settings.get_climate_generator()) {
+
+		case settings_t::HUMIDITY_BASED:
+		{
+			this->calc_humidity_map_region( xtop, ytop, xbottom, ybottom );
+
+			sint16 groundwater = world->settings.get_groundwater();
+			const sint16 winterline = world->settings.get_winter_snowline();
+			const sint16 summerline = world->settings.get_climate_borders( arctic_climate, 1 );
+
+			// annual mean temperature at summer snowline must be less than zero
+			// assume annual mean temperature at winter snowline is 14 celcius
+			const sint8 snowline_diff = summerline-winterline;
+			const sint8 groundwater_temperature = 14+((winterline-groundwater)*14)/(snowline_diff!=0 ? snowline_diff:1);
+
+			// first remove water all clear single tiles from effort
+			// for the first passes, we only work on the grid, which is much faster
+			for(  sint16 y = 0;  y < ybottom;  y++  ) {
+				for(  sint16 x = 0;  x < xbottom;  x++  ) {
+					if(  world->climate_map.at(x,y)==0x7F ) {
+						climate this_climate = arctic_climate; // fallthrough option
+
+						sint8 hgt = world->lookup_hgt_nocheck(x,y) - groundwater;
+						sint8 temperature = groundwater_temperature - (hgt-groundwater) - simrand(2);
+						sint8 this_humidity = world->humidity_map.at(x,y) + simrand(5);
+
+						if(  temperature >= world->settings.get_climate_temperature_borders(0)  ) {
+							if(  this_humidity > world->settings.get_tropic_humidity() ) {
+								this_climate = tropic_climate;
+							}
+							else if(  this_humidity > world->settings.get_desert_humidity()  ) {
+								this_climate = mediterran_climate;
+							}
+							else {
+								this_climate = desert_climate;
+							}
+						}
+						else if(  temperature >= world->settings.get_climate_temperature_borders(1)  ) {
+							if(  this_humidity > world->settings.get_desert_humidity() ) {
+								this_climate = mediterran_climate;
+							}
+							else {
+								this_climate = desert_climate;
+							}
+						}
+						else if(  temperature >= world->settings.get_climate_temperature_borders(2)  ) {
+							if(  this_humidity > world->settings.get_desert_humidity() ) {
+								this_climate = temperate_climate;
+							}
+							else {
+								this_climate = mediterran_climate;
+							}
+						}
+						else if(  temperature >= world->settings.get_climate_temperature_borders(3)  ) {
+							if(  this_humidity > world->settings.get_desert_humidity() ) {
+								this_climate = tundra_climate;
+							}
+							else {
+								this_climate = temperate_climate;
+							}
+						}
+						else if(  temperature >= world->settings.get_climate_temperature_borders(4)  ) {
+							this_climate = rocky_climate;
+						}
+
+						if( x >= xtop  &&  y >= ytop ) {
+							world->climate_map.at( x, y ) = this_climate;
+						}
+					}
+				}
+			}
+
+			// smooth climates (this code needs a little cleanup, I think)
+			const sint32 world_size = xbottom*(sint32)ybottom;
+			climate *climate_smooth = new climate[world_size];
+			climate *climate_smooth_cpy = new climate[world_size];
+
+			for(uint16 y=0; y<ybottom; y++) {
+				for(uint16 x=0; x<xbottom; x++) {
+					climate_smooth[x+y*xbottom] = (climate)world->climate_map.at( x, y );
+				}
+			}
+
+			for(int s=0; s<2; s++) {
+				memcpy( climate_smooth_cpy, climate_smooth, world_size*sizeof(climate) );
+
+				for(uint16 y=ytop; y<ybottom; y++) {
+					for(uint16 x=max(0,xtop-1); x<xbottom; x++) {
+						if(climate_smooth_cpy[x+y*xbottom] != water_climate ) {
+							sint32 temp_climate = 4 * (climate_smooth_cpy[x+y*xbottom]);
+							for(int i=0; i<8; i++) {
+								sint32 this_climate;
+								koord k_neighbour = koord(x,y) + koord::neighbours[i];
+
+								// note: cannot use is_within_limits() here since expanding the map
+								// in both directions at the same time results in a buffer overrun
+								// since the region does not necessarily cover the whole map
+								const bool within_limits = (k_neighbour.x|k_neighbour.y|(xbottom-1 - k_neighbour.x)|(ybottom-1 - k_neighbour.y)) >= 0;
+
+								if(  within_limits  &&  climate_smooth_cpy[k_neighbour.x+k_neighbour.y*xbottom]!=water_climate  ) {
+									this_climate = climate_smooth_cpy[k_neighbour.x+k_neighbour.y*xbottom];
+								}
+								else {
+									this_climate = climate_smooth_cpy[x+y*xbottom];
+								}
+								temp_climate += (i&1) ? (2 * (this_climate)) : (this_climate);
+							}
+							//if(s<8) temp_height += sets->get_map_roughness()*(simrand(8));
+							climate_smooth[x+y*xbottom]=(climate)((temp_climate)/16);
+						}
+					}
+				}
+			}
+
+			for(uint16 y=ytop; y<ybottom; y++) {
+				for(uint16 x=max(0,xtop-1); x<xbottom; x++) {
+					world->climate_map.at( x, y ) = climate_smooth[x+y*xbottom];
+				}
+			}
+
+			delete [] climate_smooth;
+			delete [] climate_smooth_cpy;
+		}
+		break;
+
+		case settings_t::HEIGHT_BASED: {
+			// first remove water all clear single tiles from effort
+			// for the first passes, we only work on the grid, which is much faster
+			for(  sint16 y = ytop;  y < ybottom;  y++  ) {
+				for(  sint16 x = xtop;  x < xbottom;  x++  ) {
+					sint8 hgt = world->lookup_hgt_nocheck( x, y );
+					if( hgt < world->groundwater ) {
+						world->climate_map.at( x, y ) = water_climate;
+					}
+					else if( world->num_climates_at_height[ hgt - world->get_groundwater() ] <= 1 ) {
+						world->climate_map.at( x, y ) = world->height_to_climate[hgt - world->get_groundwater()];
+					}
+				}
+			}
+
+			/* Now all unmarked tiles are still pending to get their climate
+			 * We will start an ellispe at the first tile than is inmarked with a random allowed climate for that height
+			 * The region sizes depends on the map (within reason)
+			 */
+			const sint16 max_patchsize_x = clamp( 5, (int)((xbottom*(long)world->settings.get_patch_size_percentage())/100l), 256 );
+			const sint16 max_patchsize_y = clamp( 5, (int)((ybottom*(long)world->settings.get_patch_size_percentage())/100l), 256 );
+
+			minivec_tpl<uint8> allowed( 8 );
+			{
+				// find the next climateless tile
+				for(  sint16 y = ytop;  y < ybottom;  y++  ) {
+					for(  sint16 x = xtop;  x < xbottom;  x++  ) {
+						if( world->climate_map.at( x, y ) > arctic_climate ) {
+							// not assigned yet => start with a random allowed climate
+							allowed.clear();
+							sint8 hgt = world->lookup_hgt_nocheck( x, y );
+							for( int cl=1;  cl<MAX_CLIMATES;  cl++ ) {
+								if(  hgt >= world->settings.get_climate_borders( cl, 0 )  &&  hgt < world->settings.get_climate_borders( cl, 1 )  ) {
+									allowed.append(cl);
+								}
+							}
+							//assert( !allowed.empty() );
+							climate cl = !allowed.empty() ? (climate)pick_any(allowed) : temperate_climate;
+
+							// now we do an ellipse with size wx and wy around the starting point
+							const sint32 wx = 2+simrand( max_patchsize_x );
+							const sint32 wy = 2+simrand( max_patchsize_y );
+							for( sint16 j = 0; j < wx; j++) {
+								for( sint16 i = 0; i < wy; i++) {
+
+									const sint32 x_off = (j-(wx>>1));
+									const sint32 y_off = (i-(wy>>1));
+									if(  x+x_off>=xtop  &&  x+x_off<xbottom  &&  y+y_off>=ytop  &&  y+y_off<ybottom  &&  world->climate_map.at( x+x_off, y+y_off )>arctic_climate  ) {
+
+										const uint64 distance = 1 + sqrt_i64( ((uint64)x_off*x_off*(wx*wx) + (uint64)y_off*y_off*(wy*wy)));
+										const uint32 threshold = (uint32)( ( 8 * (uint32)((wx*wx)+(wy*wy)) ) / distance );
+
+										if(  threshold > 40  ) {
+											hgt = world->lookup_hgt_nocheck( x+x_off, y+y_off );
+											// find out if the climate is still allowed here
+											if(  hgt >= world->settings.get_climate_borders( cl, 0 )  &&  hgt <= world->settings.get_climate_borders( cl, 1 )  ) 	{
+												world->climate_map.at( x+x_off, y+y_off ) = cl;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		break;
+
+		case settings_t::MAP_BASED:
+		{
+			/* Essentially keep the climates from this map
+			 * we just have to set the tiles with water to water climate
+			 * and vice vers
+			 */
+			for(  sint16 y = ytop;  y < ybottom;  y++  ) {
+				for(  sint16 x = xtop;  x < xbottom;  x++  ) {
+					sint8 hgt = world->lookup_hgt_nocheck( x, y );
+					if( hgt < world->get_groundwater() ) {
+						world->climate_map.at( x, y ) = water_climate;
+					}
+					else if( world->climate_map.at( x, y )==water_climate ) {
+						world->climate_map.at( x, y ) = world->height_to_climate[hgt - world->get_groundwater()];
+					}
+				}
+			}
+		}
+		break;
+
+	}
+
+	this->assign_climate_map_region( xtop, ytop, xbottom, ybottom );
+}
+
+
+void worldgen_t::assign_climate_map_region( sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom  )
+{
+	for(  sint16 y = ytop;  y < ybottom;  y++  ) {
+		for(  sint16 x = xtop;  x < xbottom;  x++  ) {
+			if(  planquadrat_t *pl = world->access( x, y )  ) {
+				if(  pl->get_kartenboden()->is_water()  ) {
+					// full water tile
+					pl->set_climate( water_climate );
+					pl->set_climate_transition_flag(false);
+					pl->set_climate_corners(0);
+					world->climate_map.at( x, y ) = water_climate;
+				}
+				else {
+					// test for beach tiles (if climate is not desert)
+					bool beach = false;
+					if(  world->climate_map.at(x,y)!=desert_climate  ) {
+						grund_t *gr = pl->get_kartenboden();
+						if(  gr->get_pos().z == world->groundwater  ) {
+							for(  int i = 0;  i < 8 && !beach;  i++  ) {
+								grund_t *gr2 = world->lookup_kartenboden( koord(x,y) + koord::neighbours[i] );
+								if(   gr2  &&  gr2->is_water()  ) {
+									beach = true;
+								}
+							}
+						}
+					}
+					// beach or only one climate
+					uint8 cl = beach ? (uint8)desert_climate : world->climate_map.at(x,y);
+					pl->set_climate( (climate)cl );
+					world->climate_map.at( x, y ) = cl;
+					pl->set_climate_transition_flag(false);
+					pl->set_climate_corners(0);
+				}
+			}
+		}
+	}
+}
+
+
+// distributes climates in a rectangle
+void worldgen_t::calc_humidity_map_region(sint16, sint16, sint16 xbottom, sint16 ybottom)
+{
+	// always calculate the map for the entire map to have smooth transitions
+	world->humidity_map.resize( xbottom, ybottom );
+
+	// some parameter to teaks:
+	// artic height should relate to the gradient, like delta_h/artic_max_height ~ 1/16 change of humidity or temperature
+	// also on smaller maps remoistering must be faster, since this parameter is kept with enlargement, it must be set externally
+
+	const sint8 height_increase = min( 160 / world->settings.get_climate_borders(arctic_climate,1), 33 );
+
+	const ribi_t::ribi wind = world->settings.get_wind_dir();
+
+	if( wind == ribi_t::west || wind == ribi_t::east ) {
+		const sint16 x0   = wind == ribi_t::west ? 0 : xbottom - 1;
+		const sint16 xmax = wind == ribi_t::west ? xbottom : -1;
+		const sint16 dx   = wind == ribi_t::west ? 1 : -1;
+
+		for(  sint16 y = 0;  y < ybottom;  y++  ) {
+			sint8 current_humidity = 50;	// start value for each row
+			for(  sint16 x = x0;  x < xmax;  x+=dx  ) {
+
+				grund_t *gr = world->lookup_kartenboden(x,y);
+				if(  gr->is_water()  ||   gr->hat_weg(water_wt)  ) {
+					// increase humidity over water and rivers
+					current_humidity += world->settings.get_moisture_water();
+
+					if( gr->is_water() ) {
+						world->climate_map.at( x, y ) = water_climate;
+					}
+				}
+				else {
+					sint8 gradient = world->lookup_hgt_nocheck( x+1, y ) - world->lookup_hgt_nocheck( x, y );
+					current_humidity += world->settings.get_moisture() + gradient * height_increase;
+				}
+
+				current_humidity = clamp<sint8>( current_humidity, 0, 100 );
+				world->humidity_map.at(x,y) = current_humidity;
+
+			}
+		}
+	}
+	else {
+		const sint16 y0   = wind == ribi_t::north ? 0 : ybottom - 1;
+		const sint16 ymax = wind == ribi_t::north ? ybottom : -1;
+		const sint16 dy   = wind == ribi_t::north ? 1 : -1;
+
+		for(  sint16 x = 0;  x < xbottom;  x++  ) {
+			sint8 current_humidity = 50;	// start value for each row
+			for(  sint16 y = y0;  y < ymax;  y+=dy  ) {
+
+				grund_t *gr = world->lookup_kartenboden(x,y);
+				if(  gr->is_water()  ||   gr->hat_weg(water_wt)  ) {
+					// increase humidity over water and rivers
+					current_humidity += world->settings.get_moisture_water();
+					if( gr->is_water() ) {
+						world->climate_map.at( x, y ) = water_climate;
+					}
+				}
+				else {
+					sint8 gradient = world->lookup_hgt_nocheck( x+1, y ) - world->lookup_hgt_nocheck( x, y );
+					current_humidity += world->settings.get_moisture() + gradient * height_increase;
+				}
+
+				current_humidity = clamp<sint8>( current_humidity, 0, 100 );
+				world->humidity_map.at(x,y) = current_humidity;
 			}
 		}
 	}

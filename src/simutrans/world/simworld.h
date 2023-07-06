@@ -1070,21 +1070,6 @@ public:
 
 public:
 	/**
-	* Calculates appropriate climate for a region using elliptic areas for each
-	*/
-	void calc_climate_map_region( sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom );
-
-	/**
-	* Calculates appropriate climate for a region using elliptic areas for each
-	*/
-	void calc_humidity_map_region( sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom );
-
-	/**
-	 * assign climated from the climate map to a region
-	 */
-	void assign_climate_map_region( sint16 xtop, sint16 ytop, sint16 xbottom, sint16 ybottom );
-
-	/**
 	 * Loop recalculating transitions - suitable for multithreading
 	 */
 	void recalc_transitions_loop(sint16, sint16, sint16, sint16);
