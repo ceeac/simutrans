@@ -20,16 +20,11 @@
 #include "../tpl/slist_tpl.h"
 
 #include "../dataobj/settings.h"
-#include "../dataobj/loadsave.h"
-#include "../dataobj/rect.h"
 
 #include "../utils/checklist.h"
 #include "../utils/sha1_hash.h"
 
-#include "simplan.h"
 #include "surface.h"
-
-#include "../simdebug.h"
 
 #include <functional>
 
@@ -54,11 +49,10 @@ class viewport_t;
 class records_t;
 class loadingscreen_t;
 class terraformer_t;
+class rect_t;
 
 
-/**
- * Threaded function caller.
- */
+/// Threaded function caller.
 using xy_loop_func = std::function<void (sint16, sint16, sint16, sint16)>;
 
 
